@@ -10,6 +10,8 @@ import {
   runVideoStage,
   selectVideoCandidate,
 } from "@/server/mvp/pipeline";
+import type { EpisodeSnapshot } from "@/server/mvp/types";
+import { buildEpisodeStudioView } from "@/server/mvp/ui-views";
 
 type Params = {
   params: Promise<{ episodeId: string }>;
@@ -22,6 +24,13 @@ const actionSchema = z.object({
   candidateId: z.string().optional(),
 });
 
+function withStudioView(snapshot: EpisodeSnapshot) {
+  return {
+    ...snapshot,
+    episodeStudio: buildEpisodeStudioView(snapshot.episode.id),
+  };
+}
+
 export async function POST(request: Request, context: Params) {
   try {
     const { episodeId } = await context.params;
@@ -32,7 +41,7 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         textModelRef: payload.textModelRef,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "script") {
@@ -40,7 +49,7 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         textModelRef: payload.textModelRef,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "assets") {
@@ -48,7 +57,7 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         textModelRef: payload.textModelRef,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "storyboard") {
@@ -56,7 +65,7 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         textModelRef: payload.textModelRef,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "video") {
@@ -64,7 +73,7 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         videoModelRef: payload.videoModelRef,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "select-video") {
@@ -82,14 +91,14 @@ export async function POST(request: Request, context: Params) {
         episodeId,
         candidateId: payload.candidateId,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     if (payload.action === "final-cut") {
       const snapshot = await runFinalCutStage({
         episodeId,
       });
-      return NextResponse.json({ ok: true, data: snapshot });
+      return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
     }
 
     const snapshot = await runEpisodePipeline({
@@ -97,7 +106,7 @@ export async function POST(request: Request, context: Params) {
       textModelRef: payload.textModelRef,
       videoModelRef: payload.videoModelRef,
     });
-    return NextResponse.json({ ok: true, data: snapshot });
+    return NextResponse.json({ ok: true, data: withStudioView(snapshot) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "执行失败";
     return NextResponse.json(
@@ -109,4 +118,3 @@ export async function POST(request: Request, context: Params) {
     );
   }
 }
-

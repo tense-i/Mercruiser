@@ -228,6 +228,9 @@ export function importSeriesFromNovel(input: {
   title: string;
   summary?: string;
   genre?: string;
+  worldview?: string;
+  visualGuide?: string;
+  directorGuide?: string;
   rawText?: string;
   episodeSources?: EpisodeSourceInput[];
   maxEpisodes?: number;
@@ -249,6 +252,9 @@ export function importSeriesFromNovel(input: {
     title: input.title,
     summary,
     genre: input.genre,
+    worldview: input.worldview,
+    visualGuide: input.visualGuide,
+    directorGuide: input.directorGuide,
     episodeSources,
   });
 
@@ -708,4 +714,3 @@ export async function runEpisodePipeline(input: {
   await runVideoStage({ episodeId: input.episodeId, videoModelRef: input.videoModelRef });
   return runFinalCutStage({ episodeId: input.episodeId });
 }
-

@@ -14,6 +14,9 @@ const createSeriesSchema = z
     title: z.string().min(1),
     summary: z.string().optional(),
     genre: z.string().optional(),
+    worldview: z.string().optional(),
+    visualGuide: z.string().optional(),
+    directorGuide: z.string().optional(),
     rawText: z.string().optional(),
     maxEpisodes: z.number().int().min(1).max(100).optional(),
     episodeSources: z.array(episodeSourceSchema).optional(),
@@ -64,4 +67,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

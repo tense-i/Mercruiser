@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { mvpStore } from "@/server/mvp/store";
+import { buildSeriesDetailView } from "@/server/mvp/ui-views";
 
 type Params = {
   params: Promise<{ seriesId: string }>;
@@ -19,12 +20,13 @@ export async function GET(_: Request, context: Params) {
   }
 
   const episodes = mvpStore.listEpisodes(seriesId);
+  const seriesDetail = buildSeriesDetailView(seriesId);
   return NextResponse.json({
     ok: true,
     data: {
       series,
       episodes,
+      seriesDetail,
     },
   });
 }
-

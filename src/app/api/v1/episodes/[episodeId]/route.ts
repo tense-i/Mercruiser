@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { mvpStore } from "@/server/mvp/store";
+import { buildEpisodeStudioView } from "@/server/mvp/ui-views";
 
 type Params = {
   params: Promise<{ episodeId: string }>;
@@ -18,9 +19,12 @@ export async function GET(_: Request, context: Params) {
     );
   }
 
+  const episodeStudio = buildEpisodeStudioView(episodeId);
   return NextResponse.json({
     ok: true,
-    data: snapshot,
+    data: {
+      ...snapshot,
+      episodeStudio,
+    },
   });
 }
-
