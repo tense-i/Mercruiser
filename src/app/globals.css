@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+:root {
+  --mc-bg: oklch(0.17 0.01 255);
+  --mc-bg-soft: oklch(0.21 0.015 255);
+  --mc-panel: oklch(0.23 0.015 255);
+  --mc-surface: oklch(0.26 0.016 255);
+  --mc-soft: oklch(0.2 0.014 255);
+  --mc-ink: oklch(0.95 0.01 95);
+  --mc-muted: oklch(0.72 0.01 255);
+  --mc-stroke: oklch(0.36 0.015 255);
+  --mc-border-strong: oklch(0.79 0.055 76);
+  --mc-accent: oklch(0.9 0.05 77);
+  --mc-highlight: oklch(0.86 0.05 95);
+  --mc-good: oklch(0.78 0.11 153);
+  --mc-danger: oklch(0.72 0.17 30);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, color-mix(in oklch, var(--mc-accent) 10%, transparent), transparent 32%),
+    radial-gradient(circle at left, color-mix(in oklch, oklch(0.55 0.08 255) 18%, transparent), transparent 28%),
+    #0b0e13;
+  color: var(--mc-ink);
+  font-family: var(--font-body), "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.font-display {
+  font-family: var(--font-body), "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--mc-stroke) 88%, white 8%);
+  border-radius: 0.95rem;
+  background: #0f141d;
+  color: var(--mc-ink);
+  padding: 0.62rem 0.82rem;
+  font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in oklch, var(--mc-muted) 68%, transparent);
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: color-mix(in oklch, var(--mc-border-strong) 38%, var(--mc-stroke));
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: color-mix(in oklch, var(--mc-border-strong) 64%, white 8%);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--mc-accent) 16%, transparent);
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.mc-canvas-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--mc-stroke) 46%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--mc-stroke) 46%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.mc-panel {
+  border: 1px solid color-mix(in oklch, var(--mc-stroke) 78%, transparent);
+  background: #0f131a;
+  box-shadow: 0 20px 80px color-mix(in oklch, black 35%, transparent);
+}
+
+.mc-soft-panel {
+  border: 1px solid color-mix(in oklch, var(--mc-stroke) 78%, transparent);
+  background: color-mix(in oklch, white 3%, transparent);
+}
+
+.mc-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--mc-muted) 72%, transparent);
+}
+
+/* Normalize legacy light utility usage to the dark style from app.tsx */
+.bg-white {
+  background-color: color-mix(in oklch, white 3%, transparent) !important;
+}
+
+.bg-white\/80,
+.bg-white\/70 {
+  background-color: color-mix(in oklch, white 3%, transparent) !important;
+}
+
+.hover\:bg-white:hover,
+.hover\:bg-white\/70:hover {
+  background-color: color-mix(in oklch, white 5%, transparent) !important;
+}
+
+@media (max-width: 1023px) {
+  body {
+    background:
+      radial-gradient(circle at top right, color-mix(in oklch, var(--mc-accent) 7%, transparent), transparent 38%),
+      #0b0e13;
+  }
+}
