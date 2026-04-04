@@ -1,0 +1,118 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: Deployment environment
+        required: true
+        default: production
+        type: choice
+        options:
+          - preview
+          - production
+      ref:
+        description: Branch/tag/SHA to deploy (manual only)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cd-${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Resolve ref
+        id: resolve_ref
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "value=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ inputs.ref }}" ]; then
+            echo "value=${{ inputs.ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve_ref.outputs.value }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --fund=false
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          [ -n "$VERCEL_TOKEN" ] || { echo "::error::Missing secret VERCEL_TOKEN"; exit 1; }
+          [ -n "$VERCEL_ORG_ID" ] || { echo "::error::Missing secret VERCEL_ORG_ID"; exit 1; }
+          [ -n "$VERCEL_PROJECT_ID" ] || { echo "::error::Missing secret VERCEL_PROJECT_ID"; exit 1; }
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Resolve deploy mode
+        id: mode
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.deploy_env }}" = "preview" ]; then
+            echo "vercel_env=preview" >> "$GITHUB_OUTPUT"
+            echo "vercel_flags=" >> "$GITHUB_OUTPUT"
+          else
+            echo "vercel_env=production" >> "$GITHUB_OUTPUT"
+            echo "vercel_flags=--prod" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=${{ steps.mode.outputs.vercel_env }} --token="$VERCEL_TOKEN"
+
+      - name: Build with Vercel
+        run: vercel build ${{ steps.mode.outputs.vercel_flags }} --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel
+        id: deploy
+        shell: bash
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt ${{ steps.mode.outputs.vercel_flags }} --token="$VERCEL_TOKEN" --yes | tail -n 1)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $DEPLOY_URL"
+
+      - name: Deployment summary
+        run: |
+          {
+            echo "## CD Result"
+            echo ""
+            echo "- Ref: ${{ steps.resolve_ref.outputs.value }}"
+            echo "- Environment: ${{ steps.mode.outputs.vercel_env }}"
+            echo "- URL: ${{ steps.deploy.outputs.url }}"
+          } >> "$GITHUB_STEP_SUMMARY"

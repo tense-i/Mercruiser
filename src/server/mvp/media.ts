@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
 import { promisify } from "node:util";
 
@@ -8,6 +8,9 @@ const execFileAsync = promisify(execFile);
 
 const PUBLIC_ROOT = join(process.cwd(), "public");
 const MEDIA_ROOT = join(PUBLIC_ROOT, "mvp-media");
+const FALLBACK_CLIP = join(MEDIA_ROOT, "_fallback", "placeholder.mp4");
+
+let ffmpegReady: boolean | null = null;
 
 function colorFromSeed(seed: string): string {
   const hash = createHash("md5").update(seed).digest("hex").slice(0, 6);
@@ -21,6 +24,24 @@ function toPublicUrl(absPath: string): string {
 
 async function ensureDir(path: string): Promise<void> {
   await mkdir(path, { recursive: true });
+}
+
+async function checkFfmpeg(): Promise<boolean> {
+  if (ffmpegReady !== null) {
+    return ffmpegReady;
+  }
+  try {
+    await execFileAsync("ffmpeg", ["-version"]);
+    ffmpegReady = true;
+  } catch {
+    ffmpegReady = false;
+  }
+  return ffmpegReady;
+}
+
+async function ensureFallbackClip(targetPath: string): Promise<void> {
+  await ensureDir(dirname(targetPath));
+  await copyFile(FALLBACK_CLIP, targetPath);
 }
 
 export async function writePublicJson(filePath: string, payload: unknown): Promise<string> {
@@ -42,6 +63,12 @@ export async function createSyntheticClip(input: {
 
   const filename = `${input.storyboardId}-${input.index + 1}.mp4`;
   const absPath = join(dir, filename);
+
+  if (!(await checkFfmpeg())) {
+    await ensureFallbackClip(absPath);
+    return { absPath, publicUrl: toPublicUrl(absPath) };
+  }
+
   const color = colorFromSeed(`${input.episodeId}:${input.storyboardId}:${input.index}`);
 
   // Keep ffmpeg filter text simple to avoid escaping pitfalls in labels.
@@ -82,6 +109,17 @@ export async function concatFinalCut(input: {
   await writeFile(manifestPath, manifest, "utf8");
 
   const outputPath = join(dir, `episode-${input.episodeId}.mp4`);
+
+  if (!(await checkFfmpeg())) {
+    const source = input.clipAbsPaths[0] ?? FALLBACK_CLIP;
+    await ensureDir(dirname(outputPath));
+    await copyFile(source, outputPath);
+    return {
+      absPath: outputPath,
+      publicUrl: toPublicUrl(outputPath),
+      manifestUrl: toPublicUrl(manifestPath),
+    };
+  }
 
   await execFileAsync("ffmpeg", [
     "-y",

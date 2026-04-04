@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getEpisodeStudio, getSeriesById } from "@/lib/mock-data";
+import { buildEpisodeStudioView, buildSeriesDetailView } from "@/server/mvp/ui-views";
 import { EpisodeStudioClient } from "./episode-studio-client";
 
 type PageProps = {
@@ -8,13 +8,12 @@ type PageProps = {
 
 export default async function EpisodeStudioPage({ params }: PageProps) {
   const { seriesId, episodeId } = await params;
-  const series = getSeriesById(seriesId);
-  const episode = getEpisodeStudio(seriesId, episodeId);
+  const series = buildSeriesDetailView(seriesId);
+  const episode = buildEpisodeStudioView(episodeId);
 
-  if (!series || !episode) {
+  if (!series || !episode || episode.seriesId !== seriesId) {
     notFound();
   }
 
   return <EpisodeStudioClient series={series} episode={episode} />;
 }
-

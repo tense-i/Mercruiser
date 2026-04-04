@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSeriesById } from "@/lib/mock-data";
+import { buildSeriesDetailView } from "@/server/mvp/ui-views";
 import { SeriesDetailClient } from "./series-detail-client";
 
 type PageProps = {
@@ -8,7 +8,7 @@ type PageProps = {
 
 export default async function SeriesDetailPage({ params }: PageProps) {
   const { seriesId } = await params;
-  const series = getSeriesById(seriesId);
+  const series = buildSeriesDetailView(seriesId);
 
   if (!series) {
     notFound();

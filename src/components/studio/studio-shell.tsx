@@ -222,11 +222,13 @@ export function ButtonPill({
   tone = "default",
   onClick,
   type,
+  disabled,
 }: {
   children: ReactNode;
   tone?: "default" | "primary" | "quiet" | "danger";
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   const toneClass = {
     default: "border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.06]",
@@ -239,7 +241,10 @@ export function ButtonPill({
     <button
       type={type ?? "button"}
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-2xl border px-3 py-1.5 text-sm font-medium transition ${toneClass}`}
+      disabled={disabled}
+      className={`inline-flex items-center gap-2 rounded-2xl border px-3 py-1.5 text-sm font-medium transition ${toneClass} ${
+        disabled ? "cursor-not-allowed opacity-60" : ""
+      }`}
     >
       {children}
     </button>
