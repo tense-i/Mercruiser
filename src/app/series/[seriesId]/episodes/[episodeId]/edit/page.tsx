@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EpisodeEditClient } from "./episode-edit-client";
-import { getEpisodeSummaryById, getSeriesById } from "@/lib/mock-data";
 import { OrchestratorPanel, StudioShell } from "@/components/studio/studio-shell";
+import { mvpStore } from "@/server/infrastructure/sqlite/store";
 
 type PageProps = {
   params: Promise<{ seriesId: string; episodeId: string }>;
@@ -10,10 +10,10 @@ type PageProps = {
 
 export default async function EpisodeEditPage({ params }: PageProps) {
   const { seriesId, episodeId } = await params;
-  const series = getSeriesById(seriesId);
-  const episode = getEpisodeSummaryById(seriesId, episodeId);
+  const series = mvpStore.getSeries(seriesId);
+  const episode = mvpStore.getEpisode(episodeId);
 
-  if (!series || !episode) {
+  if (!series || !episode || episode.seriesId !== seriesId) {
     notFound();
   }
 

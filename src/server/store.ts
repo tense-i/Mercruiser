@@ -763,6 +763,37 @@ export const mvpStore = {
     return row ? mapEpisode(row) : null;
   },
 
+  updateEpisode(
+    episodeId: string,
+    input: {
+      title?: string;
+      synopsis?: string;
+      sourceText?: string;
+    },
+  ): EpisodeRecord | null {
+    const db = ensureDb();
+    const current = this.getEpisode(episodeId);
+    if (!current) {
+      return null;
+    }
+
+    const updated: EpisodeRecord = {
+      ...current,
+      title: input.title ?? current.title,
+      synopsis: input.synopsis ?? current.synopsis,
+      sourceText: input.sourceText ?? current.sourceText,
+      updatedAt: nowIso(),
+    };
+
+    db.prepare(
+      `UPDATE episodes
+      SET title = ?, synopsis = ?, source_text = ?, updated_at = ?
+      WHERE id = ?`,
+    ).run(updated.title, updated.synopsis, updated.sourceText, updated.updatedAt, episodeId);
+
+    return updated;
+  },
+
   updateEpisodeStage(episodeId: string, stage: EpisodeStage, status: StageStatus): void {
     const db = ensureDb();
     db.prepare("UPDATE episodes SET stage = ?, status = ?, updated_at = ? WHERE id = ?").run(stage, status, nowIso(), episodeId);
