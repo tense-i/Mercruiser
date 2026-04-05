@@ -196,6 +196,18 @@ export interface EpisodeScriptWorkspaceConfigRecord {
   updatedAt: string;
 }
 
+export interface EpisodeChapterRecord {
+  id: string;
+  episodeId: string;
+  chapterCode: string;
+  title: string;
+  content: string;
+  orderIndex: number;
+  status: ScriptChapterStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface EpisodeSnapshot {
   episode: EpisodeRecord;
   entities: EntityRecord[];
@@ -370,6 +382,8 @@ export interface EpisodeScriptWorkspaceView {
     id: string;
     code: string;
     title: string;
+    content: string;
+    orderIndex: number;
     progress: number;
     status: ScriptChapterStatus;
   }>;

@@ -28,6 +28,7 @@ export async function GET(_: Request, context: Params) {
 
 const patchSchema = z.object({
   scriptText: z.string().optional(),
+  chapterDrafts: z.record(z.string(), z.string()).optional(),
   targetWords: z.number().int().min(100).max(10000).optional(),
   chapterCursor: z.string().optional(),
   config: z
@@ -54,7 +55,50 @@ export async function PATCH(request: Request, context: Params) {
     }
 
     const payload = patchSchema.parse(await request.json());
-    if (payload.scriptText && payload.scriptText.trim().length > 0) {
+    if (payload.chapterDrafts && Object.keys(payload.chapterDrafts).length > 0) {
+      const chapters = mvpStore.listEpisodeChapters(episodeId);
+      const missingDraftEntries = Object.entries(payload.chapterDrafts).filter(
+        ([chapterId]) => !chapters.some((chapter) => chapter.id === chapterId),
+      );
+
+      for (const [chapterId, content] of missingDraftEntries) {
+        if (chapterId === episodeId) {
+          mvpStore.saveEpisodeChapter({
+            id: episodeId,
+            episodeId,
+            chapterCode: "第1章",
+            title: episode.title,
+            content,
+            orderIndex: 0,
+            status: payload.chapterCursor === episodeId ? "active" : "ready",
+          });
+        }
+      }
+
+      const nextChapters = mvpStore.listEpisodeChapters(episodeId).map((chapter) =>
+        mvpStore.saveEpisodeChapter({
+          id: chapter.id,
+          episodeId,
+          chapterCode: chapter.chapterCode,
+          title: chapter.title,
+          content: payload.chapterDrafts?.[chapter.id] ?? chapter.content,
+          orderIndex: chapter.orderIndex,
+          status: chapter.id === payload.chapterCursor ? "active" : (payload.chapterDrafts?.[chapter.id] ?? chapter.content).trim() ? "ready" : "draft",
+        }),
+      );
+      const aggregatedScript = nextChapters
+        .sort((a, b) => a.orderIndex - b.orderIndex)
+        .map((chapter) => `${chapter.chapterCode} · ${chapter.title}\n\n${chapter.content}`.trim())
+        .join("\n\n");
+      mvpStore.saveScript(episodeId, {
+        strategy: "基于章节草稿保存剧本版本",
+        outline: nextChapters.map((chapter) => chapter.title),
+        scriptText: aggregatedScript,
+      });
+      if (episode.stage === "planning" || episode.stage === "script") {
+        mvpStore.updateEpisodeStage(episodeId, "assets", "ready");
+      }
+    } else if (payload.scriptText && payload.scriptText.trim().length > 0) {
       const latest = mvpStore.getLatestScript(episodeId);
       mvpStore.saveScript(episodeId, {
         strategy: latest?.strategy ?? "人工编辑保存剧本版本",

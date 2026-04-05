@@ -24,15 +24,7 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
   const [chapterCursor, setChapterCursor] = useState(workspace.chapterCursor);
   const [chapterDrafts, setChapterDrafts] = useState<Record<string, string>>(() => {
     return Object.fromEntries(
-      workspace.chapters.map((chapter) => {
-        if (chapter.id === workspace.episodeId) {
-          return [chapter.id, workspace.scriptText];
-        }
-        return [
-          chapter.id,
-          `${chapter.code} · ${chapter.title}\n\n（该章节使用归档文案占位，可切换后继续补写或重排对白节奏。）`,
-        ];
-      }),
+      workspace.chapters.map((chapter) => [chapter.id, chapter.content]),
     );
   });
   const [aspectRatio, setAspectRatio] = useState<ScriptAspectRatio>(workspace.config.aspectRatio);
@@ -70,7 +62,7 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          scriptText: chapterDrafts[workspace.episodeId] ?? workspace.scriptText,
+          chapterDrafts,
           chapterCursor,
           config: {
             aspectRatio,
@@ -88,6 +80,40 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "保存失败");
       return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addChapter = async () => {
+    if (saving) {
+      return;
+    }
+    setSaving(true);
+    setSaveError(null);
+    setSaveNotice(null);
+    try {
+      const response = await fetch(`/api/v1/episodes/${workspace.episodeId}/chapters`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: `章节 ${workspace.chapters.length + 1}` }),
+      });
+      const json = (await response.json()) as { ok: boolean; data?: { workspace?: EpisodeScriptWorkspace }; error?: string };
+      if (!response.ok || !json.ok || !json.data?.workspace) {
+        throw new Error(json.error ?? "新增章节失败");
+      }
+      const nextWorkspace = json.data.workspace;
+      setChapterDrafts((prev) => ({
+        ...prev,
+        ...Object.fromEntries(nextWorkspace.chapters.map((chapter) => [chapter.id, chapter.content])),
+      }));
+      setChapterCursor(nextWorkspace.chapters[nextWorkspace.chapters.length - 1]?.id ?? chapterCursor);
+      setSaveNotice("已新增章节。");
+      router.refresh();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "新增章节失败");
     } finally {
       setSaving(false);
     }
@@ -159,9 +185,9 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
             })}
           </div>
 
-          <ButtonPill tone="quiet">
+          <ButtonPill tone="quiet" onClick={() => void addChapter()} disabled={saving}>
             <Sparkle size={14} />
-            添加剧集
+            {saving ? "处理中..." : "添加章节"}
           </ButtonPill>
         </aside>
 

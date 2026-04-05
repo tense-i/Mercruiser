@@ -282,19 +282,30 @@ export function buildEpisodeScriptWorkspaceView(episodeId: string): EpisodeScrip
     return null;
   }
 
-  const episodes = mvpStore.listEpisodes(series.id);
   const workspaceConfig = mvpStore.getEpisodeScriptWorkspaceConfig(episodeId);
   const currentScript = mvpStore.getLatestScript(episodeId);
+  const storedChapters = mvpStore.listEpisodeChapters(episodeId);
 
-  const chapters = episodes.map((item) => {
-    const script = mvpStore.getLatestScript(item.id);
+  const chapters = storedChapters.map((chapter) => {
+    const status: "active" | "ready" | "draft" =
+      chapter.id === (workspaceConfig?.chapterCursor || storedChapters[0]?.id)
+        ? "active"
+        : chapter.content.trim()
+          ? "ready"
+          : "draft";
+
     return {
-      id: item.id,
-      code: item.code,
-      title: item.title,
-      progress: normalizeProgress(item.stage, item.status),
-      status: item.id === episodeId ? "active" : script ? "ready" : "draft",
-    } as const;
+    id: chapter.id,
+    code: chapter.chapterCode,
+    title: chapter.title,
+    content: chapter.content,
+    orderIndex: chapter.orderIndex,
+    progress:
+      chapter.content.trim().length > 0
+        ? Math.min(100, Math.round((chapter.content.replace(/\s+/g, "").length / (workspaceConfig?.targetWords ?? 1200)) * 100))
+        : 0,
+      status,
+    };
   });
 
   return {
@@ -303,9 +314,9 @@ export function buildEpisodeScriptWorkspaceView(episodeId: string): EpisodeScrip
     seriesTitle: series.title,
     episodeCode: episode.code,
     episodeTitle: episode.title,
-    scriptText: currentScript?.scriptText ?? `${episode.code} · ${episode.title}\n\n${episode.sourceText}`,
+    scriptText: currentScript?.scriptText ?? chapters[0]?.content ?? `${episode.code} · ${episode.title}\n\n${episode.sourceText}`,
     targetWords: workspaceConfig?.targetWords ?? 1200,
-    chapterCursor: workspaceConfig?.chapterCursor || episodeId,
+    chapterCursor: workspaceConfig?.chapterCursor || chapters[0]?.id || episodeId,
     chapters,
     config: {
       aspectRatio: workspaceConfig?.aspectRatio ?? "9:16",

@@ -5,12 +5,14 @@ import Database from "better-sqlite3";
 import type {
   AssetRecord,
   EntityRecord,
+  EpisodeChapterRecord,
   EpisodeRecord,
   EpisodeScriptWorkspaceConfigRecord,
   EpisodeSnapshot,
   EpisodeStage,
   FinalCutRecord,
   ScriptRecord,
+  ScriptChapterStatus,
   SeriesRecord,
   SeriesSharedAssetRecord,
   SeriesSharedAssetVariantRecord,
@@ -300,6 +302,19 @@ function ensureDb(): Database.Database {
       chapter_cursor TEXT NOT NULL DEFAULT '',
       quick_notes_json TEXT NOT NULL DEFAULT '[]',
       style_references_json TEXT NOT NULL DEFAULT '[]',
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS episode_script_chapters (
+      id TEXT PRIMARY KEY,
+      episode_id TEXT NOT NULL,
+      chapter_code TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      order_index INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'draft',
+      created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
     );
@@ -1036,6 +1051,170 @@ export const mvpStore = {
       scriptText: String(row.script_text),
       createdAt: String(row.created_at),
     };
+  },
+
+  listEpisodeChapters(episodeId: string): EpisodeChapterRecord[] {
+    const db = ensureDb();
+    const rows = db
+      .prepare("SELECT * FROM episode_script_chapters WHERE episode_id = ? ORDER BY order_index ASC, created_at ASC")
+      .all(episodeId) as Record<string, unknown>[];
+
+    if (rows.length === 0) {
+      const episode = this.getEpisode(episodeId);
+      if (!episode) {
+        return [];
+      }
+      const script = this.getLatestScript(episodeId);
+      return [
+        {
+          id: episode.id,
+          episodeId,
+          chapterCode: "第1章",
+          title: episode.title,
+          content: script?.scriptText ?? episode.sourceText,
+          orderIndex: 0,
+          status: "active",
+          createdAt: episode.createdAt,
+          updatedAt: episode.updatedAt,
+        },
+      ];
+    }
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      episodeId: String(row.episode_id),
+      chapterCode: String(row.chapter_code),
+      title: String(row.title),
+      content: String(row.content),
+      orderIndex: Number(row.order_index),
+      status: String(row.status) as ScriptChapterStatus,
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
+    }));
+  },
+
+  createEpisodeChapter(input: {
+    episodeId: string;
+    chapterCode?: string;
+    title?: string;
+    content?: string;
+  }): EpisodeChapterRecord | null {
+    const db = ensureDb();
+    const episode = this.getEpisode(input.episodeId);
+    if (!episode) {
+      return null;
+    }
+    const persistedCount = (
+      db.prepare("SELECT COUNT(*) AS count FROM episode_script_chapters WHERE episode_id = ?").get(input.episodeId) as {
+        count: number;
+      }
+    ).count;
+    if (persistedCount === 0) {
+      const script = this.getLatestScript(input.episodeId);
+      const fallbackNow = nowIso();
+      db.prepare(
+        `INSERT INTO episode_script_chapters (
+          id, episode_id, chapter_code, title, content, order_index, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        episode.id,
+        input.episodeId,
+        "第1章",
+        episode.title,
+        script?.scriptText ?? episode.sourceText,
+        0,
+        "active",
+        episode.createdAt,
+        fallbackNow,
+      );
+    }
+    const createdAt = nowIso();
+    const existing = this.listEpisodeChapters(input.episodeId);
+    const orderIndex = existing.length;
+    const chapter: EpisodeChapterRecord = {
+      id: `chapter_${randomUUID()}`,
+      episodeId: input.episodeId,
+      chapterCode: input.chapterCode ?? `第${orderIndex + 1}章`,
+      title: input.title ?? `章节 ${orderIndex + 1}`,
+      content: input.content ?? "",
+      orderIndex,
+      status: orderIndex === 0 ? "active" : "draft",
+      createdAt,
+      updatedAt: createdAt,
+    };
+
+    db.prepare(
+      `INSERT INTO episode_script_chapters (
+        id, episode_id, chapter_code, title, content, order_index, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run(
+      chapter.id,
+      chapter.episodeId,
+      chapter.chapterCode,
+      chapter.title,
+      chapter.content,
+      chapter.orderIndex,
+      chapter.status,
+      chapter.createdAt,
+      chapter.updatedAt,
+    );
+
+    return chapter;
+  },
+
+  saveEpisodeChapter(input: {
+    id?: string;
+    episodeId: string;
+    chapterCode: string;
+    title: string;
+    content: string;
+    orderIndex?: number;
+    status?: ScriptChapterStatus;
+  }): EpisodeChapterRecord {
+    const db = ensureDb();
+    const now = nowIso();
+    const current =
+      input.id
+        ? (db.prepare("SELECT * FROM episode_script_chapters WHERE id = ?").get(input.id) as Record<string, unknown> | undefined)
+        : undefined;
+    const existing = this.listEpisodeChapters(input.episodeId);
+    const orderIndex = input.orderIndex ?? (current ? Number(current.order_index) : existing.length);
+    const record: EpisodeChapterRecord = {
+      id: input.id ?? `chapter_${randomUUID()}`,
+      episodeId: input.episodeId,
+      chapterCode: input.chapterCode,
+      title: input.title,
+      content: input.content,
+      orderIndex,
+      status: input.status ?? (current ? (String(current.status) as ScriptChapterStatus) : "draft"),
+      createdAt: current ? String(current.created_at) : now,
+      updatedAt: now,
+    };
+
+    db.prepare(
+      `INSERT INTO episode_script_chapters (
+        id, episode_id, chapter_code, title, content, order_index, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        chapter_code = excluded.chapter_code,
+        title = excluded.title,
+        content = excluded.content,
+        order_index = excluded.order_index,
+        status = excluded.status,
+        updated_at = excluded.updated_at`,
+    ).run(
+      record.id,
+      record.episodeId,
+      record.chapterCode,
+      record.title,
+      record.content,
+      record.orderIndex,
+      record.status,
+      record.createdAt,
+      record.updatedAt,
+    );
+
+    return record;
   },
 
   getEpisodeScriptWorkspaceConfig(episodeId: string): EpisodeScriptWorkspaceConfigRecord | null {
