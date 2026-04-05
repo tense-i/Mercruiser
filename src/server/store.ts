@@ -5,6 +5,7 @@ import Database from "better-sqlite3";
 import type {
   AssetRecord,
   EntityRecord,
+  EpisodeShotRecord,
   EpisodeChapterRecord,
   EpisodeRecord,
   EpisodeScriptWorkspaceConfigRecord,
@@ -314,6 +315,28 @@ function ensureDb(): Database.Database {
       content TEXT NOT NULL,
       order_index INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'draft',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS episode_shots (
+      id TEXT PRIMARY KEY,
+      episode_id TEXT NOT NULL,
+      chapter_id TEXT,
+      shot_code TEXT NOT NULL,
+      scene TEXT NOT NULL DEFAULT '',
+      shot_size TEXT NOT NULL DEFAULT '',
+      composition TEXT NOT NULL DEFAULT '',
+      camera_movement TEXT NOT NULL DEFAULT '',
+      lighting TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      sound_effect TEXT NOT NULL DEFAULT '',
+      dialogue TEXT NOT NULL DEFAULT '',
+      duration_seconds INTEGER NOT NULL DEFAULT 3,
+      status TEXT NOT NULL DEFAULT 'draft',
+      order_index INTEGER NOT NULL,
+      locked INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       FOREIGN KEY(episode_id) REFERENCES episodes(id) ON DELETE CASCADE
@@ -1210,6 +1233,247 @@ export const mvpStore = {
       record.content,
       record.orderIndex,
       record.status,
+      record.createdAt,
+      record.updatedAt,
+    );
+
+    return record;
+  },
+
+  listEpisodeShots(episodeId: string): EpisodeShotRecord[] {
+    const db = ensureDb();
+    const rows = db
+      .prepare("SELECT * FROM episode_shots WHERE episode_id = ? ORDER BY order_index ASC, created_at ASC")
+      .all(episodeId) as Record<string, unknown>[];
+
+    if (rows.length === 0) {
+      const storyboards = this.listStoryboards(episodeId);
+      if (storyboards.length > 0) {
+        return storyboards.map((frame, index) => ({
+          id: frame.id,
+          episodeId,
+          chapterId: null,
+          shotCode: `${frame.shotIndex}-${index + 1}`,
+          scene: "@原场景",
+          shotSize: "中景",
+          composition: "常规构图",
+          cameraMovement: "固定镜头",
+          lighting: "默认光影",
+          description: frame.action,
+          soundEffect: frame.dialogue ? "按对白节奏补音效" : "-",
+          dialogue: frame.dialogue,
+          durationSeconds: frame.durationSeconds,
+          status: frame.status === "locked" ? "locked" : "ready",
+          orderIndex: index,
+          locked: frame.status === "locked",
+          createdAt: frame.createdAt,
+          updatedAt: frame.createdAt,
+        }));
+      }
+
+      const chapter = this.listEpisodeChapters(episodeId)[0];
+      if (!chapter) {
+        return [];
+      }
+      return [
+        {
+          id: `shot_seed_${episodeId}`,
+          episodeId,
+          chapterId: chapter.id,
+          shotCode: "1-1",
+          scene: "@待补场景",
+          shotSize: "中景",
+          composition: "常规构图",
+          cameraMovement: "固定镜头",
+          lighting: "自然光",
+          description: chapter.content.trim() || "待补分镜描述",
+          soundEffect: "-",
+          dialogue: "",
+          durationSeconds: 3,
+          status: "draft",
+          orderIndex: 0,
+          locked: false,
+          createdAt: chapter.createdAt,
+          updatedAt: chapter.updatedAt,
+        },
+      ];
+    }
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      episodeId: String(row.episode_id),
+      chapterId: row.chapter_id ? String(row.chapter_id) : null,
+      shotCode: String(row.shot_code),
+      scene: String(row.scene ?? ""),
+      shotSize: String(row.shot_size ?? ""),
+      composition: String(row.composition ?? ""),
+      cameraMovement: String(row.camera_movement ?? ""),
+      lighting: String(row.lighting ?? ""),
+      description: String(row.description ?? ""),
+      soundEffect: String(row.sound_effect ?? ""),
+      dialogue: String(row.dialogue ?? ""),
+      durationSeconds: Number(row.duration_seconds ?? 3),
+      status: String(row.status) as EpisodeShotRecord["status"],
+      orderIndex: Number(row.order_index ?? 0),
+      locked: Number(row.locked) === 1,
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
+    }));
+  },
+
+  createEpisodeShot(input: {
+    episodeId: string;
+    chapterId?: string | null;
+    scene?: string;
+    description?: string;
+  }): EpisodeShotRecord | null {
+    const db = ensureDb();
+    const episode = this.getEpisode(input.episodeId);
+    if (!episode) {
+      return null;
+    }
+    const existingCount = (
+      db.prepare("SELECT COUNT(*) AS count FROM episode_shots WHERE episode_id = ?").get(input.episodeId) as {
+        count: number;
+      }
+    ).count;
+    const createdAt = nowIso();
+    const orderIndex = existingCount;
+    const shot: EpisodeShotRecord = {
+      id: `shot_${randomUUID()}`,
+      episodeId: input.episodeId,
+      chapterId: input.chapterId ?? null,
+      shotCode: `${orderIndex + 1}-1`,
+      scene: input.scene ?? "@待补场景",
+      shotSize: "中景",
+      composition: "常规构图",
+      cameraMovement: "固定镜头",
+      lighting: "自然光",
+      description: input.description ?? "待补分镜描述",
+      soundEffect: "-",
+      dialogue: "",
+      durationSeconds: 3,
+      status: "draft",
+      orderIndex,
+      locked: false,
+      createdAt,
+      updatedAt: createdAt,
+    };
+
+    db.prepare(
+      `INSERT INTO episode_shots (
+        id, episode_id, chapter_id, shot_code, scene, shot_size, composition, camera_movement, lighting,
+        description, sound_effect, dialogue, duration_seconds, status, order_index, locked, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run(
+      shot.id,
+      shot.episodeId,
+      shot.chapterId,
+      shot.shotCode,
+      shot.scene,
+      shot.shotSize,
+      shot.composition,
+      shot.cameraMovement,
+      shot.lighting,
+      shot.description,
+      shot.soundEffect,
+      shot.dialogue,
+      shot.durationSeconds,
+      shot.status,
+      shot.orderIndex,
+      shot.locked ? 1 : 0,
+      shot.createdAt,
+      shot.updatedAt,
+    );
+
+    return shot;
+  },
+
+  saveEpisodeShot(input: {
+    id?: string;
+    episodeId: string;
+    chapterId?: string | null;
+    shotCode: string;
+    scene: string;
+    shotSize: string;
+    composition: string;
+    cameraMovement: string;
+    lighting: string;
+    description: string;
+    soundEffect: string;
+    dialogue: string;
+    durationSeconds: number;
+    status?: EpisodeShotRecord["status"];
+    orderIndex?: number;
+    locked?: boolean;
+  }): EpisodeShotRecord {
+    const db = ensureDb();
+    const now = nowIso();
+    const current =
+      input.id
+        ? (db.prepare("SELECT * FROM episode_shots WHERE id = ?").get(input.id) as Record<string, unknown> | undefined)
+        : undefined;
+    const existing = this.listEpisodeShots(input.episodeId);
+    const orderIndex = input.orderIndex ?? (current ? Number(current.order_index) : existing.length);
+    const record: EpisodeShotRecord = {
+      id: input.id ?? `shot_${randomUUID()}`,
+      episodeId: input.episodeId,
+      chapterId: input.chapterId ?? (current?.chapter_id ? String(current.chapter_id) : null),
+      shotCode: input.shotCode,
+      scene: input.scene,
+      shotSize: input.shotSize,
+      composition: input.composition,
+      cameraMovement: input.cameraMovement,
+      lighting: input.lighting,
+      description: input.description,
+      soundEffect: input.soundEffect,
+      dialogue: input.dialogue,
+      durationSeconds: input.durationSeconds,
+      status: input.status ?? (current ? (String(current.status) as EpisodeShotRecord["status"]) : "draft"),
+      orderIndex,
+      locked: input.locked ?? (current ? Number(current.locked) === 1 : false),
+      createdAt: current ? String(current.created_at) : now,
+      updatedAt: now,
+    };
+
+    db.prepare(
+      `INSERT INTO episode_shots (
+        id, episode_id, chapter_id, shot_code, scene, shot_size, composition, camera_movement, lighting,
+        description, sound_effect, dialogue, duration_seconds, status, order_index, locked, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        chapter_id = excluded.chapter_id,
+        shot_code = excluded.shot_code,
+        scene = excluded.scene,
+        shot_size = excluded.shot_size,
+        composition = excluded.composition,
+        camera_movement = excluded.camera_movement,
+        lighting = excluded.lighting,
+        description = excluded.description,
+        sound_effect = excluded.sound_effect,
+        dialogue = excluded.dialogue,
+        duration_seconds = excluded.duration_seconds,
+        status = excluded.status,
+        order_index = excluded.order_index,
+        locked = excluded.locked,
+        updated_at = excluded.updated_at`,
+    ).run(
+      record.id,
+      record.episodeId,
+      record.chapterId,
+      record.shotCode,
+      record.scene,
+      record.shotSize,
+      record.composition,
+      record.cameraMovement,
+      record.lighting,
+      record.description,
+      record.soundEffect,
+      record.dialogue,
+      record.durationSeconds,
+      record.status,
+      record.orderIndex,
+      record.locked ? 1 : 0,
       record.createdAt,
       record.updatedAt,
     );

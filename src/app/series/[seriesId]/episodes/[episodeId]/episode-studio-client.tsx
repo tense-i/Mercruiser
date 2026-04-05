@@ -6,6 +6,7 @@ import { ArrowClockwise, Check, DownloadSimple, Lock, Sparkle, Warning } from "@
 import type { EpisodeStage as StageId, EpisodeStudioView as EpisodeStudio, SeriesDetailView as SeriesDetail } from "@/server/mvp/types";
 import { stageLabels, statusLabels } from "@/lib/mvp-ui";
 import { EpisodeWorkbenchShell } from "@/domains/episode/view/episode-workbench-shell";
+import { ShotTable } from "@/domains/shot/view/shot-table";
 import {
   ButtonPill,
   OrchestratorPanel,
@@ -281,7 +282,9 @@ export function EpisodeStudioClient({
       ) : null}
 
       {activeStage === "storyboard" ? (
-        <div className="mt-4 rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
+        <div className="mt-4 space-y-3">
+          <ShotTable episodeId={episodeState.episodeId} />
+          <div className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">分镜列表 / 局部修复</p>
               <div className="mt-3 space-y-3">
                 {episodeState.storyboard.frames.map((frame) => (
@@ -306,6 +309,7 @@ export function EpisodeStudioClient({
                   </article>
                 ))}
               </div>
+          </div>
         </div>
       ) : null}
 

@@ -122,6 +122,27 @@ export interface StoryboardRecord {
   createdAt: string;
 }
 
+export interface EpisodeShotRecord {
+  id: string;
+  episodeId: string;
+  chapterId: string | null;
+  shotCode: string;
+  scene: string;
+  shotSize: string;
+  composition: string;
+  cameraMovement: string;
+  lighting: string;
+  description: string;
+  soundEffect: string;
+  dialogue: string;
+  durationSeconds: number;
+  status: "draft" | "ready" | "locked";
+  orderIndex: number;
+  locked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface VideoCandidateRecord {
   id: string;
   episodeId: string;
