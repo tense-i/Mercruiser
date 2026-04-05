@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { mvpStore } from "@/server/mvp/store";
-import { buildEpisodeStudioView } from "@/server/mvp/ui-views";
+import { buildEpisodeStudioView } from "@/server/application/views/series-episode-views";
+import { mvpStore } from "@/server/infrastructure/sqlite/store";
 
 type Params = {
   params: Promise<{ episodeId: string }>;

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { mvpStore } from "@/server/mvp/store";
+import { mvpStore } from "@/server/infrastructure/sqlite/store";
 import type { VendorConfig } from "@/server/mvp/types";
-import { getDefaultModelRef } from "@/server/mvp/vendors";
+import { getDefaultModelRef } from "@/server/infrastructure/vendors";
 
 const vendorModelSchema = z.object({
   name: z.string().min(1),

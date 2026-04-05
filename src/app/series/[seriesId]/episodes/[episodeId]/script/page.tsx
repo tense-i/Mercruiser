@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getEpisodeScriptWorkspace } from "@/lib/mock-data";
+import { buildEpisodeScriptWorkspaceView } from "@/server/application/views/series-episode-views";
 import { EpisodeScriptClient } from "./episode-script-client";
 
 type PageProps = {
@@ -8,9 +8,9 @@ type PageProps = {
 
 export default async function EpisodeScriptPage({ params }: PageProps) {
   const { seriesId, episodeId } = await params;
-  const workspace = getEpisodeScriptWorkspace(seriesId, episodeId);
+  const workspace = buildEpisodeScriptWorkspaceView(episodeId);
 
-  if (!workspace) {
+  if (!workspace || workspace.seriesId !== seriesId) {
     notFound();
   }
 

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { buildSeriesDetailView } from "@/server/mvp/ui-views";
+import { buildSeriesDetailView } from "@/server/application/views/series-episode-views";
 import { SeriesDetailClient } from "./series-detail-client";
 
 type PageProps = {

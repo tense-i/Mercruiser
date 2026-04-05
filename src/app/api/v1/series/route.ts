@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { importSeriesFromNovel } from "@/server/mvp/pipeline";
-import { mvpStore } from "@/server/mvp/store";
+import { bootstrapSeriesToScript, importSeriesFromNovel } from "@/server/application/orchestrators/series-bootstrap";
+import { mvpStore } from "@/server/infrastructure/sqlite/store";
 
 const episodeSourceSchema = z.object({
   title: z.string().min(1),
@@ -20,6 +20,7 @@ const createSeriesSchema = z
     rawText: z.string().optional(),
     maxEpisodes: z.number().int().min(1).max(100).optional(),
     episodeSources: z.array(episodeSourceSchema).optional(),
+    autoAnalyzeOnImport: z.boolean().optional().default(true),
   })
   .superRefine((value, ctx) => {
     const hasRawText = Boolean(value.rawText && value.rawText.trim().length > 0);
@@ -52,9 +53,25 @@ export async function POST(request: Request) {
   try {
     const payload = createSeriesSchema.parse(await request.json());
     const result = importSeriesFromNovel(payload);
+
+    const autoAnalyze = payload.autoAnalyzeOnImport === true;
+    if (autoAnalyze) {
+      void bootstrapSeriesToScript({
+        seriesId: result.seriesId,
+        episodeIds: result.episodeIds,
+      });
+    }
+
     return NextResponse.json({
       ok: true,
-      data: result,
+      data: {
+        ...result,
+        analysis: {
+          mode: "async",
+          targetStage: "script",
+          started: autoAnalyze,
+        },
+      },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "导入系列失败";

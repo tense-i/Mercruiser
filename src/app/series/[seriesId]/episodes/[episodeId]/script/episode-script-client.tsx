@@ -2,13 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowClockwise, CheckCircle, Circle, Sparkle, Warning } from "@phosphor-icons/react/dist/ssr";
-import type {
-  EpisodeScriptWorkspace,
-  ScriptAspectRatio,
-  ScriptCreationMode,
-  ScriptVisualTone,
-} from "@/lib/mock-data";
+import type { EpisodeScriptWorkspaceView as EpisodeScriptWorkspace, ScriptAspectRatio, ScriptCreationMode, ScriptVisualTone } from "@/server/mvp/types";
 import { ButtonPill, StudioShell } from "@/components/studio/studio-shell";
 
 const aspectRatioOptions: ScriptAspectRatio[] = ["16:9", "9:16", "4:3", "3:4"];
@@ -24,6 +20,7 @@ const visualToneOptions: Array<{ id: ScriptVisualTone; label: string }> = [
 ];
 
 export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWorkspace }) {
+  const router = useRouter();
   const [chapterCursor, setChapterCursor] = useState(workspace.chapterCursor);
   const [chapterDrafts, setChapterDrafts] = useState<Record<string, string>>(() => {
     return Object.fromEntries(
@@ -44,6 +41,9 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
   const [selectedStyleId, setSelectedStyleId] = useState(
     workspace.styleReferences.find((item) => item.selected)?.id ?? workspace.styleReferences[0]?.id ?? "",
   );
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
 
   const currentChapter =
     workspace.chapters.find((chapter) => chapter.id === chapterCursor) ?? workspace.chapters[0];
@@ -55,6 +55,43 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
     () => workspace.styleReferences.filter((style) => style.tone === visualTone),
     [visualTone, workspace.styleReferences],
   );
+
+  const saveWorkspace = async () => {
+    if (saving) {
+      return false;
+    }
+    setSaving(true);
+    setSaveError(null);
+    setSaveNotice(null);
+    try {
+      const response = await fetch(`/api/v1/episodes/${workspace.episodeId}/script-workspace`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          scriptText: chapterDrafts[workspace.episodeId] ?? workspace.scriptText,
+          chapterCursor,
+          config: {
+            aspectRatio,
+            creationMode,
+            visualTone,
+          },
+        }),
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "保存失败");
+      }
+      setSaveNotice("剧本草稿已保存。");
+      return true;
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "保存失败");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <StudioShell
@@ -76,9 +113,9 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
           >
             返回集工作台
           </Link>
-          <ButtonPill tone="primary">
+          <ButtonPill tone="primary" onClick={() => void saveWorkspace()} disabled={saving}>
             <CheckCircle size={14} />
-            保存剧本草稿
+            {saving ? "保存中..." : "保存剧本草稿"}
           </ButtonPill>
         </>
       }
@@ -171,8 +208,22 @@ export function EpisodeScriptClient({ workspace }: { workspace: EpisodeScriptWor
               <ArrowClockwise size={14} />
               重生本段
             </ButtonPill>
-            <ButtonPill tone="primary">确认并推进分镜</ButtonPill>
+            <ButtonPill
+              tone="primary"
+              onClick={() =>
+                void (async () => {
+                  const ok = await saveWorkspace();
+                  if (ok) {
+                    router.push(`/series/${workspace.seriesId}/episodes/${workspace.episodeId}`);
+                  }
+                })()
+              }
+            >
+              确认并推进分镜
+            </ButtonPill>
           </div>
+          {saveError ? <p className="mt-2 text-sm text-[var(--mc-danger)]">{saveError}</p> : null}
+          {saveNotice ? <p className="mt-2 text-sm text-[var(--mc-good)]">{saveNotice}</p> : null}
         </section>
 
         <aside className="mc-soft-panel rounded-[1.4rem] p-4">

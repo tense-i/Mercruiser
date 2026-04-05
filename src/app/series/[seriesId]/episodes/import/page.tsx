@@ -28,6 +28,40 @@ export default function EpisodeImportPage() {
     "Episode 06 · 雨后门廊 | 角色关系出现新误解，线索转向旧相册。\nEpisode 07 · 走廊低语 | 门外对话暴露母亲的隐藏信息。",
   );
   const preview = useMemo(() => parseEpisodes(rawInput), [rawInput]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const createBatch = async () => {
+    if (preview.length === 0 || submitting) {
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/v1/series/${seriesId}/episodes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          episodes: preview.map((item) => ({
+            title: item.title,
+            synopsis: item.summary,
+          })),
+        }),
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "批量导入失败");
+      }
+      router.push(`/series/${seriesId}`);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "批量导入失败");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <StudioShell
@@ -91,11 +125,13 @@ export default function EpisodeImportPage() {
           </ButtonPill>
           <ButtonPill
             tone="primary"
-            onClick={() => router.push(`/series/${seriesId}`)}
+            onClick={() => void createBatch()}
+            disabled={preview.length === 0 || submitting}
           >
-            创建 {preview.length} 个集数
+            {submitting ? "导入中..." : `创建 ${preview.length} 个集数`}
           </ButtonPill>
         </div>
+        {error ? <p className="mt-2 text-sm text-[var(--mc-danger)]">{error}</p> : null}
       </section>
     </StudioShell>
   );

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { testVendorModel } from "@/server/mvp/vendors";
+import { testVendorModel } from "@/server/infrastructure/vendors";
 
 const bodySchema = z.object({
   modelRef: z.string().min(1),
@@ -26,4 +26,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

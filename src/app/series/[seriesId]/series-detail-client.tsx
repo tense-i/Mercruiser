@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { type ChangeEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, ShieldCheck } from "@phosphor-icons/react/dist/ssr";
-import type { SeriesDetail, SharedAsset } from "@/lib/mock-data";
-import { stageLabels, statusLabels } from "@/lib/mock-data";
+import type { SeriesDetailView as SeriesDetail, SharedAssetView as SharedAsset } from "@/server/mvp/types";
+import { stageLabels, statusLabels } from "@/lib/mvp-ui";
 import {
   ButtonPill,
   EmptyHint,
@@ -65,8 +66,20 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [assetCategory, setAssetCategory] = useState<AssetCategory>("characters");
+  const [settingsForm, setSettingsForm] = useState({
+    title: series.title,
+    summary: series.subtitle,
+    worldview: series.worldview,
+    visualGuide: series.visualGuide,
+    directorGuide: series.directorGuide,
+    genre: "AI 短剧",
+  });
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [settingsNotice, setSettingsNotice] = useState<string | null>(null);
   const defaultImageModel = series.strategy.models.image;
   const imageModelOptions = useMemo(
     () =>
@@ -131,6 +144,60 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
         },
       };
     });
+  };
+
+  const saveSettings = async () => {
+    if (settingsSaving) {
+      return;
+    }
+    setSettingsSaving(true);
+    setSettingsError(null);
+    setSettingsNotice(null);
+    try {
+      const response = await fetch(`/api/v1/series/${series.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: settingsForm.title.trim(),
+          summary: settingsForm.summary.trim(),
+          worldview: settingsForm.worldview.trim(),
+          visualGuide: settingsForm.visualGuide.trim(),
+          directorGuide: settingsForm.directorGuide.trim(),
+          genre: settingsForm.genre.trim(),
+        }),
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "保存失败");
+      }
+      setSettingsNotice("系列设定已保存。");
+      router.refresh();
+    } catch (error) {
+      setSettingsError(error instanceof Error ? error.message : "保存失败");
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const deleteSeries = async () => {
+    if (!window.confirm("确认删除该系列吗？此操作不可恢复。")) {
+      return;
+    }
+    setSettingsError(null);
+    try {
+      const response = await fetch(`/api/v1/series/${series.id}`, {
+        method: "DELETE",
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "删除失败");
+      }
+      router.push("/workspace");
+    } catch (error) {
+      setSettingsError(error instanceof Error ? error.message : "删除失败");
+    }
   };
 
   return (
@@ -253,36 +320,50 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
               title="系列设定中心"
               description="维护题材、世界观、视觉和导演规则，作为后续集数统一创作基线。"
             />
-            <form className="mt-4 grid gap-3" onSubmit={(event) => event.preventDefault()}>
+            <form
+              className="mt-4 grid gap-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void saveSettings();
+              }}
+            >
               <label className="grid gap-1 text-sm">
                 系列标题
-                <input defaultValue={series.title} />
+                <input value={settingsForm.title} onChange={(event) => setSettingsForm((prev) => ({ ...prev, title: event.target.value }))} />
               </label>
               <label className="grid gap-1 text-sm">
                 系列简介
-                <textarea defaultValue={series.subtitle} />
+                <textarea value={settingsForm.summary} onChange={(event) => setSettingsForm((prev) => ({ ...prev, summary: event.target.value }))} />
               </label>
               <label className="grid gap-1 text-sm">
                 题材与定位
-                <input defaultValue="都市悬疑 / 情感反转" />
+                <input value={settingsForm.genre} onChange={(event) => setSettingsForm((prev) => ({ ...prev, genre: event.target.value }))} />
               </label>
               <label className="grid gap-1 text-sm">
                 世界观
-                <textarea defaultValue={series.worldview} />
+                <textarea value={settingsForm.worldview} onChange={(event) => setSettingsForm((prev) => ({ ...prev, worldview: event.target.value }))} />
               </label>
               <label className="grid gap-1 text-sm">
                 视觉规则
-                <textarea defaultValue={series.visualGuide} />
+                <textarea value={settingsForm.visualGuide} onChange={(event) => setSettingsForm((prev) => ({ ...prev, visualGuide: event.target.value }))} />
               </label>
               <label className="grid gap-1 text-sm">
                 导演规则
-                <textarea defaultValue={series.directorGuide} />
+                <textarea value={settingsForm.directorGuide} onChange={(event) => setSettingsForm((prev) => ({ ...prev, directorGuide: event.target.value }))} />
               </label>
+              {settingsError ? (
+                <p className="text-sm text-[var(--mc-danger)]">{settingsError}</p>
+              ) : null}
+              {settingsNotice ? (
+                <p className="text-sm text-[var(--mc-good)]">{settingsNotice}</p>
+              ) : null}
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <ButtonPill tone="danger">删除系列</ButtonPill>
+                <ButtonPill tone="danger" onClick={() => void deleteSeries()}>删除系列</ButtonPill>
                 <div className="flex flex-wrap gap-2">
                   <ButtonPill tone="quiet">Agent 建议优化</ButtonPill>
-                  <ButtonPill tone="primary">保存设定</ButtonPill>
+                  <ButtonPill tone="primary" disabled={settingsSaving}>
+                    {settingsSaving ? "保存中..." : "保存设定"}
+                  </ButtonPill>
                 </div>
               </div>
             </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ButtonPill, OrchestratorPanel, SectionTitle, StudioShell } from "@/components/studio/studio-shell";
 
@@ -8,6 +9,47 @@ export default function NewEpisodePage() {
   const params = useParams<{ seriesId: string }>();
   const seriesId = params.seriesId;
   const router = useRouter();
+  const [title, setTitle] = useState("Episode 06 · 雨后门廊");
+  const [synopsis, setSynopsis] = useState("角色关系出现新的误解，线索将转向旧相册。");
+  const [sourceText, setSourceText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = title.trim().length > 0 && !submitting;
+
+  const createEpisode = async () => {
+    if (!canSubmit) {
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/v1/series/${seriesId}/episodes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          synopsis: synopsis.trim(),
+          sourceText: sourceText.trim() || undefined,
+        }),
+      });
+      const json = (await response.json()) as {
+        ok: boolean;
+        data?: { episodes?: Array<{ id: string }> };
+        error?: string;
+      };
+      if (!response.ok || !json.ok || !json.data?.episodes?.[0]?.id) {
+        throw new Error(json.error ?? "创建集数失败");
+      }
+      router.push(`/series/${seriesId}/episodes/${json.data.episodes[0].id}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "创建集数失败");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <StudioShell
@@ -45,23 +87,28 @@ export default function NewEpisodePage() {
           className="mt-4 grid gap-3"
           onSubmit={(event) => {
             event.preventDefault();
-            router.push(`/series/${seriesId}`);
+            void createEpisode();
           }}
         >
           <label className="grid gap-1 text-sm">
             集数标题
-            <input defaultValue="Episode 06 · 雨后门廊" required />
+            <input value={title} onChange={(event) => setTitle(event.target.value)} required />
           </label>
           <label className="grid gap-1 text-sm">
             集数概要
-            <textarea defaultValue="角色关系出现新的误解，线索将转向旧相册。" />
+            <textarea value={synopsis} onChange={(event) => setSynopsis(event.target.value)} />
           </label>
+          <label className="grid gap-1 text-sm">
+            原始文本（可选）
+            <textarea value={sourceText} onChange={(event) => setSourceText(event.target.value)} rows={8} />
+          </label>
+          {error ? <p className="text-sm text-[var(--mc-danger)]">{error}</p> : null}
           <div className="flex justify-end gap-2">
             <ButtonPill tone="quiet" onClick={() => router.push(`/series/${seriesId}`)}>
               取消
             </ButtonPill>
-            <ButtonPill type="submit" tone="primary">
-              创建集数
+            <ButtonPill type="submit" tone="primary" disabled={!canSubmit}>
+              {submitting ? "创建中..." : "创建集数"}
             </ButtonPill>
           </div>
         </form>

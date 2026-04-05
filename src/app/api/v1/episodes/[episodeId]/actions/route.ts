@@ -9,9 +9,9 @@ import {
   runStoryboardStage,
   runVideoStage,
   selectVideoCandidate,
-} from "@/server/mvp/pipeline";
+} from "@/server/application/orchestrators/episode-pipeline";
 import type { EpisodeSnapshot } from "@/server/mvp/types";
-import { buildEpisodeStudioView } from "@/server/mvp/ui-views";
+import { buildEpisodeStudioView } from "@/server/application/views/series-episode-views";
 
 type Params = {
   params: Promise<{ episodeId: string }>;

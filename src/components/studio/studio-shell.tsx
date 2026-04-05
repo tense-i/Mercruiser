@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowSquareOut,
   ChartLine,
@@ -11,9 +12,11 @@ import {
   Gear,
   ListChecks,
   Plus,
+  Question,
   Sparkle,
   Stack,
   Warning,
+  X,
 } from "@phosphor-icons/react/dist/ssr";
 
 type NavKey = "workspace" | "queue" | "settings";
@@ -57,6 +60,17 @@ const recentLinks = [
   { label: "EP03 工作台", href: "/series/glasshouse/episodes/e04" },
 ];
 
+const narrativeModes = {
+  story: {
+    label: "剧情模式",
+    brief: "70% 以上为对话场景\n适合 AI短剧、情景喜剧、角色扮演",
+  },
+  narration: {
+    label: "旁白解说模式",
+    brief: "70% 以上内容为旁白解说\n适合小说推文、动态漫、纪录片、营销短片",
+  },
+} as const;
+
 export function StudioShell({
   navKey,
   eyebrow,
@@ -68,11 +82,55 @@ export function StudioShell({
   compact,
   defaultSidebarCollapsed = false,
 }: StudioShellProps) {
+  const router = useRouter();
   const hasAside = Boolean(aside);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(defaultSidebarCollapsed);
+  const [showCreateSeriesModal, setShowCreateSeriesModal] = useState(false);
+  const [seriesName, setSeriesName] = useState("");
+  const [narrativeMode, setNarrativeMode] = useState<keyof typeof narrativeModes>("story");
+  const [scriptInput, setScriptInput] = useState("");
+  const [helpMode, setHelpMode] = useState<keyof typeof narrativeModes | null>(null);
   const sidebarGridClass = sidebarCollapsed
     ? "lg:grid-cols-[88px_minmax(0,1fr)]"
     : "lg:grid-cols-[220px_minmax(0,1fr)]";
+
+  useEffect(() => {
+    if (!showCreateSeriesModal) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowCreateSeriesModal(false);
+        setHelpMode(null);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showCreateSeriesModal]);
+
+  const resetCreateModal = () => {
+    setShowCreateSeriesModal(false);
+    setSeriesName("");
+    setScriptInput("");
+    setNarrativeMode("story");
+    setHelpMode(null);
+  };
+
+  const handleCreateSeries = () => {
+    if (!seriesName.trim()) {
+      return;
+    }
+
+    const query = new URLSearchParams({
+      name: seriesName.trim(),
+      mode: narrativeMode,
+    });
+
+    router.push(`/series/new?${query.toString()}`);
+    resetCreateModal();
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -120,8 +178,15 @@ export function StudioShell({
             </button>
           ) : null}
 
-          <Link
-            href="/series/new"
+          <button
+            type="button"
+            onClick={() => {
+              setShowCreateSeriesModal(true);
+              setSeriesName("");
+              setScriptInput("");
+              setNarrativeMode("story");
+              setHelpMode(null);
+            }}
             className={`mb-4 inline-flex items-center justify-center rounded-2xl bg-[#f2dfbe] text-sm font-medium text-[#111] ${
               sidebarCollapsed ? "h-10 w-10" : "w-full gap-2 px-4 py-3"
             }`}
@@ -130,7 +195,7 @@ export function StudioShell({
           >
             <Plus size={15} />
             {!sidebarCollapsed ? "新建系列" : null}
-          </Link>
+          </button>
 
           <nav className={`space-y-1 ${sidebarCollapsed ? "w-full" : ""}`}>
             {navItems.map((item) => {
@@ -213,6 +278,124 @@ export function StudioShell({
           ) : null}
         </div>
       </div>
+
+      {showCreateSeriesModal ? (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/65 p-3 sm:p-6"
+          onClick={resetCreateModal}
+        >
+          <div
+            className="w-full max-w-4xl rounded-[2rem] border border-white/10 bg-[#1b1d22] px-5 py-5 shadow-[0_30px_140px_rgba(0,0,0,0.55)] sm:px-8 sm:py-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-semibold text-white">创建项目</h2>
+              <button
+                type="button"
+                onClick={resetCreateModal}
+                className="rounded-2xl border border-white/12 bg-white/[0.02] p-2 text-white/62 transition hover:bg-white/[0.08] hover:text-white"
+                aria-label="关闭创建弹窗"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-5">
+              <label className="block">
+                <span className="text-[2rem] font-semibold tracking-tight text-white">项目名称</span>
+                <input
+                  value={seriesName}
+                  onChange={(event) => setSeriesName(event.target.value)}
+                  placeholder="请输入短剧项目名称"
+                  className="mt-3 h-14 rounded-2xl border-white/8 bg-[#2a2d34] text-lg placeholder:text-white/32"
+                />
+              </label>
+
+              <div>
+                <p className="text-[2rem] font-semibold tracking-tight text-white">叙事模式</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {(Object.entries(narrativeModes) as Array<
+                    [keyof typeof narrativeModes, (typeof narrativeModes)[keyof typeof narrativeModes]]
+                  >).map(([key, mode]) => {
+                    const selected = narrativeMode === key;
+                    const showHelp = helpMode === key;
+
+                    return (
+                      <div
+                        key={key}
+                        className={`rounded-2xl border p-3 transition ${
+                          selected
+                            ? "border-[#f2dfbe]/45 bg-[#15120f]"
+                            : "border-white/10 bg-white/[0.03] hover:border-white/18"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setNarrativeMode(key)}
+                            className="flex-1 rounded-xl px-1 py-1 text-left"
+                          >
+                            <p className={`text-3xl font-semibold ${selected ? "text-[#f2dfbe]" : "text-white/88"}`}>{mode.label}</p>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setHelpMode((prev) => (prev === key ? null : key))}
+                            className="rounded-full border border-white/14 bg-white/[0.03] p-1.5 text-white/65 transition hover:bg-white/[0.08] hover:text-white"
+                            aria-label={`${mode.label}说明`}
+                          >
+                            <Question size={16} />
+                          </button>
+                        </div>
+                        {showHelp ? (
+                          <p className="mt-2 whitespace-pre-line rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm leading-6 text-white/76">
+                            {mode.brief}
+                          </p>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-[2rem] font-semibold tracking-tight text-white">剧本导入（选填）</p>
+                </div>
+                <textarea
+                  value={scriptInput}
+                  onChange={(event) => setScriptInput(event.target.value)}
+                  maxLength={50000}
+                  placeholder="请导入剧本，将为你自动分集（文本请用“第 n 章/集”分割）"
+                  className="min-h-[180px] rounded-2xl border-white/8 bg-[#2a2d34] text-base placeholder:text-white/32"
+                />
+                <p className="mt-2 text-right text-sm text-white/52">{scriptInput.length} / 50000</p>
+              </div>
+            </div>
+
+            <div className="mt-7 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={resetCreateModal}
+                className="rounded-full border border-white/12 bg-white/[0.03] px-7 py-3 text-xl font-medium text-white/86 transition hover:bg-white/[0.08]"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateSeries}
+                disabled={!seriesName.trim()}
+                className={`rounded-full px-7 py-3 text-xl font-semibold transition ${
+                  seriesName.trim()
+                    ? "bg-[#f2dfbe] text-[#111] hover:brightness-105"
+                    : "cursor-not-allowed bg-white/10 text-white/36"
+                }`}
+              >
+                立即创建
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

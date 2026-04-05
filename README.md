@@ -73,6 +73,28 @@ npm run build
 npm run lint
 ```
 
+## 硅基流动接入与联调
+
+设置环境变量（建议写入 `.env.local`）：
+
+```bash
+SILICONFLOW_API_KEY=your_key_here
+```
+
+启动本地服务后执行全量联调：
+
+```bash
+npm run dev
+npm run test:siliconflow
+```
+
+联调脚本会执行：
+
+- 保存/更新 `siliconflow` 供应商配置（OpenAI-compatible）
+- text/image/video 三类模型连通性测试
+- 导入系列并自动推进到剧本阶段
+- 单集手动触发 assets -> storyboard -> video -> final-cut
+
 ## 目录概览
 
 - src/app: 页面与 API Route

@@ -1,0 +1,2 @@
+file '/Users/zh/project/githubProj/Mercruiser/Mercruiser-web/public/mvp-media/episode_37bd3106-a414-4406-9646-7f10771a58f6/videos/shot_ad3639a3-0939-44e9-a5e5-b426a48edaf9-1.mp4'
+file '/Users/zh/project/githubProj/Mercruiser/Mercruiser-web/public/mvp-media/episode_37bd3106-a414-4406-9646-7f10771a58f6/videos/shot_e0741abd-7595-44f6-a7c0-9c06aa059445-2.mp4'

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, CaretRight, MagnifyingGlass, Plus } from "@phosphor-icons/react/dist/ssr";
 import { StudioShell, ToneBadge } from "@/components/studio/studio-shell";
-import { buildSeriesDetailView } from "@/server/mvp/ui-views";
-import { mvpStore } from "@/server/mvp/store";
+import { buildSeriesDetailView } from "@/server/application/views/series-episode-views";
+import { mvpStore } from "@/server/infrastructure/sqlite/store";
 import type { EpisodeStage, StageStatus } from "@/server/mvp/types";
 
 type CardTone = "warning" | "good" | "active";

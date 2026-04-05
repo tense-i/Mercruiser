@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowClockwise, Check, DownloadSimple, Lock, Sparkle, Warning } from "@phosphor-icons/react/dist/ssr";
-import type { EpisodeStudio, SeriesDetail, StageId } from "@/lib/mock-data";
-import { stageLabels, statusLabels } from "@/lib/mock-data";
+import type { EpisodeStage as StageId, EpisodeStudioView as EpisodeStudio, SeriesDetailView as SeriesDetail } from "@/server/mvp/types";
+import { stageLabels, statusLabels } from "@/lib/mvp-ui";
 import {
   ButtonPill,
   OrchestratorPanel,

@@ -1,37 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowSquareOut, Warning } from "@phosphor-icons/react/dist/ssr";
-import { queueTasks, stageLabels } from "@/lib/mock-data";
+import type { EpisodeStage, TaskRecord } from "@/server/mvp/types";
+import { stageLabels } from "@/lib/mvp-ui";
 import { ButtonPill, OrchestratorPanel, SectionTitle, StudioShell } from "@/components/studio/studio-shell";
 
+type QueueTaskView = TaskRecord & {
+  durationText: string;
+  startedAtText: string;
+};
+
+function formatTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
+    date.getHours(),
+  ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function durationText(startIso: string, endIso: string): string {
+  const start = new Date(startIso).getTime();
+  const end = new Date(endIso).getTime();
+  if (Number.isNaN(start) || Number.isNaN(end) || end < start) {
+    return "--";
+  }
+  const ms = end - start;
+  if (ms < 1000) {
+    return `${ms}ms`;
+  }
+  const sec = Math.floor(ms / 1000);
+  if (sec < 60) {
+    return `${sec}s`;
+  }
+  return `${Math.floor(sec / 60)}m ${sec % 60}s`;
+}
+
+function recoveryHint(stage: EpisodeStage): string {
+  if (stage === "planning") {
+    return "检查原始文本并重试实体识别。";
+  }
+  if (stage === "script") {
+    return "修订剧本策略后重新生成剧本。";
+  }
+  if (stage === "assets") {
+    return "补充关键实体后重跑资产提取。";
+  }
+  if (stage === "storyboard") {
+    return "先修复脚本/资产引用，再重生分镜。";
+  }
+  if (stage === "video") {
+    return "检查视频模型配置，必要时切换模型重试。";
+  }
+  if (stage === "review") {
+    return "补齐未选定视频后重新审校。";
+  }
+  return "检查片段素材后重试导出。";
+}
+
 export default function QueuePage() {
-  const [statusFilter, setStatusFilter] = useState<"all" | "queued" | "running" | "success" | "failed">("all");
+  const [tasks, setTasks] = useState<QueueTaskView[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | TaskRecord["status"]>("all");
   const [seriesFilter, setSeriesFilter] = useState("all");
   const [episodeFilter, setEpisodeFilter] = useState("all");
-  const [stageFilter, setStageFilter] = useState<"all" | keyof typeof stageLabels>("all");
+  const [stageFilter, setStageFilter] = useState<"all" | EpisodeStage>("all");
 
-  const seriesOptions = useMemo(
-    () => Array.from(new Set(queueTasks.map((task) => task.series))),
-    [],
-  );
+  const loadTasks = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/v1/tasks", { cache: "no-store" });
+      const json = (await response.json()) as { ok: boolean; data?: TaskRecord[]; error?: string };
+      if (!response.ok || !json.ok || !json.data) {
+        throw new Error(json.error ?? "加载任务失败");
+      }
+      setTasks(
+        json.data.map((task) => ({
+          ...task,
+          startedAtText: formatTime(task.createdAt),
+          durationText: durationText(task.createdAt, task.updatedAt),
+        })),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "加载任务失败");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const episodeOptions = useMemo(
-    () => Array.from(new Set(queueTasks.map((task) => task.episode))),
-    [],
-  );
+  useEffect(() => {
+    void loadTasks();
+  }, []);
+
+  const seriesOptions = useMemo(() => Array.from(new Set(tasks.map((task) => task.seriesId))), [tasks]);
+  const episodeOptions = useMemo(() => Array.from(new Set(tasks.map((task) => task.episodeId))), [tasks]);
 
   const filtered = useMemo(
     () =>
-      queueTasks.filter((task) => {
+      tasks.filter((task) => {
         const statusOk = statusFilter === "all" || task.status === statusFilter;
-        const seriesOk = seriesFilter === "all" || task.series === seriesFilter;
-        const episodeOk = episodeFilter === "all" || task.episode === episodeFilter;
+        const seriesOk = seriesFilter === "all" || task.seriesId === seriesFilter;
+        const episodeOk = episodeFilter === "all" || task.episodeId === episodeFilter;
         const stageOk = stageFilter === "all" || task.stage === stageFilter;
         return statusOk && seriesOk && episodeOk && stageOk;
       }),
-    [statusFilter, seriesFilter, episodeFilter, stageFilter],
+    [tasks, statusFilter, seriesFilter, episodeFilter, stageFilter],
   );
 
   const failedTasks = filtered.filter((task) => task.status === "failed");
@@ -44,25 +122,22 @@ export default function QueuePage() {
       description="UC-15: 观察异步任务状态、定位失败原因，并快速跳回对应模块恢复流程。"
       actions={
         <>
-          <ButtonPill tone="quiet">刷新任务</ButtonPill>
-          <ButtonPill tone="primary">重试可恢复失败</ButtonPill>
+          <ButtonPill tone="quiet" onClick={() => void loadTasks()}>
+            刷新任务
+          </ButtonPill>
         </>
       }
       aside={
         <OrchestratorPanel
           title="Recovery Console"
-          focus="失败任务恢复优先级"
-          completion={67}
-          blocking="Q-2170 需要角色主提示词修复"
-          nextStep="先修复角色提示词，再重试失败任务。"
-          recommendations={[
-            "查看失败详情",
-            "应用恢复建议",
-            "跳转到资产模块",
-          ]}
-          queuePreview={queueTasks.slice(0, 3).map((task) => ({
+          focus={failedTasks[0]?.action ?? "任务队列巡检"}
+          completion={tasks.length === 0 ? 0 : Math.round(((tasks.length - failedTasks.length) / tasks.length) * 100)}
+          blocking={failedTasks[0]?.error ?? "当前无失败阻塞"}
+          nextStep={failedTasks[0] ? recoveryHint(failedTasks[0].stage) : "继续推进当前工作流"}
+          recommendations={["查看失败详情", "应用恢复建议", "跳转对应执行页"]}
+          queuePreview={filtered.slice(0, 3).map((task) => ({
             id: task.id,
-            title: `${task.episode} / ${task.action}`,
+            title: `${task.episodeId} / ${task.action}`,
             status: task.status,
           }))}
         />
@@ -91,10 +166,7 @@ export default function QueuePage() {
               </option>
             ))}
           </select>
-          <select
-            value={stageFilter}
-            onChange={(event) => setStageFilter(event.target.value as "all" | keyof typeof stageLabels)}
-          >
+          <select value={stageFilter} onChange={(event) => setStageFilter(event.target.value as "all" | EpisodeStage)}>
             <option value="all">全部阶段</option>
             {Object.entries(stageLabels).map(([stage, label]) => (
               <option key={stage} value={stage}>
@@ -102,22 +174,20 @@ export default function QueuePage() {
               </option>
             ))}
           </select>
-          <select
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(event.target.value as "all" | "queued" | "running" | "success" | "failed")
-            }
-          >
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as "all" | TaskRecord["status"])}>
             <option value="all">全部状态</option>
-            <option value="queued">排队</option>
-            <option value="running">运行中</option>
-            <option value="success">成功</option>
-            <option value="failed">失败</option>
+            <option value="waiting">waiting</option>
+            <option value="running">running</option>
+            <option value="success">success</option>
+            <option value="failed">failed</option>
+            <option value="retrying">retrying</option>
           </select>
         </div>
       </section>
 
       <section className="mt-3 rounded-2xl border border-[var(--mc-stroke)] bg-white p-4">
+        {loading ? <p className="text-sm text-[var(--mc-muted)]">任务加载中...</p> : null}
+        {error ? <p className="text-sm text-[var(--mc-danger)]">{error}</p> : null}
         <div className="overflow-auto rounded-xl border border-[var(--mc-stroke)]">
           <table className="min-w-full text-sm">
             <thead>
@@ -137,8 +207,8 @@ export default function QueuePage() {
                 <tr key={task.id} className="border-b border-[var(--mc-stroke)] last:border-b-0">
                   <td className="px-3 py-2 font-semibold text-[var(--mc-ink)]">{task.id}</td>
                   <td className="px-3 py-2 text-[var(--mc-ink)]">
-                    <p>{task.series}</p>
-                    <p className="text-xs text-[var(--mc-muted)]">{task.episode}</p>
+                    <p>{task.seriesId}</p>
+                    <p className="text-xs text-[var(--mc-muted)]">{task.episodeId}</p>
                   </td>
                   <td className="px-3 py-2 text-[var(--mc-ink)]">{stageLabels[task.stage]}</td>
                   <td className="px-3 py-2 text-[var(--mc-ink)]">{task.action}</td>
@@ -147,8 +217,8 @@ export default function QueuePage() {
                       {task.status}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-[var(--mc-muted)]">{task.startedAt}</td>
-                  <td className="px-3 py-2 text-[var(--mc-muted)]">{task.duration}</td>
+                  <td className="px-3 py-2 text-[var(--mc-muted)]">{task.startedAtText}</td>
+                  <td className="px-3 py-2 text-[var(--mc-muted)]">{task.durationText}</td>
                   <td className="px-3 py-2">
                     <Link
                       href={`/queue/${task.id}`}
@@ -184,12 +254,11 @@ export default function QueuePage() {
                 </p>
                 <p className="mt-1 text-base font-semibold text-[var(--mc-ink)]">{task.id}</p>
                 <p className="text-sm text-[var(--mc-ink)]">
-                  {task.series} · {task.episode}
+                  {task.seriesId} · {task.episodeId}
                 </p>
-                <p className="mt-2 text-sm text-[var(--mc-muted)]">原因：{task.failureReason}</p>
-                <p className="mt-1 text-sm text-[var(--mc-muted)]">恢复建议：{task.recoveryHint}</p>
+                <p className="mt-2 text-sm text-[var(--mc-muted)]">原因：{task.error ?? "暂无错误详情"}</p>
+                <p className="mt-1 text-sm text-[var(--mc-muted)]">恢复建议：{recoveryHint(task.stage)}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <ButtonPill tone="quiet">应用恢复建议</ButtonPill>
                   <Link
                     href={`/queue/${task.id}`}
                     className="inline-flex items-center gap-1 rounded-lg border border-[var(--mc-stroke)] bg-white px-3 py-1.5 text-sm text-[var(--mc-ink)]"
