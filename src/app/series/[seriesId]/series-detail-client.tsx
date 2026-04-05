@@ -47,6 +47,14 @@ interface AssetGenState {
   lastGeneratedAt: string | null;
 }
 
+interface StrategyFormState {
+  textModel: string;
+  imageModel: string;
+  videoModel: string;
+  promptPoliciesText: string;
+  agentPoliciesText: string;
+}
+
 function createAssetGenState(asset: SharedAsset, defaultModel: string): AssetGenState {
   return {
     description: asset.note ?? asset.summary,
@@ -65,6 +73,54 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
+function serializePromptPolicies(policies: Array<{ stage: string; policy: string }>): string {
+  return policies.map((policy) => `${policy.stage} | ${policy.policy}`).join("\n");
+}
+
+function serializeAgentPolicies(policies: Array<{ name: string; value: string }>): string {
+  return policies.map((policy) => `${policy.name} | ${policy.value}`).join("\n");
+}
+
+function parsePromptPolicies(value: string): Array<{ stage: string; policy: string }> {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [stage, ...policyParts] = line.split("|");
+      return {
+        stage: stage?.trim() ?? "",
+        policy: policyParts.join("|").trim(),
+      };
+    })
+    .filter((item) => item.stage && item.policy);
+}
+
+function parseAgentPolicies(value: string): Array<{ name: string; value: string }> {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [name, ...valueParts] = line.split("|");
+      return {
+        name: name?.trim() ?? "",
+        value: valueParts.join("|").trim(),
+      };
+    })
+    .filter((item) => item.name && item.value);
+}
+
+function createStrategyFormState(series: SeriesDetail): StrategyFormState {
+  return {
+    textModel: series.strategy.models.text,
+    imageModel: series.strategy.models.image,
+    videoModel: series.strategy.models.video,
+    promptPoliciesText: serializePromptPolicies(series.strategy.promptPolicies),
+    agentPoliciesText: serializeAgentPolicies(series.strategy.agentPolicies),
+  };
+}
+
 export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
@@ -80,6 +136,10 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsError, setSettingsError] = useState<string | null>(null);
   const [settingsNotice, setSettingsNotice] = useState<string | null>(null);
+  const [strategyForm, setStrategyForm] = useState<StrategyFormState>(() => createStrategyFormState(series));
+  const [strategySaving, setStrategySaving] = useState(false);
+  const [strategyError, setStrategyError] = useState<string | null>(null);
+  const [strategyNotice, setStrategyNotice] = useState<string | null>(null);
   const defaultImageModel = series.strategy.models.image;
   const imageModelOptions = useMemo(
     () =>
@@ -198,6 +258,59 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
     } catch (error) {
       setSettingsError(error instanceof Error ? error.message : "删除失败");
     }
+  };
+
+  const saveStrategy = async () => {
+    if (strategySaving) {
+      return;
+    }
+
+    setStrategySaving(true);
+    setStrategyError(null);
+    setStrategyNotice(null);
+
+    try {
+      const promptPolicies = parsePromptPolicies(strategyForm.promptPoliciesText);
+      const agentPolicies = parseAgentPolicies(strategyForm.agentPoliciesText);
+
+      if (promptPolicies.length === 0) {
+        throw new Error("至少保留一条 Prompt 策略");
+      }
+      if (agentPolicies.length === 0) {
+        throw new Error("至少保留一条 Agent 策略");
+      }
+
+      const response = await fetch(`/api/v1/series/${series.id}/strategy`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          textModelRef: strategyForm.textModel.trim(),
+          imageModelRef: strategyForm.imageModel.trim(),
+          videoModelRef: strategyForm.videoModel.trim(),
+          promptPolicies,
+          agentPolicies,
+        }),
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "保存策略失败");
+      }
+
+      setStrategyNotice("系列策略已保存。");
+      router.refresh();
+    } catch (error) {
+      setStrategyError(error instanceof Error ? error.message : "保存策略失败");
+    } finally {
+      setStrategySaving(false);
+    }
+  };
+
+  const restoreDefaultStrategy = () => {
+    setStrategyForm(createStrategyFormState(series));
+    setStrategyError(null);
+    setStrategyNotice("已恢复为当前系列已保存策略。");
   };
 
   return (
@@ -658,20 +771,49 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
             <div className="mt-4 grid gap-3">
               <label className="grid gap-1 text-sm">
                 默认文本模型
-                <input defaultValue={series.strategy.models.text} />
+                <input
+                  value={strategyForm.textModel}
+                  onChange={(event) => setStrategyForm((prev) => ({ ...prev, textModel: event.target.value }))}
+                />
               </label>
               <label className="grid gap-1 text-sm">
                 默认图像模型
-                <input defaultValue={series.strategy.models.image} />
+                <input
+                  value={strategyForm.imageModel}
+                  onChange={(event) => setStrategyForm((prev) => ({ ...prev, imageModel: event.target.value }))}
+                />
               </label>
               <label className="grid gap-1 text-sm">
                 默认视频模型
-                <input defaultValue={series.strategy.models.video} />
+                <input
+                  value={strategyForm.videoModel}
+                  onChange={(event) => setStrategyForm((prev) => ({ ...prev, videoModel: event.target.value }))}
+                />
+              </label>
+              <label className="grid gap-1 text-sm">
+                Prompt 策略（每行：阶段 | 策略）
+                <textarea
+                  value={strategyForm.promptPoliciesText}
+                  onChange={(event) => setStrategyForm((prev) => ({ ...prev, promptPoliciesText: event.target.value }))}
+                  className="min-h-[160px]"
+                />
+              </label>
+              <label className="grid gap-1 text-sm">
+                Agent 策略（每行：名称 | 值）
+                <textarea
+                  value={strategyForm.agentPoliciesText}
+                  onChange={(event) => setStrategyForm((prev) => ({ ...prev, agentPoliciesText: event.target.value }))}
+                  className="min-h-[160px]"
+                />
               </label>
             </div>
+            {strategyError ? <p className="mt-4 text-sm text-[var(--mc-danger)]">{strategyError}</p> : null}
+            {strategyNotice ? <p className="mt-4 text-sm text-[var(--mc-good)]">{strategyNotice}</p> : null}
             <div className="mt-4 flex justify-end gap-2">
-              <ButtonPill tone="quiet">恢复默认</ButtonPill>
-              <ButtonPill tone="primary">保存策略</ButtonPill>
+              <ButtonPill tone="quiet" onClick={restoreDefaultStrategy}>恢复默认</ButtonPill>
+              <ButtonPill tone="primary" onClick={() => void saveStrategy()} disabled={strategySaving}>
+                {strategySaving ? "保存中..." : "保存策略"}
+              </ButtonPill>
             </div>
           </article>
           <article className="mc-soft-panel rounded-[1.4rem] p-4">
@@ -679,13 +821,13 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
               Prompt / Agent policies
             </p>
             <div className="mt-4 space-y-3">
-              {series.strategy.promptPolicies.map((policy) => (
+              {parsePromptPolicies(strategyForm.promptPoliciesText).map((policy) => (
                 <div key={policy.stage} className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">{policy.stage}</p>
                   <p className="mt-1 text-sm text-[var(--mc-ink)]">{policy.policy}</p>
                 </div>
               ))}
-              {series.strategy.agentPolicies.map((policy) => (
+              {parseAgentPolicies(strategyForm.agentPoliciesText).map((policy) => (
                 <div key={policy.name} className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">{policy.name}</p>
                   <p className="mt-1 text-sm text-[var(--mc-ink)]">{policy.value}</p>
