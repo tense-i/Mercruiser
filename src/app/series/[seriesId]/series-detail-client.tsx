@@ -136,10 +136,14 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsError, setSettingsError] = useState<string | null>(null);
   const [settingsNotice, setSettingsNotice] = useState<string | null>(null);
+  const [scriptReferenceNotice, setScriptReferenceNotice] = useState<string | null>(null);
   const [strategyForm, setStrategyForm] = useState<StrategyFormState>(() => createStrategyFormState(series));
   const [strategySaving, setStrategySaving] = useState(false);
   const [strategyError, setStrategyError] = useState<string | null>(null);
   const [strategyNotice, setStrategyNotice] = useState<string | null>(null);
+  const [assetSavingId, setAssetSavingId] = useState<string | null>(null);
+  const [assetActionError, setAssetActionError] = useState<string | null>(null);
+  const [assetActionNotice, setAssetActionNotice] = useState<string | null>(null);
   const defaultImageModel = series.strategy.models.image;
   const imageModelOptions = useMemo(
     () =>
@@ -260,6 +264,20 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
     }
   };
 
+  const applySeriesOptimization = () => {
+    setSettingsForm((prev) => ({
+      ...prev,
+      visualGuide: prev.visualGuide.includes("逆光")
+        ? prev.visualGuide
+        : `${prev.visualGuide}${prev.visualGuide ? "\n" : ""}高冲突场景优先使用逆光、近景和主体分层构图。`,
+      directorGuide: prev.directorGuide.includes("静默")
+        ? prev.directorGuide
+        : `${prev.directorGuide}${prev.directorGuide ? "\n" : ""}关键冲突前后预留 1-2 个静默反应镜头，增强情绪停顿。`,
+    }));
+    setSettingsNotice("已注入一轮 Agent 优化建议，请确认后保存设定。");
+    setSettingsError(null);
+  };
+
   const saveStrategy = async () => {
     if (strategySaving) {
       return;
@@ -311,6 +329,97 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
     setStrategyForm(createStrategyFormState(series));
     setStrategyError(null);
     setStrategyNotice("已恢复为当前系列已保存策略。");
+  };
+
+  const refreshScriptReferences = () => {
+    router.refresh();
+    setScriptReferenceNotice("剧本引用状态已刷新。");
+  };
+
+  const openAllScriptPages = () => {
+    series.episodes.forEach((episode) => {
+      window.open(`/series/${series.id}/episodes/${episode.id}/script`, "_blank", "noopener,noreferrer");
+    });
+    setScriptReferenceNotice(`已尝试批量打开 ${series.episodes.length} 个剧本页。`);
+  };
+
+  const saveSharedAsset = async (
+    asset: SharedAsset,
+    input: {
+      mainVersion: string;
+      locked: boolean;
+      variants: SharedAsset["variants"];
+    },
+    successMessage: string,
+  ) => {
+    if (assetSavingId) {
+      return;
+    }
+
+    setAssetSavingId(asset.id);
+    setAssetActionError(null);
+    setAssetActionNotice(null);
+
+    try {
+      const response = await fetch(`/api/v1/series/${series.id}/shared-assets`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: asset.name,
+          category: asset.category,
+          summary: asset.summary,
+          note: asset.note,
+          owner: asset.owner,
+          episodeRefs: asset.episodeRefs,
+          mainVersion: input.mainVersion,
+          locked: input.locked,
+          variants: input.variants,
+        }),
+      });
+      const json = (await response.json()) as { ok: boolean; error?: string };
+      if (!response.ok || !json.ok) {
+        throw new Error(json.error ?? "保存共享资产失败");
+      }
+
+      setAssetActionNotice(successMessage);
+      router.refresh();
+    } catch (error) {
+      setAssetActionError(error instanceof Error ? error.message : "保存共享资产失败");
+    } finally {
+      setAssetSavingId(null);
+    }
+  };
+
+  const setAssetMainVersion = async (asset: SharedAsset, variantId: string) => {
+    const nextVariants = asset.variants.map((variant) => ({
+      ...variant,
+      selected: variant.id === variantId,
+      locked: variant.id === variantId ? asset.locked : variant.locked,
+    }));
+    const selectedVariant = nextVariants.find((variant) => variant.id === variantId);
+    if (!selectedVariant) {
+      return;
+    }
+    await saveSharedAsset(asset, {
+      mainVersion: selectedVariant.label,
+      locked: asset.locked,
+      variants: nextVariants,
+    }, `${asset.name} 的主版本已切换为 ${selectedVariant.label}。`);
+  };
+
+  const toggleAssetLock = async (asset: SharedAsset) => {
+    const nextLocked = !asset.locked;
+    const nextVariants = asset.variants.map((variant) => ({
+      ...variant,
+      locked: variant.selected ? nextLocked : variant.locked,
+    }));
+    await saveSharedAsset(asset, {
+      mainVersion: asset.mainVersion,
+      locked: nextLocked,
+      variants: nextVariants,
+    }, `${asset.name} 已${nextLocked ? "" : "解除"}锁定。`);
   };
 
   return (
@@ -473,8 +582,8 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <ButtonPill tone="danger" onClick={() => void deleteSeries()}>删除系列</ButtonPill>
                 <div className="flex flex-wrap gap-2">
-                  <ButtonPill tone="quiet">Agent 建议优化</ButtonPill>
-                  <ButtonPill tone="primary" disabled={settingsSaving}>
+                  <ButtonPill tone="quiet" onClick={applySeriesOptimization}>Agent 建议优化</ButtonPill>
+                  <ButtonPill tone="primary" type="submit" disabled={settingsSaving}>
                     {settingsSaving ? "保存中..." : "保存设定"}
                   </ButtonPill>
                 </div>
@@ -599,6 +708,8 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
             title="Shared Assets"
             description="角色、场景、道具的主版本管理区，支持主版本选择、锁定和回流。"
           />
+          {assetActionError ? <p className="mt-3 text-sm text-[var(--mc-danger)]">{assetActionError}</p> : null}
+          {assetActionNotice ? <p className="mt-3 text-sm text-[var(--mc-good)]">{assetActionNotice}</p> : null}
           <div className="mt-4 flex flex-wrap gap-2">
             {assetCategories.map((category) => (
               <button
@@ -671,6 +782,15 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
                               </span>
                             </div>
                             <p className="mt-2 text-xs text-[var(--mc-muted)]">{variant.prompt}</p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <ButtonPill
+                                tone={variant.selected ? "primary" : "quiet"}
+                                onClick={() => void setAssetMainVersion(asset, variant.id)}
+                                disabled={assetSavingId === asset.id}
+                              >
+                                {variant.selected ? "当前主版本" : "设为主版本"}
+                              </ButtonPill>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -680,8 +800,9 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
                     <ButtonPill tone="quiet" onClick={() => setSelectedAssetId(asset.id)}>
                       查看右侧详情
                     </ButtonPill>
-                    <ButtonPill tone="quiet">选择主版本</ButtonPill>
-                    <ButtonPill tone="quiet">锁定资产</ButtonPill>
+                    <ButtonPill tone={asset.locked ? "danger" : "quiet"} onClick={() => void toggleAssetLock(asset)} disabled={assetSavingId === asset.id}>
+                      {asset.locked ? "解除锁定" : "锁定资产"}
+                    </ButtonPill>
                   </div>
                 </article>
               ))}
@@ -699,10 +820,11 @@ export function SeriesDetailClient({ series }: { series: SeriesDetail }) {
               description="集中查看每集剧本页入口与当前阶段，便于从系列层快速跳转并引用到后续分镜流程。"
             />
             <div className="flex flex-wrap gap-2">
-              <ButtonPill tone="quiet">刷新引用状态</ButtonPill>
-              <ButtonPill tone="primary">批量打开剧本页</ButtonPill>
+              <ButtonPill tone="quiet" onClick={refreshScriptReferences}>刷新引用状态</ButtonPill>
+              <ButtonPill tone="primary" onClick={openAllScriptPages}>批量打开剧本页</ButtonPill>
             </div>
           </div>
+          {scriptReferenceNotice ? <p className="mt-3 text-sm text-[var(--mc-good)]">{scriptReferenceNotice}</p> : null}
 
           <div className="mt-4 overflow-auto rounded-2xl border border-[var(--mc-stroke)] bg-white/80">
             <table className="min-w-full text-sm">

@@ -12,6 +12,8 @@ import type {
   FinalCutRecord,
   ScriptRecord,
   SeriesRecord,
+  SeriesSharedAssetRecord,
+  SeriesSharedAssetVariantRecord,
   SeriesStrategyRecord,
   SeriesStatus,
   ScriptStyleReference,
@@ -667,6 +669,156 @@ export const mvpStore = {
       record.updatedAt,
     );
     return record;
+  },
+
+  listSeriesSharedAssets(seriesId: string): SeriesSharedAssetRecord[] {
+    const db = ensureDb();
+    const rows = db
+      .prepare("SELECT * FROM series_shared_assets WHERE series_id = ? ORDER BY updated_at DESC")
+      .all(seriesId) as Record<string, unknown>[];
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      seriesId: String(row.series_id),
+      name: String(row.name),
+      category: String(row.category) as SeriesSharedAssetRecord["category"],
+      summary: String(row.summary ?? ""),
+      mainVersion: String(row.main_version ?? "v1"),
+      locked: Number(row.locked) === 1,
+      note: String(row.note ?? ""),
+      owner: String(row.owner ?? ""),
+      episodeRefs: parseJson<string[]>(row.episode_refs_json, []),
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
+    }));
+  },
+
+  listSeriesSharedAssetVariants(assetId: string): SeriesSharedAssetVariantRecord[] {
+    const db = ensureDb();
+    const rows = db
+      .prepare("SELECT * FROM series_shared_asset_variants WHERE asset_id = ? ORDER BY created_at ASC")
+      .all(assetId) as Record<string, unknown>[];
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      assetId: String(row.asset_id),
+      label: String(row.label),
+      prompt: String(row.prompt ?? ""),
+      selected: Number(row.selected) === 1,
+      locked: Number(row.locked) === 1,
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
+    }));
+  },
+
+  saveSeriesSharedAsset(input: {
+    seriesId: string;
+    name: string;
+    category: SeriesSharedAssetRecord["category"];
+    summary: string;
+    mainVersion: string;
+    locked: boolean;
+    note?: string;
+    owner?: string;
+    episodeRefs?: string[];
+    variants: Array<{
+      id?: string;
+      label: string;
+      prompt: string;
+      selected: boolean;
+      locked: boolean;
+    }>;
+  }): { asset: SeriesSharedAssetRecord; variants: SeriesSharedAssetVariantRecord[] } {
+    const db = ensureDb();
+    const now = nowIso();
+    const existing = db
+      .prepare("SELECT * FROM series_shared_assets WHERE series_id = ? AND category = ? AND name = ?")
+      .get(input.seriesId, input.category, input.name) as Record<string, unknown> | undefined;
+
+    const assetId = existing ? String(existing.id) : `shared_asset_${randomUUID()}`;
+    const createdAt = existing ? String(existing.created_at) : now;
+    const note =
+      input.note ??
+      (input.locked ? "已锁定系列主版本" : "可继续调整主版本与锁定状态");
+    const owner = input.owner ?? (existing?.owner ? String(existing.owner) : "");
+    const episodeRefs = input.episodeRefs ?? parseJson<string[]>(existing?.episode_refs_json, []);
+
+    const asset: SeriesSharedAssetRecord = {
+      id: assetId,
+      seriesId: input.seriesId,
+      name: input.name,
+      category: input.category,
+      summary: input.summary,
+      mainVersion: input.mainVersion,
+      locked: input.locked,
+      note,
+      owner,
+      episodeRefs,
+      createdAt,
+      updatedAt: now,
+    };
+
+    const variants = input.variants.map((variant) => ({
+      id: variant.id ?? `shared_asset_variant_${randomUUID()}`,
+      assetId,
+      label: variant.label,
+      prompt: variant.prompt,
+      selected: variant.selected,
+      locked: variant.locked,
+      createdAt: now,
+      updatedAt: now,
+    }));
+
+    const tx = db.transaction(() => {
+      db.prepare(
+        `INSERT INTO series_shared_assets (
+          id, series_id, name, category, summary, main_version, locked, note, owner, episode_refs_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          summary = excluded.summary,
+          main_version = excluded.main_version,
+          locked = excluded.locked,
+          note = excluded.note,
+          owner = excluded.owner,
+          episode_refs_json = excluded.episode_refs_json,
+          updated_at = excluded.updated_at`,
+      ).run(
+        asset.id,
+        asset.seriesId,
+        asset.name,
+        asset.category,
+        asset.summary,
+        asset.mainVersion,
+        asset.locked ? 1 : 0,
+        asset.note,
+        asset.owner,
+        JSON.stringify(asset.episodeRefs),
+        asset.createdAt,
+        asset.updatedAt,
+      );
+
+      db.prepare("DELETE FROM series_shared_asset_variants WHERE asset_id = ?").run(assetId);
+      const insertVariant = db.prepare(
+        `INSERT INTO series_shared_asset_variants (
+          id, asset_id, label, prompt, selected, locked, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      );
+      for (const variant of variants) {
+        insertVariant.run(
+          variant.id,
+          variant.assetId,
+          variant.label,
+          variant.prompt,
+          variant.selected ? 1 : 0,
+          variant.locked ? 1 : 0,
+          variant.createdAt,
+          variant.updatedAt,
+        );
+      }
+    });
+    tx();
+
+    return { asset, variants };
   },
 
   createEpisode(input: {

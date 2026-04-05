@@ -119,6 +119,10 @@ function toCategory(type: "character" | "scene" | "prop"): "characters" | "scene
 
 function buildSharedAssets(seriesId: string): SharedAssetView[] {
   const episodes = mvpStore.listEpisodes(seriesId);
+  const persistedAssets = mvpStore.listSeriesSharedAssets(seriesId);
+  const persistedByIdentity = new Map(
+    persistedAssets.map((asset) => [`${asset.category}:${asset.name}`, asset] as const),
+  );
   const assetRows = episodes.flatMap((episode) => {
     const assets = mvpStore.listAssets(episode.id);
     return assets.map((asset) => ({
@@ -136,28 +140,43 @@ function buildSharedAssets(seriesId: string): SharedAssetView[] {
   }
 
   const output: SharedAssetView[] = [];
-  grouped.forEach((bucket, key) => {
+  grouped.forEach((bucket) => {
     bucket.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
     const latest = bucket[bucket.length - 1]!;
-    const variants = bucket.map((asset, index) => ({
+    const category = toCategory(latest.type);
+    const persisted = persistedByIdentity.get(`${category}:${latest.name}`);
+    const persistedVariants = persisted ? mvpStore.listSeriesSharedAssetVariants(persisted.id) : [];
+    const derivedVariants = bucket.map((asset, index) => ({
       id: asset.id,
       label: `v${index + 1}`,
       prompt: asset.prompt,
       selected: index === bucket.length - 1,
       locked: asset.locked,
     }));
-    const [type] = key.split(":");
+    const variants =
+      persistedVariants.length > 0
+        ? persistedVariants.map((variant) => ({
+            id: variant.id,
+            label: variant.label,
+            prompt: variant.prompt,
+            selected: variant.selected,
+            locked: variant.locked,
+          }))
+        : derivedVariants;
+    const selectedVariant = variants.find((variant) => variant.selected) ?? variants[variants.length - 1];
 
     output.push({
-      id: latest.id,
+      id: persisted?.id ?? latest.id,
       name: latest.name,
-      category: toCategory(type as "character" | "scene" | "prop"),
-      summary: latest.description,
-      mainVersion: variants[variants.length - 1]?.label ?? "v1",
-      locked: bucket.some((asset) => asset.locked),
-      note: bucket.some((asset) => asset.locked) ? "含已锁定主版本" : "尚未锁定主版本",
-      owner: latest.episodeCode,
-      episodeRefs: Array.from(new Set(bucket.map((asset) => asset.episodeCode))),
+      category,
+      summary: persisted?.summary || latest.description,
+      mainVersion: persisted?.mainVersion ?? selectedVariant?.label ?? "v1",
+      locked: persisted?.locked ?? bucket.some((asset) => asset.locked),
+      note:
+        persisted?.note ||
+        (bucket.some((asset) => asset.locked) ? "含已锁定主版本" : "尚未锁定主版本"),
+      owner: persisted?.owner || latest.episodeCode,
+      episodeRefs: persisted?.episodeRefs.length ? persisted.episodeRefs : Array.from(new Set(bucket.map((asset) => asset.episodeCode))),
       variants,
     });
   });
