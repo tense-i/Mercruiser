@@ -44,3 +44,5 @@ artifacts
 # sqlite temp sidecar files
 *.sqlite-wal
 *.sqlite-shm
+
+.omx/
