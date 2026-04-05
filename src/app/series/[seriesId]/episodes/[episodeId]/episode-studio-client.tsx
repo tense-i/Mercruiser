@@ -5,12 +5,12 @@ import { useMemo, useState } from "react";
 import { ArrowClockwise, Check, DownloadSimple, Lock, Sparkle, Warning } from "@phosphor-icons/react/dist/ssr";
 import type { EpisodeStage as StageId, EpisodeStudioView as EpisodeStudio, SeriesDetailView as SeriesDetail } from "@/server/mvp/types";
 import { stageLabels, statusLabels } from "@/lib/mvp-ui";
+import { EpisodeWorkbenchShell } from "@/domains/episode/view/episode-workbench-shell";
 import {
   ButtonPill,
   OrchestratorPanel,
   SectionTitle,
   StageDot,
-  StudioShell,
 } from "@/components/studio/studio-shell";
 
 const stageOrder: StageId[] = [
@@ -103,9 +103,15 @@ export function EpisodeStudioClient({
     export: "导出与版本记录",
   }[activeStage];
 
+  const workbenchItems = stageOrder.map((stage) => ({
+    id: stage,
+    label: stageLabels[stage],
+    meta: statusLabels[episodeState.stageProgress[stage]],
+    icon: <StageDot status={episodeState.stageProgress[stage]} />,
+  }));
+
   return (
-    <StudioShell
-      navKey="workspace"
+    <EpisodeWorkbenchShell
       eyebrow="Episode Studio"
       title={episodeState.episodeTitle}
       description="UC-08: Agent 阶段诊断 + 下一步建议。该工作台以阶段感组织执行流程，避免在生成链路中迷失。"
@@ -145,50 +151,24 @@ export function EpisodeStudioClient({
           queuePreview={series.orchestrator.queuePreview}
         />
       }
-      compact
+      navigatorTitle="Stage Navigator"
+      navItems={workbenchItems}
+      activeNavId={activeStage}
+      onSelectNav={(id) => setActiveStage(id as StageId)}
     >
-      <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className="mc-soft-panel rounded-[1.4rem] p-3">
-          <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--mc-muted)]">Stage Navigator</p>
-          <div className="mt-2 space-y-1">
-            {stageOrder.map((stage) => {
-              const status = episodeState.stageProgress[stage];
-              return (
-                <button
-                  key={stage}
-                  onClick={() => setActiveStage(stage)}
-                  className={`w-full rounded-2xl border px-3 py-2 text-left transition ${activeStage === stage
-                      ? "border-[var(--mc-accent)] bg-white"
-                      : "border-transparent hover:border-[var(--mc-stroke)] hover:bg-white/70"
-                    }`}
-                >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--mc-ink)]">
-                      <StageDot status={status} />
-                      {stageLabels[stage]}
-                    </span>
-                    <span className="text-xs text-[var(--mc-muted)]">{statusLabels[status]}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </aside>
+      <SectionTitle
+        kicker={`Current Stage · ${stageLabels[activeStage]}`}
+        title={stageHeader}
+        description="生成、选择、锁定同等重要。每个阶段都保留可操作入口和 Agent 推荐动作。"
+      />
+      {actionError ? (
+        <div className="mt-3 rounded-xl border border-[var(--mc-danger)]/30 bg-[color-mix(in_oklch,var(--mc-danger)_8%,white)] p-3 text-sm text-[var(--mc-danger)]">
+          {actionError}
+        </div>
+      ) : null}
 
-        <section className="mc-soft-panel rounded-[1.4rem] p-4">
-          <SectionTitle
-            kicker={`Current Stage · ${stageLabels[activeStage]}`}
-            title={stageHeader}
-            description="生成、选择、锁定同等重要。每个阶段都保留可操作入口和 Agent 推荐动作。"
-          />
-          {actionError ? (
-            <div className="mt-3 rounded-xl border border-[var(--mc-danger)]/30 bg-[color-mix(in_oklch,var(--mc-danger)_8%,white)] p-3 text-sm text-[var(--mc-danger)]">
-              {actionError}
-            </div>
-          ) : null}
-
-          {activeStage === "planning" ? (
-            <div className="mt-4 grid gap-3 xl:grid-cols-2">
+      {activeStage === "planning" ? (
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
               <article className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">原始内容输入区</p>
                 <textarea defaultValue={episodeState.sourceText} className="mt-2" />
@@ -215,11 +195,11 @@ export function EpisodeStudioClient({
                   ))}
                 </ul>
               </article>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "script" ? (
-            <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.2fr]">
+      {activeStage === "script" ? (
+        <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.2fr]">
               <article className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">剧情骨架</p>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--mc-ink)]">
@@ -250,11 +230,11 @@ export function EpisodeStudioClient({
                   </ButtonPill>
                 </div>
               </article>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "assets" ? (
-            <div className="mt-4 grid gap-3 xl:grid-cols-2">
+      {activeStage === "assets" ? (
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
               <article className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">本集资产提取</p>
                 <div className="mt-3 space-y-2">
@@ -297,11 +277,11 @@ export function EpisodeStudioClient({
                   </ButtonPill>
                 </div>
               </article>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "storyboard" ? (
-            <div className="mt-4 rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
+      {activeStage === "storyboard" ? (
+        <div className="mt-4 rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">分镜列表 / 局部修复</p>
               <div className="mt-3 space-y-3">
                 {episodeState.storyboard.frames.map((frame) => (
@@ -326,11 +306,11 @@ export function EpisodeStudioClient({
                   </article>
                 ))}
               </div>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "video" ? (
-            <div className="mt-4 rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
+      {activeStage === "video" ? (
+        <div className="mt-4 rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">
                 视频候选区（已选 {selectedCount}/{episodeState.storyboard.frames.length}）
               </p>
@@ -371,11 +351,11 @@ export function EpisodeStudioClient({
                   </article>
                 ))}
               </div>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "review" ? (
-            <div className="mt-4 grid gap-3 xl:grid-cols-2">
+      {activeStage === "review" ? (
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
               <article className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">阶段完成度</p>
                 <p className="mt-2 text-4xl font-bold leading-none text-[var(--mc-ink)]">{episodeState.review.completion}%</p>
@@ -403,11 +383,11 @@ export function EpisodeStudioClient({
                   </ButtonPill>
                 </div>
               </article>
-            </div>
-          ) : null}
+        </div>
+      ) : null}
 
-          {activeStage === "export" ? (
-            <div className="mt-4 grid gap-3 xl:grid-cols-2">
+      {activeStage === "export" ? (
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
               <article className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">导出参数</p>
                 <div className="mt-3 space-y-2">
@@ -439,10 +419,8 @@ export function EpisodeStudioClient({
                   ))}
                 </div>
               </article>
-            </div>
-          ) : null}
-        </section>
-      </div>
-    </StudioShell>
+        </div>
+      ) : null}
+    </EpisodeWorkbenchShell>
   );
 }
