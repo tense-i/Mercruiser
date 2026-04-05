@@ -43,7 +43,7 @@ async function waitForServer(server, logs) {
 
 test("PRD-aligned episode edit flow and script workspace persist against real data", { timeout: 180_000 }, async () => {
   const logs = [];
-  const server = spawn("npx", ["next", "dev", "--port", String(PORT)], {
+  const server = spawn("npx", ["next", "start", "--port", String(PORT)], {
     cwd: process.cwd(),
     env: {
       ...process.env,

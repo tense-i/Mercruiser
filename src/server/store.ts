@@ -1697,6 +1697,64 @@ export const mvpStore = {
     }));
   },
 
+  saveStoryboard(input: {
+    id: string;
+    episodeId: string;
+    shotIndex?: number;
+    title?: string;
+    action?: string;
+    dialogue?: string;
+    prompt?: string;
+    durationSeconds?: number;
+    assetRefs?: string[];
+    status?: StoryboardRecord["status"];
+    imageUrl?: string | null;
+  }): StoryboardRecord | null {
+    const db = ensureDb();
+    const current = db.prepare("SELECT * FROM episode_storyboards WHERE id = ? AND episode_id = ?").get(input.id, input.episodeId) as
+      | Record<string, unknown>
+      | undefined;
+    if (!current) {
+      return null;
+    }
+
+    const record: StoryboardRecord = {
+      id: String(current.id),
+      episodeId: String(current.episode_id),
+      shotIndex: input.shotIndex ?? Number(current.shot_index),
+      title: input.title ?? String(current.title),
+      action: input.action ?? String(current.action),
+      dialogue: input.dialogue ?? String(current.dialogue),
+      prompt: input.prompt ?? String(current.prompt),
+      durationSeconds: input.durationSeconds ?? Number(current.duration_seconds),
+      assetRefs: input.assetRefs ?? parseJson<string[]>(current.asset_refs_json, []),
+      status: input.status ?? (String(current.status) as StoryboardRecord["status"]),
+      imageUrl:
+        input.imageUrl !== undefined ? input.imageUrl : current.image_url ? String(current.image_url) : null,
+      createdAt: String(current.created_at),
+    };
+
+    db.prepare(
+      `UPDATE episode_storyboards
+      SET shot_index = ?, title = ?, action = ?, dialogue = ?, prompt = ?, duration_seconds = ?, asset_refs_json = ?, status = ?, image_url = ?
+      WHERE id = ? AND episode_id = ?`,
+    ).run(
+      record.shotIndex,
+      record.title,
+      record.action,
+      record.dialogue,
+      record.prompt,
+      record.durationSeconds,
+      JSON.stringify(record.assetRefs),
+      record.status,
+      record.imageUrl,
+      record.id,
+      record.episodeId,
+    );
+
+    return record;
+  },
+
   replaceVideoCandidates(
     episodeId: string,
     candidates: Array<Omit<VideoCandidateRecord, "id" | "episodeId" | "createdAt" | "selected"> & { selected?: boolean }>,

@@ -7,6 +7,7 @@ import type { EpisodeStage as StageId, EpisodeStudioView as EpisodeStudio, Serie
 import { stageLabels, statusLabels } from "@/lib/mvp-ui";
 import { EpisodeWorkbenchShell } from "@/domains/episode/view/episode-workbench-shell";
 import { ShotTable } from "@/domains/shot/view/shot-table";
+import { StoryboardWorkbench } from "@/domains/storyboard/view/storyboard-workbench";
 import {
   ButtonPill,
   OrchestratorPanel,
@@ -284,32 +285,12 @@ export function EpisodeStudioClient({
       {activeStage === "storyboard" ? (
         <div className="mt-4 space-y-3">
           <ShotTable episodeId={episodeState.episodeId} />
-          <div className="rounded-2xl border border-[var(--mc-stroke)] bg-white/80 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--mc-muted)]">分镜列表 / 局部修复</p>
-              <div className="mt-3 space-y-3">
-                {episodeState.storyboard.frames.map((frame) => (
-                  <article key={frame.id} className="rounded-xl border border-[var(--mc-stroke)] bg-[var(--mc-soft)] p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-[var(--mc-ink)]">{frame.shot}</p>
-                      <span className="rounded-full border border-[var(--mc-stroke)] px-2 py-1 text-xs text-[var(--mc-muted)]">
-                        {frame.status}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-[var(--mc-ink)]">Action: {frame.action}</p>
-                    <p className="mt-1 text-sm text-[var(--mc-muted)]">Dialogue: {frame.dialogue}</p>
-                    <p className="mt-1 text-xs text-[var(--mc-muted)]">Prompt: {frame.prompt}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <ButtonPill tone="quiet">编辑分镜</ButtonPill>
-                      <ButtonPill tone="quiet">局部修复</ButtonPill>
-                      <ButtonPill tone="quiet">重排顺序</ButtonPill>
-                      <ButtonPill tone="quiet" onClick={() => runEpisodeAction("storyboard")} disabled={Boolean(runningAction)}>
-                        {runningAction === "storyboard" ? "处理中..." : "锁定通过并刷新分镜"}
-                      </ButtonPill>
-                    </div>
-                  </article>
-                ))}
-              </div>
-          </div>
+          <StoryboardWorkbench
+            episodeId={episodeState.episodeId}
+            refreshKey={episodeState.storyboard.frames.map((frame) => `${frame.id}:${frame.status}`).join("|")}
+            onGenerate={() => void runEpisodeAction("storyboard")}
+            generating={runningAction === "storyboard"}
+          />
         </div>
       ) : null}
 
