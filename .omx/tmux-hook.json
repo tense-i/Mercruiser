@@ -2,7 +2,7 @@
   "enabled": true,
   "target": {
     "type": "pane",
-    "value": "replace-with-tmux-pane-id"
+    "value": "%0"
   },
   "allowed_modes": [
     "ralph",

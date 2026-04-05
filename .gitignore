@@ -46,3 +46,7 @@ artifacts
 *.sqlite-shm
 
 .omx/
+.omx/*
+.omx/logs
+.omx/tmux-hook.json
+
