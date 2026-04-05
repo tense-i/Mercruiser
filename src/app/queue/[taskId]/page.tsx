@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
+import { TaskRerunButton } from "@/components/studio/task-rerun-button";
 import { stageLabels } from "@/lib/mvp-ui";
 import { mvpStore } from "@/server/infrastructure/sqlite/store";
-import { ButtonPill, OrchestratorPanel, SectionTitle, StudioShell } from "@/components/studio/studio-shell";
+import { OrchestratorPanel, SectionTitle, StudioShell } from "@/components/studio/studio-shell";
 
 type PageProps = {
   params: Promise<{ taskId: string }>;
@@ -131,7 +132,7 @@ export default async function QueueTaskDetailPage({ params }: PageProps) {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <ButtonPill tone="primary">应用恢复建议</ButtonPill>
+          <TaskRerunButton taskId={task.id} label={task.status === "failed" ? "重试当前阶段" : "重新执行当前阶段"} />
           <Link
             href={jumpExecutionHref}
             className="inline-flex items-center gap-1 rounded-lg border border-[var(--mc-stroke)] bg-white px-3 py-1.5 text-sm text-[var(--mc-ink)]"
