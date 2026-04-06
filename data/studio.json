@@ -2,7 +2,7 @@
   "version": 1,
   "meta": {
     "name": "Mercruiser Studio",
-    "updatedAt": "2026-04-06T05:15:31.065Z"
+    "updatedAt": "2026-04-06T09:32:24.313Z"
   },
   "series": [
     {
@@ -59,7 +59,7 @@
         "script": "completed",
         "subjects": "completed",
         "shots": "completed",
-        "storyboard": "completed",
+        "storyboard": "ready",
         "final-cut": "completed"
       },
       "sourceDocumentId": null,
@@ -84,7 +84,7 @@
       "directorPlanId": null,
       "finalCutId": "final_01",
       "createdAt": "2026-03-28T10:00:00.000Z",
-      "updatedAt": "2026-04-06T05:15:31.064Z"
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "episode_02",
@@ -184,9 +184,9 @@
       ],
       "audioStatus": "locked",
       "estimatedDurationSeconds": 28,
+      "revision": 1,
       "createdAt": "2026-03-28T10:00:00.000Z",
-      "updatedAt": "2026-03-29T12:00:00.000Z",
-      "revision": 1
+      "updatedAt": "2026-03-29T12:00:00.000Z"
     },
     {
       "id": "chapter_01_b",
@@ -203,9 +203,9 @@
       ],
       "audioStatus": "locked",
       "estimatedDurationSeconds": 22,
+      "revision": 1,
       "createdAt": "2026-03-28T10:05:00.000Z",
-      "updatedAt": "2026-03-29T12:00:00.000Z",
-      "revision": 1
+      "updatedAt": "2026-03-29T12:00:00.000Z"
     },
     {
       "id": "chapter_02_a",
@@ -217,9 +217,9 @@
       "dialogues": [],
       "audioStatus": "ready",
       "estimatedDurationSeconds": 24,
+      "revision": 1,
       "createdAt": "2026-04-02T10:00:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z",
-      "revision": 1
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     },
     {
       "id": "chapter_02_b",
@@ -240,9 +240,9 @@
       ],
       "audioStatus": "ready",
       "estimatedDurationSeconds": 30,
+      "revision": 1,
       "createdAt": "2026-04-02T10:03:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z",
-      "revision": 1
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     }
   ],
   "assets": [
@@ -296,8 +296,6 @@
       ],
       "parentAssetId": null,
       "variantName": null,
-      "createdAt": "2026-04-01T08:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z",
       "revision": 1,
       "globalAssetId": null,
       "syncSource": "local",
@@ -307,7 +305,9 @@
         "styleKeywords": [
           "series-default"
         ]
-      }
+      },
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
     },
     {
       "id": "asset_market",
@@ -358,8 +358,6 @@
       ],
       "parentAssetId": null,
       "variantName": null,
-      "createdAt": "2026-04-01T09:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z",
       "revision": 1,
       "globalAssetId": "global_asset_neon_gate",
       "syncSource": "linked",
@@ -369,7 +367,9 @@
         "styleKeywords": [
           "series-default"
         ]
-      }
+      },
+      "createdAt": "2026-04-01T09:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
     },
     {
       "id": "asset_relic",
@@ -420,8 +420,6 @@
       ],
       "parentAssetId": null,
       "variantName": null,
-      "createdAt": "2026-04-01T09:30:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z",
       "revision": 1,
       "globalAssetId": null,
       "syncSource": "local",
@@ -431,7 +429,9 @@
         "styleKeywords": [
           "series-default"
         ]
-      }
+      },
+      "createdAt": "2026-04-01T09:30:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
     },
     {
       "id": "asset_agent",
@@ -477,8 +477,6 @@
       ],
       "parentAssetId": null,
       "variantName": null,
-      "createdAt": "2026-04-03T11:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z",
       "revision": 1,
       "globalAssetId": null,
       "syncSource": "local",
@@ -488,7 +486,170 @@
         "styleKeywords": [
           "series-default"
         ]
-      }
+      },
+      "createdAt": "2026-04-03T11:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    }
+  ],
+  "globalAssets": [
+    {
+      "id": "global_asset_neon_gate",
+      "name": "霓虹夜市摊位",
+      "type": "scene",
+      "ownerId": "workspace-owner",
+      "description": "可跨系列复用的赛博夜市摊位资产。",
+      "prompt": "Cyber oriental market stall, layered neon lights, cinematic clutter.",
+      "referenceImages": [
+        "/generated/asset_market-asset_image_307319b7.jpg"
+      ],
+      "selectedImageId": "global_asset_neon_gate_image_1",
+      "voiceId": null,
+      "faceLocked": false,
+      "consistencyConfig": {
+        "referenceStrength": 0.72,
+        "styleKeywords": [
+          "cyber-oriental",
+          "market"
+        ]
+      },
+      "usedInSeries": [
+        {
+          "seriesId": "series_neon_relic",
+          "seriesName": "Neon Relic",
+          "linkedAssetId": "asset_market"
+        }
+      ],
+      "tags": [
+        "scene",
+        "market"
+      ],
+      "revision": 1,
+      "createdAt": "2026-04-05T08:00:00.000Z",
+      "updatedAt": "2026-04-06T05:15:31.065Z"
+    }
+  ],
+  "generationPresets": [
+    {
+      "id": "preset_series_storyboard",
+      "name": "Series Storyboard Hero",
+      "scope": "series",
+      "scopeId": "series_neon_relic",
+      "type": "image",
+      "imageConfig": {
+        "model": "siliconflow/black-forest-labs/FLUX.1-schnell",
+        "style": "cyber-oriental cinematic",
+        "negativePrompt": "blurry, duplicate limbs, watermark",
+        "aspectRatio": "16:9",
+        "steps": 30,
+        "cfgScale": 6.5
+      },
+      "usageCount": 2,
+      "createdBy": "producer",
+      "createdAt": "2026-04-05T09:00:00.000Z",
+      "updatedAt": "2026-04-06T05:00:00.000Z"
+    },
+    {
+      "id": "preset_global_motion",
+      "name": "Global Motion Base",
+      "scope": "global",
+      "scopeId": null,
+      "type": "video",
+      "videoConfig": {
+        "model": "siliconflow/kling-v1",
+        "motionScale": 0.6,
+        "fps": 24,
+        "duration": 5
+      },
+      "usageCount": 1,
+      "createdBy": "producer",
+      "createdAt": "2026-04-05T10:00:00.000Z",
+      "updatedAt": "2026-04-06T05:00:00.000Z"
+    }
+  ],
+  "apiUsageRecords": [
+    {
+      "id": "usage_1f47a276",
+      "currency": "USD",
+      "createdAt": "2026-04-06T09:32:24.313Z",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "shot_image_generation",
+      "imageCount": 2,
+      "estimatedCost": 0.4,
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_01",
+      "taskType": "asset_generate",
+      "taskId": "task_dd7b7278"
+    },
+    {
+      "id": "usage_8f627a4a",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "shot_image_generation",
+      "imageCount": 2,
+      "estimatedCost": 0.4,
+      "currency": "USD",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_01",
+      "taskType": "asset_generate",
+      "taskId": "task_8f31be51",
+      "createdAt": "2026-04-06T09:32:21.965Z"
+    },
+    {
+      "id": "usage_seed_script",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "script_generation",
+      "inputTokens": 860,
+      "outputTokens": 320,
+      "estimatedCost": 0.18,
+      "currency": "USD",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "taskType": "script",
+      "taskId": "task_seed_script",
+      "createdAt": "2026-04-06T04:35:00.000Z"
+    },
+    {
+      "id": "usage_seed_shot",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "shot_generation",
+      "inputTokens": 640,
+      "outputTokens": 280,
+      "estimatedCost": 0.22,
+      "currency": "USD",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "taskType": "shot_generate",
+      "taskId": "task_seed_shot",
+      "createdAt": "2026-04-06T04:40:00.000Z"
+    }
+  ],
+  "usageAlerts": [
+    {
+      "id": "usage_single_task",
+      "type": "single_task_limit",
+      "threshold": 5,
+      "currentValue": 0.4,
+      "status": "normal",
+      "notifyMethod": "block"
+    },
+    {
+      "id": "usage_daily",
+      "type": "daily_limit",
+      "threshold": 50,
+      "currentValue": 1.2,
+      "status": "normal",
+      "notifyMethod": "block"
+    },
+    {
+      "id": "usage_monthly",
+      "type": "monthly_limit",
+      "threshold": 500,
+      "currentValue": 1.2,
+      "status": "normal",
+      "notifyMethod": "block"
     }
   ],
   "directorPlans": [],
@@ -532,21 +693,27 @@
       ],
       "takes": [
         {
-          "id": "take_01_a",
+          "id": "take_shot_image_1f6ce1ff",
           "kind": "image",
           "label": "主版本",
-          "url": "/shots/shot-01-a.jpg",
+          "url": "/generated/shot_01-shot_image_1f6ce1ff.jpg",
           "durationSeconds": null,
           "isSelected": true
         }
       ],
-      "images": [],
-      "state": "draft",
+      "images": [
+        {
+          "id": "shot_image_1f6ce1ff",
+          "label": "主版本",
+          "imageUrl": "/generated/shot_01-shot_image_1f6ce1ff.jpg",
+          "createdAt": "2026-04-06T09:32:21.965Z",
+          "isSelected": true
+        }
+      ],
+      "state": "completed",
       "track": "default",
       "trackId": "track_default",
-      "createdAt": "2026-03-29T10:00:00.000Z",
-      "updatedAt": "2026-03-30T10:00:00.000Z",
-      "revision": 1,
+      "revision": 3,
       "assetSnapshots": [
         {
           "assetId": "asset_lan",
@@ -581,7 +748,9 @@
           "url": null,
           "notes": "远景建立失控夜市和林岚的动线，前景灯箱遮挡制造压迫感。"
         }
-      ]
+      ],
+      "createdAt": "2026-03-29T10:00:00.000Z",
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "shot_02",
@@ -622,21 +791,27 @@
       ],
       "takes": [
         {
-          "id": "take_02_a",
+          "id": "take_shot_image_80ba98c9",
           "kind": "image",
           "label": "主版本",
-          "url": "/shots/shot-02-a.jpg",
+          "url": "/generated/shot_02-shot_image_80ba98c9.jpg",
           "durationSeconds": null,
           "isSelected": true
         }
       ],
-      "images": [],
-      "state": "draft",
+      "images": [
+        {
+          "id": "shot_image_80ba98c9",
+          "label": "主版本",
+          "imageUrl": "/generated/shot_02-shot_image_80ba98c9.jpg",
+          "createdAt": "2026-04-06T09:32:21.965Z",
+          "isSelected": true
+        }
+      ],
+      "state": "completed",
       "track": "default",
       "trackId": "track_default",
-      "createdAt": "2026-03-29T10:10:00.000Z",
-      "updatedAt": "2026-03-30T10:10:00.000Z",
-      "revision": 1,
+      "revision": 3,
       "assetSnapshots": [
         {
           "assetId": "asset_lan",
@@ -671,7 +846,9 @@
           "url": null,
           "notes": "Relic 在手掌中亮起，电流纹理与角色瞳孔反光形成对照。"
         }
-      ]
+      ],
+      "createdAt": "2026-03-29T10:10:00.000Z",
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "shot_03",
@@ -738,8 +915,6 @@
       "state": "draft",
       "track": "default",
       "trackId": "track_default",
-      "createdAt": "2026-04-03T12:00:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z",
       "revision": 1,
       "assetSnapshots": [
         {
@@ -775,7 +950,9 @@
           "url": null,
           "notes": "林岚抱着 relic 穿过夜市后巷，灯箱投影从头顶下坠。"
         }
-      ]
+      ],
+      "createdAt": "2026-04-03T12:00:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     },
     {
       "id": "shot_04",
@@ -828,8 +1005,6 @@
       "state": "draft",
       "track": "default",
       "trackId": "track_default",
-      "createdAt": "2026-04-03T12:10:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z",
       "revision": 1,
       "assetSnapshots": [
         {
@@ -865,7 +1040,9 @@
           "url": null,
           "notes": "地下摊主提出交易，镜头从中景逐步逼近林岚眼神。"
         }
-      ]
+      ],
+      "createdAt": "2026-04-03T12:10:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     }
   ],
   "storyboards": [
@@ -875,12 +1052,12 @@
       "shotId": "shot_01",
       "subtitle": "雨雾和霓虹压低了城市的呼吸。",
       "notes": "建立系列视觉语言。",
-      "selectedTakeId": "take_01_a",
+      "selectedTakeId": "take_shot_image_1f6ce1ff",
       "referenceAssetIds": [
         "asset_market"
       ],
-      "updatedAt": "2026-03-30T10:00:00.000Z",
-      "revision": 1
+      "revision": 3,
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "story_02",
@@ -888,12 +1065,12 @@
       "shotId": "shot_02",
       "subtitle": "它第一次叫出她的名字。",
       "notes": "遗物激活应与上一镜主光方向一致。",
-      "selectedTakeId": "take_02_a",
+      "selectedTakeId": "take_shot_image_80ba98c9",
       "referenceAssetIds": [
         "asset_relic"
       ],
-      "updatedAt": "2026-03-30T10:10:00.000Z",
-      "revision": 1
+      "revision": 3,
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "story_03",
@@ -906,8 +1083,8 @@
         "asset_lan",
         "asset_market"
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z",
-      "revision": 1
+      "revision": 1,
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     },
     {
       "id": "story_04",
@@ -920,8 +1097,8 @@
         "asset_lan",
         "asset_relic"
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z",
-      "revision": 1
+      "revision": 1,
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     }
   ],
   "finalCuts": [
@@ -975,8 +1152,8 @@
           ]
         }
       ],
-      "updatedAt": "2026-04-01T16:00:00.000Z",
-      "revision": 1
+      "revision": 1,
+      "updatedAt": "2026-04-01T16:00:00.000Z"
     },
     {
       "id": "final_02",
@@ -1028,8 +1205,8 @@
           ]
         }
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z",
-      "revision": 1
+      "revision": 1,
+      "updatedAt": "2026-04-06T00:00:00.000Z"
     },
     {
       "id": "final_03",
@@ -1039,15 +1216,87 @@
       "exportStatus": "draft",
       "notes": "第三集尚未进入成片阶段。",
       "tracks": [],
-      "updatedAt": "2026-04-05T09:30:00.000Z",
-      "revision": 1
+      "revision": 1,
+      "updatedAt": "2026-04-05T09:30:00.000Z"
     }
   ],
   "tasks": [
     {
+      "id": "task_dd7b7278",
+      "createdAt": "2026-04-06T09:32:24.313Z",
+      "updatedAt": "2026-04-06T09:32:24.313Z",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_01",
+      "title": "为 遗物开口 批量生成分镜图",
+      "description": "共完成 2 个镜头的分镜主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_01",
+      "error": null,
+      "logs": [
+        "shot rendered: 夜市建立镜头",
+        "shot rendered: 遗物特写"
+      ],
+      "batch": {
+        "total": 2,
+        "processed": 2,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_01",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_02",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "task_8f31be51",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_01",
+      "title": "为 遗物开口 批量生成分镜图",
+      "description": "共完成 2 个镜头的分镜主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_01",
+      "error": null,
+      "logs": [
+        "shot rendered: 夜市建立镜头",
+        "shot rendered: 遗物特写"
+      ],
+      "batch": {
+        "total": 2,
+        "processed": 2,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_01",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_02",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-06T09:32:21.965Z",
+      "updatedAt": "2026-04-06T09:32:21.965Z"
+    },
+    {
       "id": "task_431b8e34",
-      "createdAt": "2026-04-06T05:15:31.065Z",
-      "updatedAt": "2026-04-06T05:15:31.065Z",
       "kind": "asset",
       "targetType": "episode",
       "targetId": "episode_01",
@@ -1057,7 +1306,10 @@
       "retryable": true,
       "link": "/series/series_neon_relic/episodes/episode_01",
       "error": null,
-      "logs": []
+      "logs": [],
+      "batch": null,
+      "createdAt": "2026-04-06T05:15:31.065Z",
+      "updatedAt": "2026-04-06T05:15:31.065Z"
     },
     {
       "id": "task_3813b1ad",
@@ -1076,6 +1328,7 @@
         "asset rendered: 遗物 Relic",
         "asset rendered: 巡检 Agent"
       ],
+      "batch": null,
       "createdAt": "2026-04-06T04:39:45.014Z",
       "updatedAt": "2026-04-06T04:39:45.014Z"
     },
@@ -1096,6 +1349,7 @@
         "asset rendered: 遗物 Relic",
         "asset rendered: 巡检 Agent"
       ],
+      "batch": null,
       "createdAt": "2026-04-06T04:39:44.197Z",
       "updatedAt": "2026-04-06T04:39:44.197Z"
     },
@@ -1116,6 +1370,7 @@
         "asset rendered: 遗物 Relic",
         "asset rendered: 巡检 Agent"
       ],
+      "batch": null,
       "createdAt": "2026-04-06T04:39:41.258Z",
       "updatedAt": "2026-04-06T04:39:41.258Z"
     },
@@ -1133,6 +1388,7 @@
       "logs": [
         "asset extraction completed"
       ],
+      "batch": null,
       "createdAt": "2026-04-06T04:39:34.697Z",
       "updatedAt": "2026-04-06T04:39:34.697Z"
     },
@@ -1151,6 +1407,7 @@
         "selected provider: video/mock-v1",
         "request timeout after 30s"
       ],
+      "batch": null,
       "createdAt": "2026-04-06T00:00:00.000Z",
       "updatedAt": "2026-04-06T00:00:00.000Z"
     },
@@ -1170,6 +1427,7 @@
         "loaded 2 shots",
         "loaded 4 shared assets"
       ],
+      "batch": null,
       "createdAt": "2026-04-05T23:50:00.000Z",
       "updatedAt": "2026-04-06T00:00:00.000Z"
     }
@@ -1233,6 +1491,28 @@
     }
   ],
   "workflowRuns": [
+    {
+      "id": "workflow_f2f64b2f",
+      "episodeId": "episode_01",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 2 条分镜图",
+      "taskId": "task_dd7b7278",
+      "createdAt": "2026-04-06T09:32:24.313Z",
+      "updatedAt": "2026-04-06T09:32:24.313Z"
+    },
+    {
+      "id": "workflow_e94a3a37",
+      "episodeId": "episode_01",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 2 条分镜图",
+      "taskId": "task_8f31be51",
+      "createdAt": "2026-04-06T09:32:21.965Z",
+      "updatedAt": "2026-04-06T09:32:21.965Z"
+    },
     {
       "id": "workflow_e5858d57",
       "episodeId": "episode_01",
@@ -1387,15 +1667,15 @@
         },
         {
           "kind": "open_storyboard",
-          "enabled": false,
+          "enabled": true,
           "label": "进入故事板",
-          "reason": "分镜图片尚未收敛"
+          "reason": null
         },
         {
           "kind": "open_final_cut",
-          "enabled": false,
+          "enabled": true,
           "label": "进入成片",
-          "reason": "需要先完成故事板主版本选择"
+          "reason": null
         },
         {
           "kind": "export_episode",
@@ -1404,147 +1684,12 @@
           "reason": null
         }
       ],
-      "blockedReasons": [
-        "仍有分镜未完成图片生成或未选定主版本"
-      ],
+      "blockedReasons": [],
       "requiredInputs": [
         "需要先导入小说原文",
         "需要先提取本集主体"
       ],
-      "updatedAt": "2026-04-06T05:15:31.064Z"
-    }
-  ],
-  "globalAssets": [
-    {
-      "id": "global_asset_neon_gate",
-      "name": "霓虹夜市摊位",
-      "type": "scene",
-      "ownerId": "workspace-owner",
-      "description": "可跨系列复用的赛博夜市摊位资产。",
-      "prompt": "Cyber oriental market stall, layered neon lights, cinematic clutter.",
-      "referenceImages": [
-        "/generated/asset_market-asset_image_307319b7.jpg"
-      ],
-      "selectedImageId": "global_asset_neon_gate_image_1",
-      "voiceId": null,
-      "faceLocked": false,
-      "consistencyConfig": {
-        "referenceStrength": 0.72,
-        "styleKeywords": [
-          "cyber-oriental",
-          "market"
-        ]
-      },
-      "usedInSeries": [
-        {
-          "seriesId": "series_neon_relic",
-          "seriesName": "Neon Relic",
-          "linkedAssetId": "asset_market"
-        }
-      ],
-      "tags": [
-        "scene",
-        "market"
-      ],
-      "revision": 1,
-      "createdAt": "2026-04-05T08:00:00.000Z",
-      "updatedAt": "2026-04-06T05:15:31.065Z"
-    }
-  ],
-  "generationPresets": [
-    {
-      "id": "preset_series_storyboard",
-      "name": "Series Storyboard Hero",
-      "scope": "series",
-      "scopeId": "series_neon_relic",
-      "type": "image",
-      "imageConfig": {
-        "model": "siliconflow/black-forest-labs/FLUX.1-schnell",
-        "style": "cyber-oriental cinematic",
-        "negativePrompt": "blurry, duplicate limbs, watermark",
-        "aspectRatio": "16:9",
-        "steps": 30,
-        "cfgScale": 6.5
-      },
-      "usageCount": 2,
-      "createdBy": "producer",
-      "createdAt": "2026-04-05T09:00:00.000Z",
-      "updatedAt": "2026-04-06T05:00:00.000Z"
-    },
-    {
-      "id": "preset_global_motion",
-      "name": "Global Motion Base",
-      "scope": "global",
-      "scopeId": null,
-      "type": "video",
-      "videoConfig": {
-        "model": "siliconflow/kling-v1",
-        "motionScale": 0.6,
-        "fps": 24,
-        "duration": 5
-      },
-      "usageCount": 1,
-      "createdBy": "producer",
-      "createdAt": "2026-04-05T10:00:00.000Z",
-      "updatedAt": "2026-04-06T05:00:00.000Z"
-    }
-  ],
-  "apiUsageRecords": [
-    {
-      "id": "usage_seed_script",
-      "provider": "mock",
-      "model": "google/gemini-2.5-flash",
-      "endpoint": "script_generation",
-      "inputTokens": 860,
-      "outputTokens": 320,
-      "estimatedCost": 0.18,
-      "currency": "USD",
-      "seriesId": "series_neon_relic",
-      "episodeId": "episode_02",
-      "taskType": "script",
-      "taskId": "task_seed_script",
-      "createdAt": "2026-04-06T04:35:00.000Z"
-    },
-    {
-      "id": "usage_seed_shot",
-      "provider": "mock",
-      "model": "google/gemini-2.5-flash",
-      "endpoint": "shot_generation",
-      "inputTokens": 640,
-      "outputTokens": 280,
-      "estimatedCost": 0.22,
-      "currency": "USD",
-      "seriesId": "series_neon_relic",
-      "episodeId": "episode_02",
-      "taskType": "shot_generate",
-      "taskId": "task_seed_shot",
-      "createdAt": "2026-04-06T04:40:00.000Z"
-    }
-  ],
-  "usageAlerts": [
-    {
-      "id": "usage_single_task",
-      "type": "single_task_limit",
-      "threshold": 5,
-      "currentValue": 0.22,
-      "status": "normal",
-      "notifyMethod": "block"
-    },
-    {
-      "id": "usage_daily",
-      "type": "daily_limit",
-      "threshold": 50,
-      "currentValue": 0.4,
-      "status": "normal",
-      "notifyMethod": "block"
-    },
-    {
-      "id": "usage_monthly",
-      "type": "monthly_limit",
-      "threshold": 500,
-      "currentValue": 0.4,
-      "status": "normal",
-      "notifyMethod": "block"
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     }
   ]
 }
