@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    exclude: ['.omx/**', 'node_modules/**'],
     alias: {
       '@': process.cwd(),
     },

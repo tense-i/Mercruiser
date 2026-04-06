@@ -12,3 +12,4 @@ coverage/
 !.env.example
 ./Toonflow-app
 Toonflow-app/
+.codex/

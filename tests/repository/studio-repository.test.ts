@@ -102,7 +102,7 @@ describe('studio repository', () => {
 
     const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
     const shot = episodeView?.shots.find((item) => item.id === 'shot_03');
-    const storyboard = episodeView?.storyboard.find((item) => item.shotId === 'shot_03');
+    const storyboard = episodeView?.storyboards.find((item) => item.shotId === 'shot_03');
 
     expect(shot?.takes.find((take) => take.id === 'take_03_a')?.isSelected).toBe(false);
     expect(shot?.takes.find((take) => take.id === 'take_03_b')?.isSelected).toBe(true);
@@ -194,7 +194,7 @@ describe('studio repository', () => {
 
     const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
     expect(episodeView?.shots.length).toBeGreaterThan(0);
-    expect(episodeView?.shots.every((shot) => shot.takes).every((takes) => takes.length === 0)).toBe(true);
+    expect(episodeView?.shots.every((shot) => shot.takes.length === 0)).toBe(true);
     expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId === null)).toBe(true);
     expect(episodeView?.tasks[0]?.kind).toBe('agent');
   });

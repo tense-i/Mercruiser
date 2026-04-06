@@ -4,13 +4,16 @@ import path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import type { StudioWorkspace } from '@/lib/domain/types';
+
 let previousPath = process.env.MERCRUISER_DATA_PATH;
 
-async function prepareWorkspace() {
+async function prepareWorkspace(mutate?: (workspace: StudioWorkspace) => void) {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-api-'));
   const targetPath = path.join(tempDir, 'studio.json');
-  const seed = await readFile(path.join(process.cwd(), 'data', 'studio.json'), 'utf8');
-  await writeFile(targetPath, seed, 'utf8');
+  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'studio.json'), 'utf8')) as StudioWorkspace;
+  mutate?.(seed);
+  await writeFile(targetPath, JSON.stringify(seed, null, 2), 'utf8');
   process.env.MERCRUISER_DATA_PATH = targetPath;
 }
 
@@ -114,6 +117,77 @@ describe('studio api route', () => {
     expect(shot.durationSeconds).toBe(7);
   });
 
+  it('selects a requested take through the api and syncs storyboard state', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'selectTake',
+            shotId: 'shot_03',
+            takeId: 'take_03_b',
+          },
+          context: {
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    const shot = payload.episodeView.shots.find((item: { id: string }) => item.id === 'shot_03');
+    const storyboard = payload.episodeView.storyboards.find((item: { shotId: string }) => item.shotId === 'shot_03');
+    expect(shot.takes.find((take: { id: string }) => take.id === 'take_03_a').isSelected).toBe(false);
+    expect(shot.takes.find((take: { id: string }) => take.id === 'take_03_b').isSelected).toBe(true);
+    expect(storyboard.selectedTakeId).toBe('take_03_b');
+  });
+
+  it('selects an asset image through the api and mirrors the selection to versions', async () => {
+    await prepareWorkspace((workspace) => {
+      const asset = workspace.assets.find((item) => item.id === 'asset_agent');
+      if (!asset || !asset.images[0]) {
+        throw new Error('asset_agent seed asset is missing its primary image');
+      }
+
+      const alternate = {
+        ...asset.images[0],
+        id: 'asset_image_alt',
+        label: '候选版本',
+        imageUrl: '/generated/asset-agent-alt.jpg',
+        isSelected: false,
+      };
+
+      asset.images = [asset.images[0], alternate];
+      asset.versions = [asset.versions[0], alternate];
+    });
+
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'selectAssetImage',
+            assetId: 'asset_agent',
+            imageId: 'asset_image_alt',
+          },
+          context: {
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    const asset = payload.episodeView.assets.find((item: { id: string }) => item.id === 'asset_agent');
+    expect(asset.images.find((image: { id: string }) => image.id === 'asset_image_9a9e2465').isSelected).toBe(false);
+    expect(asset.images.find((image: { id: string }) => image.id === 'asset_image_alt').isSelected).toBe(true);
+    expect(asset.versions.find((image: { id: string }) => image.id === 'asset_image_alt').isSelected).toBe(true);
+  });
+
   it('imports source documents through the api', async () => {
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(
@@ -164,5 +238,32 @@ describe('studio api route', () => {
     expect(payload.ok).toBe(true);
     expect(payload.settings.ai.mode).toBe('siliconflow');
     expect(payload.settings.ai.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
+  });
+
+  it('retries failed tasks through the dedicated retry route', async () => {
+    const { POST } = await import('@/app/api/tasks/[taskId]/retry/route');
+    const response = await POST(new Request('http://localhost/api/tasks/task_failed_storyboard/retry', { method: 'POST' }), {
+      params: Promise.resolve({ taskId: 'task_failed_storyboard' }),
+    });
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.result.task.status).toBe('completed');
+    expect(payload.result.task.error).toBeNull();
+    const retriedTask = payload.tasks.find((task: { id: string }) => task.id === 'task_failed_storyboard');
+    expect(retriedTask.status).toBe('completed');
+    expect(retriedTask.error).toBeNull();
+  });
+
+  it('rejects remote retry attempts by default', async () => {
+    const { POST } = await import('@/app/api/tasks/[taskId]/retry/route');
+    const response = await POST(new Request('https://example.com/api/tasks/task_failed_storyboard/retry', { method: 'POST' }), {
+      params: Promise.resolve({ taskId: 'task_failed_storyboard' }),
+    });
+    const payload = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(payload.ok).toBe(false);
+    expect(payload.error).toContain('Remote writes are disabled');
   });
 });
