@@ -7,6 +7,74 @@ const BatchSnapshotSchema = z.object({
   revision: z.number().int().positive(),
 });
 
+const SeriesSettingsPayloadSchema = z.object({
+  worldEra: z.string().optional(),
+  worldDescription: z.string().optional(),
+  coreRules: z.array(z.string()).optional(),
+  visualStylePreset: z.string().optional(),
+  visualStylePrompt: z.string().optional(),
+  referenceImages: z.array(z.string()).optional(),
+  defaultShotStrategy: z.string().optional(),
+  defaultDurationStrategy: z.string().optional(),
+  cameraMotionPreference: z.string().optional(),
+  inheritToEpisodes: z.boolean().optional(),
+});
+
+const SeriesStrategyPayloadSchema = z.object({
+  model: z.string().optional(),
+  stylePreference: z.string().optional(),
+  aspectRatio: z.string().optional(),
+  creationMode: z.string().optional(),
+  promptGuidance: z.string().optional(),
+  inheritToEpisodes: z.boolean().optional(),
+  priorityNote: z.string().optional(),
+});
+
+export const CreateSeriesCommandSchema = z.object({
+  type: z.literal('createSeries'),
+  name: z.string().min(1).max(50),
+  description: z.string().default(''),
+  coverUrl: z.string().optional(),
+});
+
+export const ImportSeriesCommandSchema = z.object({
+  type: z.literal('importSeries'),
+  name: z.string().min(1).max(50),
+  description: z.string().default(''),
+  importType: z.literal('text').default('text'),
+  sourceTitle: z.string().min(1).default('Imported source'),
+  content: z.string().min(1),
+  firstEpisodeTitle: z.string().min(1).default('Episode 1'),
+});
+
+export const UpdateSeriesSettingsCommandSchema = z.object({
+  type: z.literal('updateSeriesSettings'),
+  seriesId: z.string(),
+  settings: SeriesSettingsPayloadSchema,
+});
+
+export const UpdateSeriesStrategyCommandSchema = z.object({
+  type: z.literal('updateSeriesStrategy'),
+  seriesId: z.string(),
+  strategy: SeriesStrategyPayloadSchema,
+});
+
+export const CreateEpisodeCommandSchema = z.object({
+  type: z.literal('createEpisode'),
+  seriesId: z.string(),
+  title: z.string().min(1),
+  logline: z.string().default(''),
+});
+
+export const CreateEpisodeFromSourceCommandSchema = z.object({
+  type: z.literal('createEpisodeFromSource'),
+  seriesId: z.string(),
+  title: z.string().min(1),
+  logline: z.string().default(''),
+  sourceTitle: z.string().min(1),
+  sourceContent: z.string().min(1),
+});
+
 export const UpdateChapterCommandSchema = z.object({
   type: z.literal('updateChapter'),
   chapterId: z.string(),
@@ -169,6 +237,12 @@ export const RetryTaskCommandSchema = z.object({
 });
 
 export const StudioCommandSchema = z.discriminatedUnion('type', [
+  CreateSeriesCommandSchema,
+  ImportSeriesCommandSchema,
+  UpdateSeriesSettingsCommandSchema,
+  UpdateSeriesStrategyCommandSchema,
+  CreateEpisodeCommandSchema,
+  CreateEpisodeFromSourceCommandSchema,
   UpdateChapterCommandSchema,
   ImportSourceDocumentCommandSchema,
   GenerateScriptFromSourceCommandSchema,
