@@ -1,0 +1,1180 @@
+{
+  "version": 1,
+  "meta": {
+    "name": "Mercruiser Studio",
+    "updatedAt": "2026-04-06T05:15:31.065Z"
+  },
+  "series": [
+    {
+      "id": "series_neon_relic",
+      "name": "Neon Relic",
+      "description": "霓虹遗城中的失控文物与失忆少女，围绕系列世界观、共享资产和工业化生产线持续推进。",
+      "status": "producing",
+      "coverUrl": "/covers/neon-relic.jpg",
+      "genre": "科幻悬疑",
+      "style": "赛博东方 + 高对比胶片感",
+      "worldRules": [
+        "系列共享主体优先于单集临时资产",
+        "音频前置时镜头时长默认由对白长度锁定",
+        "关键镜头必须经过 continuity 检查"
+      ],
+      "episodeIds": [
+        "episode_01",
+        "episode_02",
+        "episode_03"
+      ],
+      "progress": 62,
+      "createdAt": "2026-03-28T10:00:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "series_jade_archive",
+      "name": "Jade Archive",
+      "description": "一部围绕古城档案馆与灵异录音带展开的短剧企划，目前停留在系列设定阶段。",
+      "status": "setting",
+      "coverUrl": "/covers/jade-archive.jpg",
+      "genre": "都市奇谈",
+      "style": "湿冷青绿 + 静压镜头",
+      "worldRules": [
+        "每集必须保留一个可复用的场景资产",
+        "设定侧边栏变更不能静默污染系列规则"
+      ],
+      "episodeIds": [],
+      "progress": 18,
+      "createdAt": "2026-04-02T09:00:00.000Z",
+      "updatedAt": "2026-04-05T08:00:00.000Z"
+    }
+  ],
+  "episodes": [
+    {
+      "id": "episode_01",
+      "seriesId": "series_neon_relic",
+      "index": 1,
+      "title": "遗物开口",
+      "logline": "拾荒少女林岚在失控夜市捡到会说话的 relic，系列生产线从概览推进到成片草装配。",
+      "status": "done",
+      "progress": 100,
+      "stationStates": {
+        "overview": "completed",
+        "script": "completed",
+        "subjects": "completed",
+        "shots": "completed",
+        "storyboard": "completed",
+        "final-cut": "completed"
+      },
+      "sourceDocumentId": null,
+      "currentStage": "final_cut",
+      "chapterIds": [
+        "chapter_01_a",
+        "chapter_01_b"
+      ],
+      "assetIds": [
+        "asset_lan",
+        "asset_market",
+        "asset_relic"
+      ],
+      "shotIds": [
+        "shot_01",
+        "shot_02"
+      ],
+      "storyboardIds": [
+        "story_01",
+        "story_02"
+      ],
+      "directorPlanId": null,
+      "finalCutId": "final_01",
+      "createdAt": "2026-03-28T10:00:00.000Z",
+      "updatedAt": "2026-04-06T05:15:31.064Z"
+    },
+    {
+      "id": "episode_02",
+      "seriesId": "series_neon_relic",
+      "index": 2,
+      "title": "夜市回响",
+      "logline": "林岚与 relic 被追入夜市深处，当前正在剧本、主体、分镜和故事板并行生产。",
+      "status": "in_progress",
+      "progress": 100,
+      "stationStates": {
+        "overview": "completed",
+        "script": "editing",
+        "subjects": "completed",
+        "shots": "ready",
+        "storyboard": "generating",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": null,
+      "currentStage": "final_cut",
+      "chapterIds": [
+        "chapter_02_a",
+        "chapter_02_b"
+      ],
+      "assetIds": [
+        "asset_lan",
+        "asset_market",
+        "asset_relic",
+        "asset_agent"
+      ],
+      "shotIds": [
+        "shot_03",
+        "shot_04"
+      ],
+      "storyboardIds": [
+        "story_03",
+        "story_04"
+      ],
+      "directorPlanId": null,
+      "finalCutId": "final_02",
+      "createdAt": "2026-04-02T10:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "episode_03",
+      "seriesId": "series_neon_relic",
+      "index": 3,
+      "title": "磁场错位",
+      "logline": "第三集现在停留在原文已导入、待生成剧本的阶段，用于验证新版 Agent 驱动工作流。",
+      "status": "not_started",
+      "progress": 20,
+      "stationStates": {
+        "overview": "ready",
+        "script": "idle",
+        "subjects": "idle",
+        "shots": "idle",
+        "storyboard": "idle",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": "source_episode_03",
+      "currentStage": "script_generation",
+      "chapterIds": [],
+      "assetIds": [
+        "asset_lan",
+        "asset_relic"
+      ],
+      "shotIds": [],
+      "storyboardIds": [],
+      "directorPlanId": null,
+      "finalCutId": "final_03",
+      "createdAt": "2026-04-05T09:30:00.000Z",
+      "updatedAt": "2026-04-05T09:30:00.000Z"
+    }
+  ],
+  "sourceDocuments": [
+    {
+      "id": "source_episode_03",
+      "episodeId": "episode_03",
+      "title": "第三集原文",
+      "content": "林岚在磁场错乱的废弃车站醒来，站台上的时钟全部停在不同刻度。她听见 relic 用更清晰的声音提醒她不要看向轨道尽头。巡检 Agent 的脚步声从回声里逼近，废旧广告屏开始闪烁她并不记得的童年画面。她必须在逃离、回望和追问真相之间做出第一次主动选择。",
+      "importedAt": "2026-04-05T09:20:00.000Z"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "chapter_01_a",
+      "episodeId": "episode_01",
+      "index": 1,
+      "title": "夜市开场",
+      "content": "霓虹雨幕下，林岚穿过拥挤夜市，摊位灯箱与湿地反光构成一条压迫性的通道，她在旧物堆里听见微弱的求救声。",
+      "scene": "夜市入口",
+      "dialogues": [
+        {
+          "speaker": "旁白",
+          "content": "夜市像在收紧呼吸。"
+        }
+      ],
+      "audioStatus": "locked",
+      "estimatedDurationSeconds": 28,
+      "createdAt": "2026-03-28T10:00:00.000Z",
+      "updatedAt": "2026-03-29T12:00:00.000Z"
+    },
+    {
+      "id": "chapter_01_b",
+      "episodeId": "episode_01",
+      "index": 2,
+      "title": "遗物发声",
+      "content": "她捡起 relic 的瞬间，画面中的电流噪点骤然加重，遗物用像收音机一样断裂的嗓音叫出她的名字。",
+      "scene": "夜市旧物堆",
+      "dialogues": [
+        {
+          "speaker": "Relic",
+          "content": "林岚。"
+        }
+      ],
+      "audioStatus": "locked",
+      "estimatedDurationSeconds": 22,
+      "createdAt": "2026-03-28T10:05:00.000Z",
+      "updatedAt": "2026-03-29T12:00:00.000Z"
+    },
+    {
+      "id": "chapter_02_a",
+      "episodeId": "episode_02",
+      "index": 1,
+      "title": "回廊追逐",
+      "content": "林岚抱着 relic 躲进夜市后巷，头顶的投影广告一层层坠下，巡检 agent 的脚步声从深处逼近，镜头需要突出空间压缩感与角色呼吸。",
+      "scene": "夜市后巷",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 24,
+      "createdAt": "2026-04-02T10:00:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "chapter_02_b",
+      "episodeId": "episode_02",
+      "index": 2,
+      "title": "摊主交易",
+      "content": "地下摊主提出用一段旧记忆换取隐藏路线，林岚在犹豫和求生之间摇摆，镜头需要从中景逐步逼近到特写，让眼神成为冲突核心。",
+      "scene": "地下摊位",
+      "dialogues": [
+        {
+          "speaker": "摊主",
+          "content": "拿你的记忆换路。"
+        },
+        {
+          "speaker": "林岚",
+          "content": "我只要离开这里。"
+        }
+      ],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 30,
+      "createdAt": "2026-04-02T10:03:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset_lan",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "name": "林岚",
+      "type": "character",
+      "description": "短发拾荒少女，默认状态需要保持疲惫但反应敏捷；近景时强调眼下冷色反光与脸部划痕。",
+      "prompt": "",
+      "chapterIds": [],
+      "tags": [
+        "主角",
+        "shared"
+      ],
+      "isShared": true,
+      "isFaceLocked": true,
+      "voice": "冷静女声 / 轻沙哑",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_lan_default",
+          "name": "默认态",
+          "notes": "深灰外套，袖口有磨损"
+        },
+        {
+          "id": "state_lan_escape",
+          "name": "逃亡态",
+          "notes": "沾雨痕与霓虹反射，呼吸急促"
+        }
+      ],
+      "selectedStateId": "state_lan_escape",
+      "versions": [
+        {
+          "id": "asset_image_b177e431",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_lan-asset_image_b177e431.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "asset_image_b177e431",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_lan-asset_image_b177e431.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "createdAt": "2026-04-01T08:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "asset_market",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "name": "失控夜市",
+      "type": "scene",
+      "description": "层叠灯箱、狭长回廊与潮湿地面形成的主场景，需要持续维持赛博东方的空间层次。",
+      "prompt": "",
+      "chapterIds": [],
+      "tags": [
+        "主场景"
+      ],
+      "isShared": true,
+      "isFaceLocked": false,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_market_default",
+          "name": "默认态",
+          "notes": "人群稠密，橙蓝霓虹混杂"
+        },
+        {
+          "id": "state_market_alert",
+          "name": "警戒态",
+          "notes": "广告投影坠落，红色警示灯穿透雨雾"
+        }
+      ],
+      "selectedStateId": "state_market_alert",
+      "versions": [
+        {
+          "id": "asset_image_307319b7",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_market-asset_image_307319b7.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "asset_image_307319b7",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_market-asset_image_307319b7.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "createdAt": "2026-04-01T09:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "asset_relic",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "name": "遗物 Relic",
+      "type": "prop",
+      "description": "会发声的古旧装置，默认关闭时像一台磨损收音机，激活时边缘会出现蓝白电弧。",
+      "prompt": "",
+      "chapterIds": [],
+      "tags": [
+        "关键道具"
+      ],
+      "isShared": true,
+      "isFaceLocked": false,
+      "voice": "电流男声 / 断续失真",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_relic_idle",
+          "name": "静默态",
+          "notes": "灰黑金属壳，表面有划痕"
+        },
+        {
+          "id": "state_relic_active",
+          "name": "激活态",
+          "notes": "蓝白电弧，表面字符点亮"
+        }
+      ],
+      "selectedStateId": "state_relic_active",
+      "versions": [
+        {
+          "id": "asset_image_b98e9878",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_relic-asset_image_b98e9878.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "asset_image_b98e9878",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_relic-asset_image_b98e9878.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "createdAt": "2026-04-01T09:30:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "asset_agent",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "name": "巡检 Agent",
+      "type": "character",
+      "description": "追逐段中的压迫来源，建议维持面无表情的合成脸与硬质制服轮廓。",
+      "prompt": "",
+      "chapterIds": [],
+      "tags": [
+        "反派临时主体"
+      ],
+      "isShared": false,
+      "isFaceLocked": false,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_agent_patrol",
+          "name": "巡逻态",
+          "notes": "头灯稳定"
+        }
+      ],
+      "selectedStateId": "state_agent_patrol",
+      "versions": [
+        {
+          "id": "asset_image_9a9e2465",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_agent-asset_image_9a9e2465.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "asset_image_9a9e2465",
+          "label": "主版本",
+          "imageUrl": "/generated/asset_agent-asset_image_9a9e2465.jpg",
+          "createdAt": "2026-04-06T04:39:41.258Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "createdAt": "2026-04-03T11:00:00.000Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    }
+  ],
+  "directorPlans": [],
+  "shots": [
+    {
+      "id": "shot_01",
+      "episodeId": "episode_01",
+      "chapterId": "chapter_01_a",
+      "index": 1,
+      "title": "夜市建立镜头",
+      "description": "远景建立失控夜市和林岚的动线，前景灯箱遮挡制造压迫感。",
+      "scene": "失控夜市入口",
+      "associatedAssetIds": [],
+      "associatedAssetNames": [],
+      "duration": 3,
+      "shotSize": "中景",
+      "cameraMove": "定镜",
+      "action": "",
+      "emotion": "",
+      "sound": "",
+      "composition": "远景",
+      "lighting": "暖橙招牌 + 冷蓝地面反射",
+      "cameraMotion": "缓推",
+      "prompt": "夜市入口，潮湿地面，霓虹反光，林岚从画面右侧切入，前景灯箱压缩空间。",
+      "videoDesc": "",
+      "dialogue": "",
+      "sfx": "雨水、电流嗡鸣、人群模糊说话声",
+      "durationSeconds": 7,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_lan",
+        "asset_market"
+      ],
+      "takes": [
+        {
+          "id": "take_01_a",
+          "kind": "image",
+          "label": "主版本",
+          "url": "/shots/shot-01-a.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        }
+      ],
+      "images": [],
+      "state": "draft",
+      "track": "default",
+      "trackId": "track_default",
+      "createdAt": "2026-03-29T10:00:00.000Z",
+      "updatedAt": "2026-03-30T10:00:00.000Z"
+    },
+    {
+      "id": "shot_02",
+      "episodeId": "episode_01",
+      "chapterId": "chapter_01_b",
+      "index": 2,
+      "title": "遗物特写",
+      "description": "Relic 在手掌中亮起，电流纹理与角色瞳孔反光形成对照。",
+      "scene": "夜市旧物堆",
+      "associatedAssetIds": [],
+      "associatedAssetNames": [],
+      "duration": 3,
+      "shotSize": "中景",
+      "cameraMove": "定镜",
+      "action": "",
+      "emotion": "",
+      "sound": "",
+      "composition": "特写",
+      "lighting": "主光压暗，电弧补光",
+      "cameraMotion": "定镜",
+      "prompt": "手掌中的 relic 激活特写，表面字符亮起，背景夜市虚化。",
+      "videoDesc": "",
+      "dialogue": "Relic：林岚。",
+      "sfx": "老旧电流声",
+      "durationSeconds": 5,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_relic"
+      ],
+      "takes": [
+        {
+          "id": "take_02_a",
+          "kind": "image",
+          "label": "主版本",
+          "url": "/shots/shot-02-a.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        }
+      ],
+      "images": [],
+      "state": "draft",
+      "track": "default",
+      "trackId": "track_default",
+      "createdAt": "2026-03-29T10:10:00.000Z",
+      "updatedAt": "2026-03-30T10:10:00.000Z"
+    },
+    {
+      "id": "shot_03",
+      "episodeId": "episode_02",
+      "chapterId": "chapter_02_a",
+      "index": 1,
+      "title": "回廊压迫",
+      "description": "林岚抱着 relic 穿过夜市后巷，灯箱投影从头顶下坠。",
+      "scene": "夜市后巷",
+      "associatedAssetIds": [],
+      "associatedAssetNames": [],
+      "duration": 3,
+      "shotSize": "中景",
+      "cameraMove": "定镜",
+      "action": "",
+      "emotion": "",
+      "sound": "",
+      "composition": "中景",
+      "lighting": "顶光偏冷 + 红色警示反射",
+      "cameraMotion": "跟拍",
+      "prompt": "狭长后巷，中景跟拍林岚奔跑，头顶投影广告碎裂下落，空间逐步压缩。",
+      "videoDesc": "",
+      "dialogue": "",
+      "sfx": "脚步、水花、投影坠落声",
+      "durationSeconds": 6,
+      "status": "ready",
+      "continuityStatus": "warning",
+      "continuityIssues": [
+        {
+          "id": "issue_03",
+          "severity": "warning",
+          "message": "镜头 1 和镜头 2 的主光方向尚未统一。"
+        }
+      ],
+      "referenceAssetIds": [
+        "asset_lan",
+        "asset_market",
+        "asset_relic"
+      ],
+      "takes": [
+        {
+          "id": "take_03_a",
+          "kind": "image",
+          "label": "主版本",
+          "url": "/shots/shot-03-a.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        },
+        {
+          "id": "take_03_b",
+          "kind": "video",
+          "label": "视频候选",
+          "url": "/shots/shot-03-b.mp4",
+          "durationSeconds": 6,
+          "isSelected": false
+        }
+      ],
+      "images": [],
+      "state": "draft",
+      "track": "default",
+      "trackId": "track_default",
+      "createdAt": "2026-04-03T12:00:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "shot_04",
+      "episodeId": "episode_02",
+      "chapterId": "chapter_02_b",
+      "index": 2,
+      "title": "交易犹豫",
+      "description": "地下摊主提出交易，镜头从中景逐步逼近林岚眼神。",
+      "scene": "地下摊位",
+      "associatedAssetIds": [],
+      "associatedAssetNames": [],
+      "duration": 3,
+      "shotSize": "中景",
+      "cameraMove": "定镜",
+      "action": "",
+      "emotion": "",
+      "sound": "",
+      "composition": "近景",
+      "lighting": "暖色摊灯 + 背景蓝绿轮廓",
+      "cameraMotion": "缓推",
+      "prompt": "近景对准林岚和摊主的交易时刻，暖色主灯照亮桌面，镜头缓慢逼近林岚的眼神变化。",
+      "videoDesc": "",
+      "dialogue": "摊主：拿你的记忆换路。 林岚：我只要离开这里。",
+      "sfx": "远处广播噪声、桌面敲击声",
+      "durationSeconds": 8,
+      "status": "draft",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_lan",
+        "asset_relic",
+        "asset_market"
+      ],
+      "takes": [
+        {
+          "id": "take_04_a",
+          "kind": "image",
+          "label": "草案",
+          "url": "/shots/shot-04-a.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        }
+      ],
+      "images": [],
+      "state": "draft",
+      "track": "default",
+      "trackId": "track_default",
+      "createdAt": "2026-04-03T12:10:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    }
+  ],
+  "storyboards": [
+    {
+      "id": "story_01",
+      "episodeId": "episode_01",
+      "shotId": "shot_01",
+      "subtitle": "雨雾和霓虹压低了城市的呼吸。",
+      "notes": "建立系列视觉语言。",
+      "selectedTakeId": "take_01_a",
+      "referenceAssetIds": [
+        "asset_market"
+      ],
+      "updatedAt": "2026-03-30T10:00:00.000Z"
+    },
+    {
+      "id": "story_02",
+      "episodeId": "episode_01",
+      "shotId": "shot_02",
+      "subtitle": "它第一次叫出她的名字。",
+      "notes": "遗物激活应与上一镜主光方向一致。",
+      "selectedTakeId": "take_02_a",
+      "referenceAssetIds": [
+        "asset_relic"
+      ],
+      "updatedAt": "2026-03-30T10:10:00.000Z"
+    },
+    {
+      "id": "story_03",
+      "episodeId": "episode_02",
+      "shotId": "shot_03",
+      "subtitle": "后巷越来越窄，追逐越来越急。",
+      "notes": "需修正镜头与下一条的主光方向。",
+      "selectedTakeId": "take_03_a",
+      "referenceAssetIds": [
+        "asset_lan",
+        "asset_market"
+      ],
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "story_04",
+      "episodeId": "episode_02",
+      "shotId": "shot_04",
+      "subtitle": "她在求生和代价之间停顿了一秒。",
+      "notes": "建议补一条更紧的反应特写。",
+      "selectedTakeId": "take_04_a",
+      "referenceAssetIds": [
+        "asset_lan",
+        "asset_relic"
+      ],
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    }
+  ],
+  "finalCuts": [
+    {
+      "id": "final_01",
+      "episodeId": "episode_01",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "exportStatus": "ready",
+      "notes": "第一集已完成内部审核。",
+      "tracks": [
+        {
+          "id": "track_01_v",
+          "type": "video",
+          "name": "画面轨",
+          "items": [
+            {
+              "id": "clip_01_a",
+              "label": "夜市建立镜头",
+              "shotId": "shot_01",
+              "takeId": "take_01_a",
+              "startSeconds": 0,
+              "endSeconds": 7,
+              "locked": true
+            },
+            {
+              "id": "clip_01_b",
+              "label": "遗物特写",
+              "shotId": "shot_02",
+              "takeId": "take_02_a",
+              "startSeconds": 7,
+              "endSeconds": 12,
+              "locked": true
+            }
+          ]
+        },
+        {
+          "id": "track_01_d",
+          "type": "dialogue",
+          "name": "对白轨",
+          "items": [
+            {
+              "id": "clip_01_d1",
+              "label": "遗物发声",
+              "shotId": "shot_02",
+              "takeId": null,
+              "startSeconds": 8,
+              "endSeconds": 10,
+              "locked": true
+            }
+          ]
+        }
+      ],
+      "updatedAt": "2026-04-01T16:00:00.000Z"
+    },
+    {
+      "id": "final_02",
+      "episodeId": "episode_02",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "exportStatus": "review",
+      "notes": "当前处于粗装配阶段，等待故事板主版本稳定后再锁轨。",
+      "tracks": [
+        {
+          "id": "track_02_v",
+          "type": "video",
+          "name": "画面轨",
+          "items": [
+            {
+              "id": "clip_02_a",
+              "label": "回廊压迫",
+              "shotId": "shot_03",
+              "takeId": "take_03_a",
+              "startSeconds": 0,
+              "endSeconds": 6,
+              "locked": false
+            },
+            {
+              "id": "clip_02_b",
+              "label": "交易犹豫",
+              "shotId": "shot_04",
+              "takeId": "take_04_a",
+              "startSeconds": 6,
+              "endSeconds": 14,
+              "locked": false
+            }
+          ]
+        },
+        {
+          "id": "track_02_a",
+          "type": "audio",
+          "name": "环境 / BGM",
+          "items": [
+            {
+              "id": "clip_02_audio",
+              "label": "夜市环境床",
+              "shotId": null,
+              "takeId": null,
+              "startSeconds": 0,
+              "endSeconds": 14,
+              "locked": false
+            }
+          ]
+        }
+      ],
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "final_03",
+      "episodeId": "episode_03",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "exportStatus": "draft",
+      "notes": "第三集尚未进入成片阶段。",
+      "tracks": [],
+      "updatedAt": "2026-04-05T09:30:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_431b8e34",
+      "createdAt": "2026-04-06T05:15:31.065Z",
+      "updatedAt": "2026-04-06T05:15:31.065Z",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_01",
+      "title": "为 遗物开口 批量生成资产图",
+      "description": "共完成 0 个主体的主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_01",
+      "error": null,
+      "logs": []
+    },
+    {
+      "id": "task_3813b1ad",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "为 夜市回响 批量生成资产图",
+      "description": "共完成 4 个主体的主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": null,
+      "logs": [
+        "asset rendered: 林岚",
+        "asset rendered: 失控夜市",
+        "asset rendered: 遗物 Relic",
+        "asset rendered: 巡检 Agent"
+      ],
+      "createdAt": "2026-04-06T04:39:45.014Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "task_52b0c2f4",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "为 夜市回响 批量生成资产图",
+      "description": "共完成 4 个主体的主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": null,
+      "logs": [
+        "asset rendered: 林岚",
+        "asset rendered: 失控夜市",
+        "asset rendered: 遗物 Relic",
+        "asset rendered: 巡检 Agent"
+      ],
+      "createdAt": "2026-04-06T04:39:44.197Z",
+      "updatedAt": "2026-04-06T04:39:44.197Z"
+    },
+    {
+      "id": "task_51cf6640",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "为 夜市回响 批量生成资产图",
+      "description": "共完成 4 个主体的主版本图片。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": null,
+      "logs": [
+        "asset rendered: 林岚",
+        "asset rendered: 失控夜市",
+        "asset rendered: 遗物 Relic",
+        "asset rendered: 巡检 Agent"
+      ],
+      "createdAt": "2026-04-06T04:39:41.258Z",
+      "updatedAt": "2026-04-06T04:39:41.258Z"
+    },
+    {
+      "id": "task_e180dd56",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "为 夜市回响 提取主体",
+      "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": null,
+      "logs": [
+        "asset extraction completed"
+      ],
+      "createdAt": "2026-04-06T04:39:34.697Z",
+      "updatedAt": "2026-04-06T04:39:34.697Z"
+    },
+    {
+      "id": "task_failed_storyboard",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "故事板视频抽卡失败",
+      "description": "供应商返回空素材，建议切回图片候选或重试视频生成。",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": "video provider timeout",
+      "logs": [
+        "selected provider: video/mock-v1",
+        "request timeout after 30s"
+      ],
+      "createdAt": "2026-04-06T00:00:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "task_running_agent",
+      "kind": "agent",
+      "targetType": "episode",
+      "targetId": "episode_02",
+      "title": "监督 Agent 检查连戏",
+      "description": "正在针对当前 selected takes 进行 continuity 风险审查。",
+      "status": "running",
+      "retryable": false,
+      "link": "/series/series_neon_relic/episodes/episode_02",
+      "error": null,
+      "logs": [
+        "agent started",
+        "loaded 2 shots",
+        "loaded 4 shared assets"
+      ],
+      "createdAt": "2026-04-05T23:50:00.000Z",
+      "updatedAt": "2026-04-06T00:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "locale": "zh-CN",
+    "ai": {
+      "mode": "mock",
+      "model": "google/gemini-2.5-flash",
+      "systemPrompt": "你是 Mercruiser Studio 的生产协调 Agent，帮助用户推进系列治理与单集生产。",
+      "skillPrompt": "优先使用结构化工具读写本地工作区，避免输出空泛建议。",
+      "memoryEnabled": true
+    },
+    "workspace": {
+      "aspectRatio": "16:9",
+      "creationMode": "Audio First",
+      "defaultStyle": "赛博东方",
+      "dataPath": "data/studio.json"
+    },
+    "governance": {
+      "requestLogging": true,
+      "allowAgentWrites": true
+    }
+  },
+  "agentRuns": [
+    {
+      "id": "run_recent_01",
+      "scopeType": "episode",
+      "scopeId": "episode_02",
+      "prompt": "检查第二集接下来应该先推进哪一站",
+      "summary": "建议先统一镜头 1/2 的主光方向，再锁定故事板主版本后进入成片装配。",
+      "status": "completed",
+      "toolCalls": [
+        {
+          "id": "tool_1",
+          "name": "get_episode_workspace",
+          "status": "completed",
+          "summary": "读取当前工位和任务状态"
+        }
+      ],
+      "createdAt": "2026-04-05T22:30:00.000Z",
+      "completedAt": "2026-04-05T22:30:05.000Z"
+    }
+  ],
+  "workflowRuns": [
+    {
+      "id": "workflow_e5858d57",
+      "episodeId": "episode_01",
+      "stage": "asset_rendering",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "完成 0 个资产主版本",
+      "taskId": "task_431b8e34",
+      "createdAt": "2026-04-06T05:15:31.065Z",
+      "updatedAt": "2026-04-06T05:15:31.065Z"
+    },
+    {
+      "id": "workflow_7b52ef33",
+      "episodeId": "episode_02",
+      "stage": "asset_rendering",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "完成 4 个资产主版本",
+      "taskId": "task_3813b1ad",
+      "createdAt": "2026-04-06T04:39:45.014Z",
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "workflow_f7f9724b",
+      "episodeId": "episode_02",
+      "stage": "asset_rendering",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "完成 4 个资产主版本",
+      "taskId": "task_52b0c2f4",
+      "createdAt": "2026-04-06T04:39:44.197Z",
+      "updatedAt": "2026-04-06T04:39:44.197Z"
+    },
+    {
+      "id": "workflow_db912516",
+      "episodeId": "episode_02",
+      "stage": "asset_rendering",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "完成 4 个资产主版本",
+      "taskId": "task_51cf6640",
+      "createdAt": "2026-04-06T04:39:41.258Z",
+      "updatedAt": "2026-04-06T04:39:41.258Z"
+    },
+    {
+      "id": "workflow_e1cd15ea",
+      "episodeId": "episode_02",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_e180dd56",
+      "createdAt": "2026-04-06T04:39:34.697Z",
+      "updatedAt": "2026-04-06T04:39:34.697Z"
+    }
+  ],
+  "gateSnapshots": [
+    {
+      "episodeId": "episode_02",
+      "currentStage": "final_cut",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": false,
+          "label": "从原文生成剧本",
+          "reason": "缺少原文输入"
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": true,
+          "label": "提取本集主体",
+          "reason": null
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": true,
+          "label": "批量生成资产图片",
+          "reason": null
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": true,
+          "label": "生成分镜表",
+          "reason": null
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": true,
+          "label": "生成分镜图片",
+          "reason": null
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": false,
+          "label": "进入故事板",
+          "reason": "分镜图片尚未收敛"
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": false,
+          "label": "进入成片",
+          "reason": "需要先完成故事板主版本选择"
+        },
+        {
+          "kind": "export_episode",
+          "enabled": true,
+          "label": "导出成片",
+          "reason": null
+        }
+      ],
+      "blockedReasons": [
+        "仍有分镜未完成图片生成或未选定主版本"
+      ],
+      "requiredInputs": [
+        "需要先导入小说原文"
+      ],
+      "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "episodeId": "episode_01",
+      "currentStage": "final_cut",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": false,
+          "label": "从原文生成剧本",
+          "reason": "缺少原文输入"
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": true,
+          "label": "提取本集主体",
+          "reason": null
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": false,
+          "label": "批量生成资产图片",
+          "reason": "还没有可生成的主体"
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": false,
+          "label": "生成分镜表",
+          "reason": "所有资产必须完成并选定主版本"
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": true,
+          "label": "生成分镜图片",
+          "reason": null
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": false,
+          "label": "进入故事板",
+          "reason": "分镜图片尚未收敛"
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": false,
+          "label": "进入成片",
+          "reason": "需要先完成故事板主版本选择"
+        },
+        {
+          "kind": "export_episode",
+          "enabled": true,
+          "label": "导出成片",
+          "reason": null
+        }
+      ],
+      "blockedReasons": [
+        "仍有分镜未完成图片生成或未选定主版本"
+      ],
+      "requiredInputs": [
+        "需要先导入小说原文",
+        "需要先提取本集主体"
+      ],
+      "updatedAt": "2026-04-06T05:15:31.064Z"
+    }
+  ]
+}

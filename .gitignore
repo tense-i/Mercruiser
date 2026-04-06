@@ -1,0 +1,14 @@
+node_modules/
+build/
+dist/
+coverage/
+.next/
+.turbo/
+.DS_Store
+*.log
+*.tsbuildinfo
+.omx/
+.env*
+!.env.example
+./Toonflow-app
+Toonflow-app/
