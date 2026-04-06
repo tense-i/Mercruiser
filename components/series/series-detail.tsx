@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { Box, CheckCircle2, ChevronRight, Clock, Film, MoreVertical, Plus, Sparkles } from 'lucide-react';
+import { Box, CheckCircle2, ChevronRight, Clock, Film, Sparkles } from 'lucide-react';
 
 import type { SeriesView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
 
 export function SeriesDetail({ view }: { view: SeriesView }) {
+  const focusEpisode = view.episodes.find((episode) => episode.status !== 'done') ?? view.episodes[0] ?? null;
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="flex flex-col gap-8 lg:flex-row">
@@ -18,9 +20,14 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
               <h2 className="mb-3 text-4xl font-bold tracking-tight">{view.series.name}</h2>
               <p className="max-w-2xl leading-relaxed text-zinc-400">{view.series.description}</p>
             </div>
-            <button className="rounded-xl p-2 transition-colors hover:bg-zinc-800">
-              <MoreVertical size={24} />
-            </button>
+            {focusEpisode ? (
+              <Link
+                href={`/series/${view.series.id}/episodes/${focusEpisode.id}`}
+                className="rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-300 transition-colors hover:bg-brand-500/20"
+              >
+                Continue Current Episode
+              </Link>
+            ) : null}
           </div>
 
           <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -32,9 +39,7 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
           <div className="mb-8">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-xl font-bold">Episodes</h3>
-              <button className="flex items-center gap-1 text-sm font-medium text-brand-400 transition-colors hover:text-brand-300">
-                <Plus size={16} /> Add Episode
-              </button>
+              <span className="text-sm text-zinc-500">Open an episode below to continue production.</span>
             </div>
             <div className="space-y-3">
               {view.episodes.map((episode) => (
@@ -82,10 +87,10 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
                   </div>
                 </div>
               ))}
-              <button className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700 text-zinc-500 transition-all hover:border-zinc-500 hover:text-zinc-300">
-                <Plus size={20} />
-                <span className="text-[10px] font-medium">New Asset</span>
-              </button>
+              <div className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/40 px-4 text-center text-zinc-500">
+                <span className="text-[10px] font-medium uppercase tracking-[0.18em]">Shared assets</span>
+                <span className="text-xs leading-5 text-zinc-400">Promote locked episode assets from the workspace instead of creating empty shells here.</span>
+              </div>
             </div>
           </div>
 

@@ -371,6 +371,9 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         throw new Error(`Asset ${command.assetId} not found`);
       }
       asset.description = command.description;
+      if (command.prompt !== undefined) {
+        asset.prompt = command.prompt;
+      }
       if (command.voice !== undefined) {
         asset.voice = command.voice;
       }

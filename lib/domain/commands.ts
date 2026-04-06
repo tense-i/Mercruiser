@@ -32,6 +32,7 @@ export const UpdateAssetCommandSchema = z.object({
   type: z.literal('updateAsset'),
   assetId: z.string(),
   description: z.string(),
+  prompt: z.string().optional(),
   voice: z.string().optional(),
   isShared: z.boolean().optional(),
 });
