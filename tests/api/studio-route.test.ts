@@ -60,6 +60,27 @@ describe('studio api route', () => {
     expect(asset.voice).toBe('voice-02');
   });
 
+  it('rejects remote write attempts by default', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('https://example.com/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateAsset',
+            assetId: 'asset_agent',
+            description: '远程写入',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(payload.ok).toBe(false);
+    expect(payload.error).toContain('Remote writes are disabled');
+  });
+
   it('updates structured shot fields through the api', async () => {
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(
