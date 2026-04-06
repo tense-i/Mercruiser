@@ -111,6 +111,8 @@ describe('studio repository', () => {
 
     const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
     expect(episodeView?.shots.length).toBeGreaterThan(0);
+    expect(episodeView?.shots.every((shot) => shot.takes).every((takes) => takes.length === 0)).toBe(true);
+    expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId === null)).toBe(true);
     expect(episodeView?.tasks[0]?.kind).toBe('agent');
   });
 
@@ -141,6 +143,14 @@ describe('studio repository', () => {
 
     const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
     expect(episodeView?.shots.every((shot) => shot.images.some((image) => image.isSelected))).toBe(true);
+    expect(
+      episodeView?.shots.every((shot) => {
+        const selectedImage = shot.images.find((image) => image.isSelected);
+        const selectedTake = shot.takes.find((take) => take.isSelected);
+        return Boolean(selectedImage && selectedTake && selectedTake.url === selectedImage.imageUrl);
+      }),
+    ).toBe(true);
+    expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId !== null)).toBe(true);
     expect(episodeView?.gate?.currentStage).toBe('storyboard');
   });
 });
