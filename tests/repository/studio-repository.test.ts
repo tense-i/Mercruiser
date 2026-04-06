@@ -47,7 +47,7 @@ describe('studio repository', () => {
       firstEpisodeTitle: 'Episode Alpha',
     })) as {
       ok: boolean;
-      series: { id: string; importMetadata: { source: string; sourceLabel: string } };
+      series: { id: string; description: string; importMetadata: { source: string; sourceLabel: string } };
       episode: { id: string; title: string; sourceDocumentId: string | null };
     };
 
@@ -62,6 +62,10 @@ describe('studio repository', () => {
     expect(imported.series.importMetadata.sourceLabel).toBe('Pilot Manuscript');
     expect(imported.episode.title).toBe('Episode Alpha');
     expect(imported.episode.sourceDocumentId).toBeTruthy();
+    expect(imported.series.description).toBe('');
+    const importedView = await repo.getEpisodeWorkspaceView(imported.episode.id);
+    expect(importedView?.chapters.length).toBeGreaterThan(0);
+    expect(importedView?.gate?.currentStage).toBe('asset_extraction');
     expect(dashboard.series[0]?.id).toBe(imported.series.id);
     expect(dashboard.series.some((series) => series.id === manual.series.id)).toBe(true);
   });
@@ -142,7 +146,10 @@ describe('studio repository', () => {
     expect(blankEpisode.episode.assetIds.every((assetId) => sharedAssetIds.has(assetId))).toBe(true);
     expect(sourcedEpisode.ok).toBe(true);
     expect(sourcedEpisode.episode.sourceDocumentId).toBeTruthy();
+    const sourcedEpisodeView = await repo.getEpisodeWorkspaceView(sourcedEpisode.episode.id);
     expect(sourcedEpisode.episode.assetIds.every((assetId) => sharedAssetIds.has(assetId))).toBe(true);
+    expect(sourcedEpisodeView?.chapters.length).toBeGreaterThan(0);
+    expect(sourcedEpisodeView?.gate?.currentStage).toBe('asset_extraction');
     expect(seriesView?.episodes.some((episode) => episode.id === blankEpisode.episode.id)).toBe(true);
     expect(seriesView?.episodes.some((episode) => episode.id === sourcedEpisode.episode.id)).toBe(true);
   });

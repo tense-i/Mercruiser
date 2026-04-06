@@ -47,12 +47,16 @@ function computeEpisodeProgress(workspace: StudioWorkspace, episodeId: string) {
     return 0;
   }
 
+  const hasFinalCutContent = workspace.finalCuts.some(
+    (finalCut) => finalCut.id === episode.finalCutId && finalCut.tracks.some((track) => track.items.length > 0),
+  );
+
   const checkpoints = [
     episode.chapterIds.length > 0,
     workspace.assets.some((asset) => asset.episodeId === episodeId || (asset.isShared && asset.seriesId === episode.seriesId)),
     episode.shotIds.length > 0,
     episode.storyboardIds.length > 0,
-    workspace.finalCuts.some((finalCut) => finalCut.id === episode.finalCutId && finalCut.tracks.length > 0),
+    hasFinalCutContent,
   ];
 
   return Math.round((checkpoints.filter(Boolean).length / checkpoints.length) * 100);
@@ -629,7 +633,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       const series = {
         id: id('series'),
         name,
-        description: command.description.trim() || command.content.trim().slice(0, 120),
+        description: command.description.trim(),
         status: 'setting' as const,
         coverUrl: '/generated/series-imported.jpg',
         genre: '导入项目',
@@ -674,18 +678,22 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         sourceTitle: command.sourceTitle,
         sourceContent: command.content,
       });
+      executeCommand(workspace, {
+        type: 'generateScriptFromSource',
+        episodeId: episode.id,
+      });
 
       createTask(workspace, {
         kind: 'settings',
         targetType: 'series',
         targetId: series.id,
         title: `导入创建 ${series.name}`,
-        description: '文本导入已生成系列和首集原文骨架。',
+        description: '文本导入已生成系列、首集原文骨架，并自动完成剧本拆解。',
         status: 'completed',
         retryable: false,
         link: `/series/${series.id}`,
         error: null,
-        logs: ['series imported', `episode created: ${episode.id}`],
+        logs: ['series imported', `episode created: ${episode.id}`, 'script auto-generated'],
         batch: null,
       });
       return { ok: true, series, episode };
@@ -788,18 +796,22 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         sourceTitle: command.sourceTitle,
         sourceContent: command.sourceContent,
       });
+      executeCommand(workspace, {
+        type: 'generateScriptFromSource',
+        episodeId: episode.id,
+      });
       syncSeriesEpisodes(workspace, series.id);
       createTask(workspace, {
         kind: 'script',
         targetType: 'episode',
         targetId: episode.id,
         title: `从原文创建 ${episode.title}`,
-        description: '已创建集数并写入首份原文，可直接进入脚本工位。',
+        description: '已创建集数、写入原文并自动生成章节剧本。',
         status: 'completed',
         retryable: false,
         link: `/series/${series.id}/episodes/${episode.id}`,
         error: null,
-        logs: [`source document: ${command.sourceTitle.trim()}`, `shared assets inherited: ${episode.assetIds.length}`],
+        logs: [`source document: ${command.sourceTitle.trim()}`, `shared assets inherited: ${episode.assetIds.length}`, 'script auto-generated'],
         batch: null,
       });
       return { ok: true, episode, series };

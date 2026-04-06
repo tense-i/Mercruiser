@@ -116,7 +116,9 @@ describe('studio api route', () => {
     expect(payload.ok).toBe(true);
     expect(payload.result.episode.title).toBe('API Episode');
     expect(payload.result.episode.sourceDocumentId).toBeTruthy();
+    expect(payload.result.episode.chapterIds.length).toBeGreaterThan(0);
     expect(payload.seriesView.episodes.some((episode: { id: string }) => episode.id === payload.result.episode.id)).toBe(true);
+    expect(payload.seriesView.episodes.find((episode: { id: string }) => episode.id === payload.result.episode.id)?.gate.currentStage).toBe('asset_extraction');
   });
 
   it('saves series settings and strategy through the api', async () => {

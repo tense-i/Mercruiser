@@ -23,6 +23,7 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
   const shotsReady = shots.length > 0 && !hasBrokenAssetRefs;
   const shotImagesReady = shotsReady && shots.every((shot) => shot.images.some((image) => image.isSelected));
   const storyboardReady = shotImagesReady && storyboards.length > 0 && storyboards.every((item) => item.selectedTakeId !== null);
+  const finalCutReady = Boolean(finalCut?.tracks.some((track) => track.items.length > 0));
 
   let currentStage: GateSnapshot['currentStage'] = 'script_generation';
   if (chapters.length > 0) currentStage = 'asset_extraction';
@@ -30,7 +31,7 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
   if (assetsReady) currentStage = 'shot_generation';
   if (shots.length > 0) currentStage = 'shot_rendering';
   if (shotImagesReady) currentStage = 'storyboard';
-  if (finalCut?.tracks.length) currentStage = 'final_cut';
+  if (finalCutReady) currentStage = 'final_cut';
 
   const blockedReasons: string[] = [];
   const requiredInputs: string[] = [];
@@ -111,9 +112,9 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
       },
       {
         kind: 'export_episode',
-        enabled: Boolean(finalCut?.tracks.length) && !hasBrokenAssetRefs && !blockingUsageAlert,
+        enabled: finalCutReady && !hasBrokenAssetRefs && !blockingUsageAlert,
         label: '导出成片',
-        reason: finalCut?.tracks.length ? blockingUsageAlert ? 'API 用量超限，已阻止导出' : hasBrokenAssetRefs ? '存在 broken 资产引用' : null : '成片工位尚未装配完成',
+        reason: finalCutReady ? blockingUsageAlert ? 'API 用量超限，已阻止导出' : hasBrokenAssetRefs ? '存在 broken 资产引用' : null : '成片工位尚未装配完成',
       },
     ],
     blockedReasons,
