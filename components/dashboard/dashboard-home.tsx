@@ -1,25 +1,155 @@
+'use client';
+
 import Link from 'next/link';
-import { Film } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Film, FolderInput, PlusCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import type { DashboardView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
 
 export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
+  const router = useRouter();
+  const [pending, setPending] = useState<'createSeries' | 'importSeries' | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const primarySeries = dashboard.series[0] ?? null;
+  const recentSeries = useMemo(
+    () => [...dashboard.series].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)).slice(0, 3),
+    [dashboard.series],
+  );
+
+  async function dispatch(command: Record<string, unknown>) {
+    setPending(String(command.type) as 'createSeries' | 'importSeries');
+    try {
+      const response = await fetch('/api/studio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.result) {
+        throw new Error(payload.error ?? '操作失败');
+      }
+      setErrorMessage(null);
+      return payload;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '操作失败';
+      setErrorMessage(message);
+      return null;
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function handleCreateSeries() {
+    const name = (document.getElementById('series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const description = (document.getElementById('series-description') as HTMLTextAreaElement | null)?.value ?? '';
+    const payload = await dispatch({ type: 'createSeries', name, description });
+    const seriesId = payload?.result?.series?.id as string | undefined;
+    if (seriesId) {
+      router.push(`/series/${seriesId}`);
+      router.refresh();
+    }
+  }
+
+  async function handleImportSeries() {
+    const name = (document.getElementById('import-series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const description = (document.getElementById('import-series-description') as HTMLTextAreaElement | null)?.value ?? '';
+    const sourceTitle = (document.getElementById('import-source-title') as HTMLInputElement | null)?.value?.trim() ?? 'Imported source';
+    const firstEpisodeTitle = (document.getElementById('import-episode-title') as HTMLInputElement | null)?.value?.trim() ?? 'Episode 1';
+    const content = (document.getElementById('import-source-content') as HTMLTextAreaElement | null)?.value ?? '';
+    const payload = await dispatch({
+      type: 'importSeries',
+      name,
+      description,
+      importType: 'text',
+      sourceTitle,
+      firstEpisodeTitle,
+      content,
+    });
+    const seriesId = payload?.result?.series?.id as string | undefined;
+    if (seriesId) {
+      router.push(`/series/${seriesId}`);
+      router.refresh();
+    }
+  }
 
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h2 className="mb-1 text-3xl font-bold tracking-tight">Welcome back, Producer</h2>
-          <p className="text-zinc-500">Manage your series and continue your production journey.</p>
+    <div className="mx-auto max-w-7xl space-y-8">
+      {errorMessage ? (
+        <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">{errorMessage}</div>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
+        <div className="glass-panel rounded-3xl p-8">
+          <div className="mb-8 flex items-start justify-between gap-6">
+            <div>
+              <h2 className="mb-1 text-3xl font-bold tracking-tight">Series control center</h2>
+              <p className="max-w-2xl text-zinc-400">Launch a new series, import an existing draft into a fresh series shell, or jump back into the latest production lane.</p>
+            </div>
+            <Link
+              href={primarySeries ? `/series/${primarySeries.id}` : '/tasks'}
+              className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-medium text-white shadow-lg shadow-brand-600/20 transition-all hover:scale-105 hover:bg-brand-500 active:scale-95"
+            >
+              {primarySeries ? 'Continue Series' : 'Open Task Center'}
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {dashboard.stats.map((stat) => (
+              <div key={stat.label} className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+                <div className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">{stat.label}</div>
+                <div className="mt-3 text-3xl font-bold text-zinc-100">{stat.value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {recentSeries.map((series) => (
+              <Link
+                key={series.id}
+                href={`/series/${series.id}`}
+                className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4 transition-colors hover:border-brand-500/40"
+              >
+                <div className="flex items-center justify-between">
+                  <StatusBadge status={series.status} />
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{series.episodeIds.length} EPs</span>
+                </div>
+                <div className="mt-4 text-lg font-bold text-zinc-100">{series.name}</div>
+                <p className="mt-2 line-clamp-2 text-sm text-zinc-500">{series.description}</p>
+              </Link>
+            ))}
+          </div>
         </div>
-        <Link
-          href={primarySeries ? `/series/${primarySeries.id}` : '/tasks'}
-          className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-medium text-white shadow-lg shadow-brand-600/20 transition-all hover:scale-105 hover:bg-brand-500 active:scale-95"
-        >
-          {primarySeries ? 'Continue Series' : 'Open Task Center'}
-        </Link>
+
+        <div className="space-y-6">
+          <ActionCard
+            icon={<PlusCircle size={18} className="text-brand-300" />}
+            title="新建系列"
+            description="首页 P0 入口：名称必填、名称不重复、创建后进入系列详情并保持 setting 初始状态。"
+            actionLabel={pending === 'createSeries' ? 'Creating…' : 'Create Series'}
+            onAction={() => void handleCreateSeries()}
+            disabled={pending !== null}
+          >
+            <input id="series-name" maxLength={50} placeholder="Series name" className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
+            <textarea id="series-description" placeholder="Series summary (optional)" className="mt-3 h-24 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
+          </ActionCard>
+
+          <ActionCard
+            icon={<FolderInput size={18} className="text-brand-300" />}
+            title="导入创建"
+            description="P0 仅支持文本导入：创建系列并生成首集原文骨架，失败时返回明确错误。"
+            actionLabel={pending === 'importSeries' ? 'Importing…' : 'Import as Series'}
+            onAction={() => void handleImportSeries()}
+            disabled={pending !== null}
+          >
+            <input id="import-series-name" maxLength={50} placeholder="Imported series name" className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
+            <textarea id="import-series-description" placeholder="Imported series summary (optional)" className="mt-3 h-20 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
+            <input id="import-source-title" placeholder="Source title" className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
+            <input id="import-episode-title" placeholder="Initial episode title" className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
+            <textarea id="import-source-content" placeholder="Paste the imported text here" className="mt-3 h-28 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
+          </ActionCard>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,7 +187,7 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
         ))}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="glass-panel rounded-3xl p-6">
           <h3 className="text-sm font-bold text-zinc-100">Usage Summary</h3>
           <p className="mt-3 text-sm text-zinc-400">
@@ -71,6 +201,45 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ActionCard({
+  icon,
+  title,
+  description,
+  actionLabel,
+  onAction,
+  disabled,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  actionLabel: string;
+  onAction: () => void;
+  disabled: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="glass-panel rounded-3xl p-6">
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/10">{icon}</div>
+        <div>
+          <h3 className="font-bold text-zinc-100">{title}</h3>
+          <p className="text-xs text-zinc-500">{description}</p>
+        </div>
+      </div>
+      {children}
+      <button
+        type="button"
+        onClick={onAction}
+        disabled={disabled}
+        className="mt-4 w-full rounded-xl bg-brand-600 py-3 text-sm font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+      >
+        {actionLabel}
+      </button>
     </div>
   );
 }
