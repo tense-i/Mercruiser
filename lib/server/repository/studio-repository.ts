@@ -58,6 +58,151 @@ function computeEpisodeProgress(workspace: StudioWorkspace, episodeId: string) {
   return Math.round((checkpoints.filter(Boolean).length / checkpoints.length) * 100);
 }
 
+function normalizeName(value: string) {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function normalizeTextLines(value: string) {
+  return value
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function ensureUniqueSeriesName(workspace: StudioWorkspace, name: string, currentSeriesId?: string) {
+  const normalized = normalizeName(name).toLocaleLowerCase();
+  const duplicate = workspace.series.find((series) => series.id !== currentSeriesId && normalizeName(series.name).toLocaleLowerCase() === normalized);
+  if (duplicate) {
+    throw new Error(`Series name "${name}" already exists`);
+  }
+}
+
+function buildSeriesSettingsPatch(
+  current: StudioWorkspace['series'][number]['settings'],
+  input: Partial<StudioWorkspace['series'][number]['settings']>,
+) {
+  return {
+    ...current,
+    ...input,
+    coreRules: input.coreRules ?? current.coreRules,
+    referenceImages: input.referenceImages ?? current.referenceImages,
+  };
+}
+
+function buildSeriesStrategyPatch(
+  current: StudioWorkspace['series'][number]['strategy'],
+  input: Partial<StudioWorkspace['series'][number]['strategy']>,
+) {
+  return {
+    ...current,
+    ...input,
+  };
+}
+
+function createDefaultStationStates(hasSource = false) {
+  return {
+    overview: 'completed',
+    script: hasSource ? 'ready' : 'editing',
+    subjects: 'idle',
+    shots: 'idle',
+    storyboard: 'idle',
+    'final-cut': 'idle',
+  } as const;
+}
+
+function createDefaultFinalCut(episodeId: string): FinalCut {
+  return {
+    id: id('final'),
+    episodeId,
+    resolution: '1080p',
+    fps: 24,
+    exportStatus: 'draft',
+    notes: '',
+    tracks: [
+      { id: id('track'), type: 'video', name: 'Video', items: [] },
+      { id: id('track'), type: 'dialogue', name: 'Dialogue', items: [] },
+      { id: id('track'), type: 'audio', name: 'Audio', items: [] },
+    ],
+    revision: 1,
+    updatedAt: nowIso(),
+  };
+}
+
+function createInheritedDirectorPlan(workspace: StudioWorkspace, series: StudioWorkspace['series'][number], episodeId: string) {
+  const planId = id('director_plan');
+  workspace.directorPlans.push({
+    id: planId,
+    episodeId,
+    theme: series.settings.worldDescription || series.description || `${series.name} default theme`,
+    visualStyle: [series.settings.visualStylePreset, series.settings.visualStylePrompt || series.style].filter(Boolean).join(' · ') || 'Follow series baseline',
+    narrativeStructure: series.strategy.creationMode || 'Series default creation flow',
+    sceneIntent: series.settings.defaultShotStrategy || 'Carry series-level directing intent into this episode',
+    soundDirection: series.strategy.promptGuidance || 'Respect series-level prompt guidance and pacing',
+    transitionStrategy: series.settings.cameraMotionPreference || 'Use smooth transitions aligned with the series camera preference',
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  });
+  return planId;
+}
+
+function createEpisodeScaffold(
+  workspace: StudioWorkspace,
+  series: StudioWorkspace['series'][number],
+  input: {
+    title: string;
+    logline: string;
+    sourceTitle?: string;
+    sourceContent?: string;
+  },
+) {
+  const episodeId = id('episode');
+  const finalCut = createDefaultFinalCut(episodeId);
+  workspace.finalCuts.push(finalCut);
+
+  const inheritedSharedAssetIds = workspace.assets
+    .filter((asset) => asset.seriesId === series.id && asset.isShared)
+    .map((asset) => asset.id);
+
+  const episode = {
+    id: episodeId,
+    seriesId: series.id,
+    index: series.episodeIds.length + 1,
+    title: normalizeName(input.title),
+    logline: input.logline.trim(),
+    status: 'not_started' as const,
+    progress: 0,
+    stationStates: createDefaultStationStates(Boolean(input.sourceContent)),
+    sourceDocumentId: null,
+    currentStage: 'script_generation' as const,
+    chapterIds: [],
+    assetIds: inheritedSharedAssetIds,
+    shotIds: [],
+    storyboardIds: [],
+    directorPlanId: createInheritedDirectorPlan(workspace, series, episodeId),
+    finalCutId: finalCut.id,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+
+  if (input.sourceContent) {
+    const sourceId = id('source');
+    workspace.sourceDocuments.push({
+      id: sourceId,
+      episodeId,
+      title: input.sourceTitle?.trim() || `${episode.title} Source`,
+      content: input.sourceContent,
+      importedAt: nowIso(),
+      revision: 1,
+    });
+    episode.sourceDocumentId = sourceId;
+  }
+
+  workspace.episodes.push(episode);
+  series.episodeIds.push(episode.id);
+  series.updatedAt = nowIso();
+  return episode;
+}
+
 function upsertWorkflowRun(
   workspace: StudioWorkspace,
   input: {
@@ -410,6 +555,255 @@ export const studioRepository = new StudioRepository();
 
 function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unknown {
   switch (command.type) {
+    case 'createSeries': {
+      const name = normalizeName(command.name);
+      if (!name) {
+        throw new Error('Series name is required');
+      }
+      ensureUniqueSeriesName(workspace, name);
+
+      const series = {
+        id: id('series'),
+        name,
+        description: command.description.trim(),
+        status: 'setting' as const,
+        coverUrl: command.coverUrl ?? '/generated/series-placeholder.jpg',
+        genre: '待补充',
+        style: workspace.settings.workspace.defaultStyle || 'Series default',
+        worldRules: [],
+        episodeIds: [],
+        progress: 0,
+        settings: {
+          worldEra: '',
+          worldDescription: '',
+          coreRules: [],
+          visualStylePreset: workspace.settings.workspace.defaultStyle || '',
+          visualStylePrompt: '',
+          referenceImages: [],
+          defaultShotStrategy: '',
+          defaultDurationStrategy: '',
+          cameraMotionPreference: '',
+          inheritToEpisodes: true,
+        },
+        strategy: {
+          model: workspace.settings.ai.model,
+          stylePreference: workspace.settings.workspace.defaultStyle || '',
+          aspectRatio: workspace.settings.workspace.aspectRatio,
+          creationMode: workspace.settings.workspace.creationMode,
+          promptGuidance: '',
+          inheritToEpisodes: true,
+          priorityNote: 'Episode overrides > Series strategy > Global settings',
+        },
+        importMetadata: {
+          source: 'manual' as const,
+          importedAt: null,
+          sourceLabel: '',
+        },
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+      };
+
+      workspace.series.unshift(series);
+      createTask(workspace, {
+        kind: 'settings',
+        targetType: 'series',
+        targetId: series.id,
+        title: `创建系列 ${series.name}`,
+        description: '系列已建立，可继续完善系列设定、策略与共享资产。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}`,
+        error: null,
+        logs: ['series created'],
+        batch: null,
+      });
+      return { ok: true, series };
+    }
+    case 'importSeries': {
+      const name = normalizeName(command.name);
+      if (!name) {
+        throw new Error('Series name is required');
+      }
+      ensureUniqueSeriesName(workspace, name);
+
+      const series = {
+        id: id('series'),
+        name,
+        description: command.description.trim() || command.content.trim().slice(0, 120),
+        status: 'setting' as const,
+        coverUrl: '/generated/series-imported.jpg',
+        genre: '导入项目',
+        style: workspace.settings.workspace.defaultStyle || 'Imported baseline',
+        worldRules: [],
+        episodeIds: [],
+        progress: 0,
+        settings: {
+          worldEra: '',
+          worldDescription: '',
+          coreRules: [],
+          visualStylePreset: workspace.settings.workspace.defaultStyle || '',
+          visualStylePrompt: '',
+          referenceImages: [],
+          defaultShotStrategy: '',
+          defaultDurationStrategy: '',
+          cameraMotionPreference: '',
+          inheritToEpisodes: true,
+        },
+        strategy: {
+          model: workspace.settings.ai.model,
+          stylePreference: workspace.settings.workspace.defaultStyle || '',
+          aspectRatio: workspace.settings.workspace.aspectRatio,
+          creationMode: workspace.settings.workspace.creationMode,
+          promptGuidance: 'Imported series baseline',
+          inheritToEpisodes: true,
+          priorityNote: 'Episode overrides > Series strategy > Global settings',
+        },
+        importMetadata: {
+          source: 'text' as const,
+          importedAt: nowIso(),
+          sourceLabel: command.sourceTitle.trim(),
+        },
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+      };
+      workspace.series.unshift(series);
+
+      const episode = createEpisodeScaffold(workspace, series, {
+        title: command.firstEpisodeTitle,
+        logline: `Imported from ${command.sourceTitle.trim()}`,
+        sourceTitle: command.sourceTitle,
+        sourceContent: command.content,
+      });
+
+      createTask(workspace, {
+        kind: 'settings',
+        targetType: 'series',
+        targetId: series.id,
+        title: `导入创建 ${series.name}`,
+        description: '文本导入已生成系列和首集原文骨架。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}`,
+        error: null,
+        logs: ['series imported', `episode created: ${episode.id}`],
+        batch: null,
+      });
+      return { ok: true, series, episode };
+    }
+    case 'updateSeriesSettings': {
+      const series = workspace.series.find((item) => item.id === command.seriesId);
+      if (!series) {
+        throw new Error(`Series ${command.seriesId} not found`);
+      }
+      series.settings = buildSeriesSettingsPatch(series.settings, {
+        ...command.settings,
+        coreRules: command.settings.coreRules?.map((item) => item.trim()).filter(Boolean),
+        referenceImages: command.settings.referenceImages?.map((item) => item.trim()).filter(Boolean),
+      });
+      if (command.settings.visualStylePrompt !== undefined && command.settings.visualStylePrompt.trim()) {
+        series.style = command.settings.visualStylePrompt.trim();
+      }
+      if (command.settings.coreRules !== undefined) {
+        series.worldRules = command.settings.coreRules.map((item) => item.trim()).filter(Boolean);
+      }
+      series.updatedAt = nowIso();
+      createTask(workspace, {
+        kind: 'settings',
+        targetType: 'series',
+        targetId: series.id,
+        title: `保存 ${series.name} 系列设定`,
+        description: '世界观、视觉风格与导演规则已保存。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}`,
+        error: null,
+        logs: ['series settings updated'],
+        batch: null,
+      });
+      return { ok: true, series };
+    }
+    case 'updateSeriesStrategy': {
+      const series = workspace.series.find((item) => item.id === command.seriesId);
+      if (!series) {
+        throw new Error(`Series ${command.seriesId} not found`);
+      }
+      series.strategy = buildSeriesStrategyPatch(series.strategy, command.strategy);
+      series.updatedAt = nowIso();
+      createTask(workspace, {
+        kind: 'settings',
+        targetType: 'series',
+        targetId: series.id,
+        title: `保存 ${series.name} 系列策略`,
+        description: '系列级生成与创作策略已保存，后续集数默认继承。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}`,
+        error: null,
+        logs: ['series strategy updated', series.strategy.priorityNote],
+        batch: null,
+      });
+      return { ok: true, series };
+    }
+    case 'createEpisode': {
+      const series = workspace.series.find((item) => item.id === command.seriesId);
+      if (!series) {
+        throw new Error(`Series ${command.seriesId} not found`);
+      }
+      const title = normalizeName(command.title);
+      if (!title) {
+        throw new Error('Episode title is required');
+      }
+      const episode = createEpisodeScaffold(workspace, series, {
+        title,
+        logline: command.logline.trim(),
+      });
+      syncSeriesEpisodes(workspace, series.id);
+      createTask(workspace, {
+        kind: 'script',
+        targetType: 'episode',
+        targetId: episode.id,
+        title: `创建集数 ${episode.title}`,
+        description: '空白集数已创建，可继续补原文或直接编写。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}/episodes/${episode.id}`,
+        error: null,
+        logs: [`shared assets inherited: ${episode.assetIds.length}`],
+        batch: null,
+      });
+      return { ok: true, episode, series };
+    }
+    case 'createEpisodeFromSource': {
+      const series = workspace.series.find((item) => item.id === command.seriesId);
+      if (!series) {
+        throw new Error(`Series ${command.seriesId} not found`);
+      }
+      const title = normalizeName(command.title);
+      if (!title) {
+        throw new Error('Episode title is required');
+      }
+      const episode = createEpisodeScaffold(workspace, series, {
+        title,
+        logline: command.logline.trim(),
+        sourceTitle: command.sourceTitle,
+        sourceContent: command.sourceContent,
+      });
+      syncSeriesEpisodes(workspace, series.id);
+      createTask(workspace, {
+        kind: 'script',
+        targetType: 'episode',
+        targetId: episode.id,
+        title: `从原文创建 ${episode.title}`,
+        description: '已创建集数并写入首份原文，可直接进入脚本工位。',
+        status: 'completed',
+        retryable: false,
+        link: `/series/${series.id}/episodes/${episode.id}`,
+        error: null,
+        logs: [`source document: ${command.sourceTitle.trim()}`, `shared assets inherited: ${episode.assetIds.length}`],
+        batch: null,
+      });
+      return { ok: true, episode, series };
+    }
     case 'updateChapter': {
       const chapter = workspace.chapters.find((item) => item.id === command.chapterId);
       if (!chapter) {
@@ -738,10 +1132,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         touchRevision(globalAsset);
       }
 
-      if (asset.episodeId) {
-        syncEpisode(workspace, asset.episodeId);
-      } else {
+      if (asset.isShared || !asset.episodeId) {
         syncSeriesEpisodes(workspace, asset.seriesId);
+      } else if (asset.episodeId) {
+        syncEpisode(workspace, asset.episodeId);
       }
 
       const cascadeWarnings = workspace.shots
@@ -783,10 +1177,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         }
       }
 
-      if (asset.episodeId) {
-        syncEpisode(workspace, asset.episodeId);
-      } else {
+      if (asset.isShared || !asset.episodeId) {
         syncSeriesEpisodes(workspace, asset.seriesId);
+      } else if (asset.episodeId) {
+        syncEpisode(workspace, asset.episodeId);
       }
       return { ok: true, asset };
     }
@@ -796,7 +1190,16 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         throw new Error(`Asset ${command.assetId} not found`);
       }
       asset.isShared = true;
+      asset.episodeId = null;
+      workspace.episodes
+        .filter((episode) => episode.seriesId === asset.seriesId)
+        .forEach((episode) => {
+          if (!episode.assetIds.includes(asset.id)) {
+            episode.assetIds.push(asset.id);
+          }
+        });
       touchRevision(asset);
+      syncSeriesEpisodes(workspace, asset.seriesId);
       createTask(workspace, {
         kind: 'asset',
         targetType: 'asset',
@@ -909,6 +1312,13 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         updatedAt: nowIso(),
       };
       workspace.assets.unshift(asset);
+      workspace.episodes
+        .filter((episode) => episode.seriesId === series.id)
+        .forEach((episode) => {
+          if (!episode.assetIds.includes(asset.id)) {
+            episode.assetIds.push(asset.id);
+          }
+        });
       if (!globalAsset.usedInSeries.some((item) => item.linkedAssetId === asset.id)) {
         globalAsset.usedInSeries.push({
           seriesId: series.id,
@@ -1090,8 +1500,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       if (!episode) {
         throw new Error(`Episode ${command.episodeId} not found`);
       }
-      const ownAssets = workspace.assets.filter((asset) => asset.episodeId === episode.id);
-      const assetsReady = ownAssets.length > 0 && ownAssets.every((asset) => {
+      const episodeAssets = workspace.assets.filter((asset) => episode.assetIds.includes(asset.id));
+      const assetsReady = episodeAssets.length > 0 && episodeAssets.every((asset) => {
         const images = asset.images.length ? asset.images : asset.versions;
         return asset.state === 'completed' && images.some((image) => image.isSelected);
       });
@@ -1099,7 +1509,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         throw new Error('All assets must be completed with selected versions before shot generation');
       }
 
-      const { selectedAssets, skippedAssetIds } = resolveAssetBatch(ownAssets, command.assetSnapshots);
+      const { selectedAssets, skippedAssetIds } = resolveAssetBatch(episodeAssets, command.assetSnapshots);
       const chapters = workspace.chapters.filter((chapter) => chapter.episodeId === episode.id).sort((left, right) => left.index - right.index);
       let directorPlanId = episode.directorPlanId;
       if (!directorPlanId) {

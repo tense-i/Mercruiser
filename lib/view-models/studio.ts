@@ -71,15 +71,24 @@ export function buildSeriesView(workspace: StudioWorkspace, seriesId: string) {
       gate: buildGateSnapshot(workspace, episode.id),
     }));
   const sharedAssets = workspace.assets.filter((asset) => asset.seriesId === seriesId && asset.isShared);
+  const promotableAssets = workspace.assets.filter((asset) => asset.seriesId === seriesId && !asset.isShared);
   const globalAssets = workspace.globalAssets.filter((asset) => asset.usedInSeries.some((item) => item.seriesId === seriesId));
+  const availableGlobalAssets = workspace.globalAssets;
   const generationPresets = workspace.generationPresets.filter((preset) => preset.scope === 'global' || preset.scopeId === seriesId || preset.scope === 'user');
   const tasks = workspace.tasks.filter((task) => task.targetType === 'series' || episodes.some((episode) => episode.id === task.targetId)).slice(0, 8);
+  const sharedAssetUsage = sharedAssets.map((asset) => ({
+    assetId: asset.id,
+    episodeIds: episodes.filter((episode) => episode.assetIds.includes(asset.id)).map((episode) => episode.id),
+  }));
 
   return {
     series,
     episodes,
     sharedAssets,
+    promotableAssets,
     globalAssets,
+    availableGlobalAssets,
+    sharedAssetUsage,
     generationPresets,
     usageSummary: buildUsageSummary(workspace, { seriesId }),
     tasks,
