@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
+import { ZodError } from 'zod';
 
 import { studioRepository, StudioCommandConflictError } from '@/lib/server/repository/studio-repository';
 import { assertLocalMutationRequest } from '@/lib/server/request-guard';
+
+function formatValidationError(error: ZodError) {
+  return error.issues
+    .map((issue) => {
+      const path = issue.path.join('.') || 'field';
+      if (issue.code === 'too_small' && issue.minimum === 1) {
+        return `${path} 不能为空`;
+      }
+      return `${path}: ${issue.message}`;
+    })
+    .join('；');
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -79,6 +92,10 @@ export async function POST(request: Request) {
         },
         { status: error.statusCode },
       );
+    }
+
+    if (error instanceof ZodError) {
+      return NextResponse.json({ ok: false, error: formatValidationError(error), issues: error.issues }, { status: 400 });
     }
 
     if (error instanceof Error) {

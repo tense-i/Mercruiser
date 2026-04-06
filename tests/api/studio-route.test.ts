@@ -63,6 +63,34 @@ describe('studio api route', () => {
     expect(asset.voice).toBe('voice-02');
   });
 
+  it('formats validation issues for importSeries payloads', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'importSeries',
+            name: '',
+            description: '',
+            sourceTitle: '',
+            firstEpisodeTitle: '',
+            content: '',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.ok).toBe(false);
+    expect(payload.error).toContain('name 不能为空');
+    expect(payload.error).toContain('sourceTitle 不能为空');
+    expect(payload.error).toContain('firstEpisodeTitle 不能为空');
+    expect(payload.error).toContain('content 不能为空');
+    expect(Array.isArray(payload.issues)).toBe(true);
+  });
+
   it('creates episodes from source and returns refreshed series view', async () => {
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(

@@ -44,6 +44,12 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
   async function handleCreateSeries() {
     const name = (document.getElementById('series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
     const description = (document.getElementById('series-description') as HTMLTextAreaElement | null)?.value ?? '';
+
+    if (!name) {
+      setErrorMessage('系列名称不能为空');
+      return;
+    }
+
     const payload = await dispatch({ type: 'createSeries', name, description });
     const seriesId = payload?.result?.series?.id as string | undefined;
     if (seriesId) {
@@ -54,9 +60,15 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
   async function handleImportSeries() {
     const name = (document.getElementById('import-series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
     const description = (document.getElementById('import-series-description') as HTMLTextAreaElement | null)?.value ?? '';
-    const sourceTitle = (document.getElementById('import-source-title') as HTMLInputElement | null)?.value?.trim() ?? 'Imported source';
-    const firstEpisodeTitle = (document.getElementById('import-episode-title') as HTMLInputElement | null)?.value?.trim() ?? 'Episode 1';
-    const content = (document.getElementById('import-source-content') as HTMLTextAreaElement | null)?.value ?? '';
+    const sourceTitle = (document.getElementById('import-source-title') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const firstEpisodeTitle = (document.getElementById('import-episode-title') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const content = (document.getElementById('import-source-content') as HTMLTextAreaElement | null)?.value?.trim() ?? '';
+
+    if (!name || !sourceTitle || !content || !firstEpisodeTitle) {
+      setErrorMessage('导入创建需要填写系列名称、原文标题、首集标题和原文内容');
+      return;
+    }
+
     const payload = await dispatch({
       type: 'importSeries',
       name,
