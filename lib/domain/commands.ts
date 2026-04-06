@@ -41,7 +41,7 @@ export const ImportSeriesCommandSchema = z.object({
   type: z.literal('importSeries'),
   name: z.string().min(1).max(50),
   description: z.string().default(''),
-  importType: z.literal('text').default('text'),
+  importType: z.enum(['text', 'file']).default('text'),
   sourceTitle: z.string().min(1).default('Imported source'),
   content: z.string().min(1),
   firstEpisodeTitle: z.string().min(1).default('Episode 1'),
@@ -85,6 +85,7 @@ export const UpdateChapterCommandSchema = z.object({
 export const GenerateScriptFromSourceCommandSchema = z.object({
   type: z.literal('generateScriptFromSource'),
   episodeId: z.string(),
+  forceRegenerate: z.boolean().optional(),
 });
 
 export const ImportSourceDocumentCommandSchema = z.object({
@@ -92,6 +93,7 @@ export const ImportSourceDocumentCommandSchema = z.object({
   episodeId: z.string(),
   title: z.string().min(1),
   content: z.string().min(1),
+  autoAnalyze: z.boolean().optional(),
 });
 
 export const ExtractAssetsFromScriptCommandSchema = z.object({

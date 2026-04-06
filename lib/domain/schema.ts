@@ -33,7 +33,7 @@ const NotifyMethodSchema = z.enum(['toast', 'email', 'block']);
 const CurrencySchema = z.enum(['USD', 'CNY']);
 const SyncSourceSchema = z.enum(['local', 'linked', 'detached']);
 const AssetRefStatusSchema = z.enum(['valid', 'broken', 'stale']);
-const SeriesImportSourceSchema = z.enum(['manual', 'text']);
+const SeriesImportSourceSchema = z.enum(['manual', 'text', 'file']);
 
 export const DialogueLineSchema = z.object({
   speaker: z.string(),

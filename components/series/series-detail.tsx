@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Box, CheckCircle2, ChevronRight, Clock, Film, Globe2, PlusCircle, Sparkles, Wand2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { readSourceFile } from '@/lib/source-file';
 import type { SeriesView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +46,7 @@ export function SeriesDetail({ view: initialView }: { view: SeriesView }) {
     sourceTitle: '',
     sourceContent: '',
   });
+  const episodeSourceFileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setSettingsDraft({
@@ -172,6 +174,25 @@ export function SeriesDetail({ view: initialView }: { view: SeriesView }) {
     });
   }
 
+  async function handleEpisodeSourceFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    try {
+      const parsed = await readSourceFile(file);
+      setEpisodeDraft((current) => ({
+        ...current,
+        sourceTitle: parsed.title,
+        sourceContent: parsed.content,
+        title: current.title || parsed.title,
+      }));
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '读取原文文件失败');
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       {errorMessage ? (
@@ -224,7 +245,7 @@ export function SeriesDetail({ view: initialView }: { view: SeriesView }) {
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
                 <h4 className="text-sm font-bold text-zinc-100">从原文创建</h4>
-                <p className="mt-2 text-xs text-zinc-500">写入原文后直接进入脚本工位，后续可继续拆章节。</p>
+                <p className="mt-2 text-xs text-zinc-500">支持粘贴或上传 .txt / .md，提交后自动启动 Agent 分析全文并生成剧本章节。</p>
               </div>
             </div>
             <div className="mt-4 grid gap-3">
@@ -265,6 +286,23 @@ export function SeriesDetail({ view: initialView }: { view: SeriesView }) {
                 placeholder="Paste source text here to create the episode from source"
                 className="h-28 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none"
               />
+              <input
+                ref={episodeSourceFileRef}
+                type="file"
+                accept=".txt,.md,text/plain,text/markdown"
+                className="hidden"
+                onChange={(event) => {
+                  void handleEpisodeSourceFile(event.target.files?.[0] ?? null);
+                  event.currentTarget.value = '';
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => episodeSourceFileRef.current?.click()}
+                className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm font-medium text-zinc-100 transition-colors hover:border-brand-500/40 hover:bg-zinc-800"
+              >
+                上传 .txt / .md 原文文件
+              </button>
               <button
                 type="button"
                 onClick={() => void handleCreateEpisode('source')}

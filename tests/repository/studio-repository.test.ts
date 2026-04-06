@@ -10,7 +10,7 @@ import type { StudioWorkspace } from '@/lib/domain/types';
 async function createTempWorkspace(mutate?: (workspace: StudioWorkspace) => void) {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-repo-'));
   const targetPath = path.join(tempDir, 'studio.json');
-  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'studio.json'), 'utf8')) as StudioWorkspace;
+  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'tests', 'fixtures', 'studio-seed.json'), 'utf8')) as StudioWorkspace;
   mutate?.(seed);
   await writeFile(targetPath, JSON.stringify(seed, null, 2), 'utf8');
   return targetPath;
@@ -42,6 +42,7 @@ describe('studio repository', () => {
       type: 'importSeries',
       name: 'Archive Import',
       description: '',
+      importType: 'file',
       sourceTitle: 'Pilot Manuscript',
       content: '第一段。第二段。',
       firstEpisodeTitle: 'Episode Alpha',
@@ -58,7 +59,7 @@ describe('studio repository', () => {
     expect(manual.series.status).toBe('setting');
     expect(manual.series.importMetadata.source).toBe('manual');
     expect(imported.ok).toBe(true);
-    expect(imported.series.importMetadata.source).toBe('text');
+    expect(imported.series.importMetadata.source).toBe('file');
     expect(imported.series.importMetadata.sourceLabel).toBe('Pilot Manuscript');
     expect(imported.episode.title).toBe('Episode Alpha');
     expect(imported.episode.sourceDocumentId).toBeTruthy();
@@ -152,6 +153,27 @@ describe('studio repository', () => {
     expect(sourcedEpisodeView?.gate?.currentStage).toBe('asset_extraction');
     expect(seriesView?.episodes.some((episode) => episode.id === blankEpisode.episode.id)).toBe(true);
     expect(seriesView?.episodes.some((episode) => episode.id === sourcedEpisode.episode.id)).toBe(true);
+  });
+
+  it('imports source documents and auto-analyzes them into chapters by default', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    const result = (await repo.dispatch({
+      type: 'importSourceDocument',
+      episodeId: 'episode_03',
+      title: '新的第三集原文',
+      content: '第一幕。第二幕。第三幕。',
+      autoAnalyze: true,
+    })) as { ok: boolean; sourceDocumentId: string };
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
+
+    expect(result.ok).toBe(true);
+    expect(result.sourceDocumentId).toBeTruthy();
+    expect(episodeView?.sourceDocument?.title).toBe('新的第三集原文');
+    expect(episodeView?.chapters.length).toBeGreaterThan(0);
+    expect(episodeView?.gate?.currentStage).toBe('asset_extraction');
   });
 
   it('updates chapter content and persists it', async () => {

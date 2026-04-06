@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Film, FolderInput, PlusCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
+import { readSourceFile } from '@/lib/source-file';
 import type { DashboardView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +13,17 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
   const router = useRouter();
   const [pending, setPending] = useState<'createSeries' | 'importSeries' | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [createDraft, setCreateDraft] = useState({ name: '', description: '' });
+  const [importDraft, setImportDraft] = useState({
+    name: '',
+    description: '',
+    sourceTitle: '',
+    firstEpisodeTitle: '',
+    content: '',
+    importType: 'text' as 'text' | 'file',
+    fileName: '',
+  });
+  const importFileRef = useRef<HTMLInputElement | null>(null);
   const primarySeries = dashboard.series[0] ?? null;
   const recentSeries = useMemo(
     () => [...dashboard.series].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)).slice(0, 3),
@@ -42,8 +54,8 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
   }
 
   async function handleCreateSeries() {
-    const name = (document.getElementById('series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
-    const description = (document.getElementById('series-description') as HTMLTextAreaElement | null)?.value ?? '';
+    const name = createDraft.name.trim();
+    const description = createDraft.description;
 
     if (!name) {
       setErrorMessage('系列名称不能为空');
@@ -58,11 +70,11 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
   }
 
   async function handleImportSeries() {
-    const name = (document.getElementById('import-series-name') as HTMLInputElement | null)?.value?.trim() ?? '';
-    const description = (document.getElementById('import-series-description') as HTMLTextAreaElement | null)?.value ?? '';
-    const sourceTitle = (document.getElementById('import-source-title') as HTMLInputElement | null)?.value?.trim() ?? '';
-    const firstEpisodeTitle = (document.getElementById('import-episode-title') as HTMLInputElement | null)?.value?.trim() ?? '';
-    const content = (document.getElementById('import-source-content') as HTMLTextAreaElement | null)?.value?.trim() ?? '';
+    const name = importDraft.name.trim();
+    const description = importDraft.description;
+    const sourceTitle = importDraft.sourceTitle.trim();
+    const firstEpisodeTitle = importDraft.firstEpisodeTitle.trim();
+    const content = importDraft.content.trim();
 
     if (!name || !sourceTitle || !content || !firstEpisodeTitle) {
       setErrorMessage('导入创建需要填写系列名称、原文标题、首集标题和原文内容');
@@ -73,7 +85,7 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
       type: 'importSeries',
       name,
       description,
-      importType: 'text',
+      importType: importDraft.importType,
       sourceTitle,
       firstEpisodeTitle,
       content,
@@ -81,6 +93,28 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
     const seriesId = payload?.result?.series?.id as string | undefined;
     if (seriesId) {
       router.push(`/series/${seriesId}`);
+    }
+  }
+
+  async function handleImportFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    try {
+      const parsed = await readSourceFile(file);
+      setImportDraft((current) => ({
+        ...current,
+        importType: 'file',
+        fileName: parsed.fileName,
+        sourceTitle: parsed.title,
+        firstEpisodeTitle: current.firstEpisodeTitle || parsed.title,
+        name: current.name || parsed.title,
+        content: parsed.content,
+      }));
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '读取上传文件失败');
     }
   }
 
@@ -141,23 +175,84 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
             onAction={() => void handleCreateSeries()}
             disabled={pending !== null}
           >
-            <input id="series-name" maxLength={50} placeholder="Series name" className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
-            <textarea id="series-description" placeholder="Series summary (optional)" className="mt-3 h-24 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
+            <input
+              id="series-name"
+              maxLength={50}
+              value={createDraft.name}
+              onChange={(event) => setCreateDraft((current) => ({ ...current, name: event.target.value }))}
+              placeholder="Series name"
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none"
+            />
+            <textarea
+              id="series-description"
+              value={createDraft.description}
+              onChange={(event) => setCreateDraft((current) => ({ ...current, description: event.target.value }))}
+              placeholder="Series summary (optional)"
+              className="mt-3 h-24 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none"
+            />
           </ActionCard>
 
           <ActionCard
             icon={<FolderInput size={18} className="text-brand-300" />}
             title="导入创建"
-            description="P0 仅支持文本导入：创建系列并生成首集原文骨架，失败时返回明确错误。"
+            description="支持粘贴原文或直接上传 .txt / .md，导入后自动触发 Agent 分析全文并生成首集剧本。"
             actionLabel={pending === 'importSeries' ? 'Importing…' : 'Import as Series'}
             onAction={() => void handleImportSeries()}
             disabled={pending !== null}
           >
-            <input id="import-series-name" maxLength={50} placeholder="Imported series name" className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
-            <textarea id="import-series-description" placeholder="Imported series summary (optional)" className="mt-3 h-20 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
-            <input id="import-source-title" placeholder="Source title" className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
-            <input id="import-episode-title" placeholder="Initial episode title" className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none" />
-            <textarea id="import-source-content" placeholder="Paste the imported text here" className="mt-3 h-28 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" />
+            <input
+              id="import-series-name"
+              maxLength={50}
+              value={importDraft.name}
+              onChange={(event) => setImportDraft((current) => ({ ...current, name: event.target.value, importType: 'text' }))}
+              placeholder="Imported series name"
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none"
+            />
+            <textarea
+              id="import-series-description"
+              value={importDraft.description}
+              onChange={(event) => setImportDraft((current) => ({ ...current, description: event.target.value }))}
+              placeholder="Imported series summary (optional)"
+              className="mt-3 h-20 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none"
+            />
+            <input
+              id="import-source-title"
+              value={importDraft.sourceTitle}
+              onChange={(event) => setImportDraft((current) => ({ ...current, sourceTitle: event.target.value, importType: 'text' }))}
+              placeholder="Source title"
+              className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none"
+            />
+            <input
+              id="import-episode-title"
+              value={importDraft.firstEpisodeTitle}
+              onChange={(event) => setImportDraft((current) => ({ ...current, firstEpisodeTitle: event.target.value }))}
+              placeholder="Initial episode title"
+              className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500 focus:outline-none"
+            />
+            <textarea
+              id="import-source-content"
+              value={importDraft.content}
+              onChange={(event) => setImportDraft((current) => ({ ...current, content: event.target.value, importType: 'text' }))}
+              placeholder="Paste the imported text here"
+              className="mt-3 h-28 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none"
+            />
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".txt,.md,text/plain,text/markdown"
+              className="hidden"
+              onChange={(event) => {
+                void handleImportFile(event.target.files?.[0] ?? null);
+                event.currentTarget.value = '';
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => importFileRef.current?.click()}
+              className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900 py-2 text-sm font-medium text-zinc-100 transition-colors hover:border-brand-500/40 hover:bg-zinc-800"
+            >
+              {importDraft.fileName ? `已选择文件：${importDraft.fileName}` : '上传 .txt / .md 原文文件'}
+            </button>
           </ActionCard>
         </div>
       </div>

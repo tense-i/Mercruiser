@@ -11,7 +11,7 @@ let previousPath = process.env.MERCRUISER_DATA_PATH;
 async function prepareWorkspace(mutate?: (workspace: StudioWorkspace) => void) {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-api-'));
   const targetPath = path.join(tempDir, 'studio.json');
-  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'data', 'studio.json'), 'utf8')) as StudioWorkspace;
+  const seed = JSON.parse(await readFile(path.join(process.cwd(), 'tests', 'fixtures', 'studio-seed.json'), 'utf8')) as StudioWorkspace;
   mutate?.(seed);
   await writeFile(targetPath, JSON.stringify(seed, null, 2), 'utf8');
   process.env.MERCRUISER_DATA_PATH = targetPath;
@@ -89,6 +89,32 @@ describe('studio api route', () => {
     expect(payload.error).toContain('firstEpisodeTitle 不能为空');
     expect(payload.error).toContain('content 不能为空');
     expect(Array.isArray(payload.issues)).toBe(true);
+  });
+
+  it('imports a source-backed series in file mode and auto-generates chapters', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'importSeries',
+            name: '文件导入系列',
+            description: '',
+            importType: 'file',
+            sourceTitle: 'novel.md',
+            firstEpisodeTitle: '第一集',
+            content: '第一幕。第二幕。第三幕。',
+          },
+          context: {},
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.result.series.importMetadata.source).toBe('file');
+    expect(payload.result.episode.chapterIds.length).toBeGreaterThan(0);
   });
 
   it('creates episodes from source and returns refreshed series view', async () => {
@@ -311,6 +337,7 @@ describe('studio api route', () => {
             episodeId: 'episode_03',
             title: '新的第三集原文',
             content: '新的原文内容',
+            autoAnalyze: true,
           },
           context: {
             episodeId: 'episode_03',
@@ -322,6 +349,7 @@ describe('studio api route', () => {
 
     expect(payload.ok).toBe(true);
     expect(payload.episodeView.sourceDocument.title).toBe('新的第三集原文');
+    expect(payload.episodeView.chapters.length).toBeGreaterThan(0);
   });
 
   it('accepts siliconflow mode in persisted settings updates', async () => {

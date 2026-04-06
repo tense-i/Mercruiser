@@ -9,7 +9,7 @@ let previousPath = process.env.MERCRUISER_DATA_PATH;
 async function prepareWorkspace() {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-ai-'));
   const targetPath = path.join(tempDir, 'studio.json');
-  const seed = await readFile(path.join(process.cwd(), 'data', 'studio.json'), 'utf8');
+  const seed = await readFile(path.join(process.cwd(), 'tests', 'fixtures', 'studio-seed.json'), 'utf8');
   await writeFile(targetPath, seed, 'utf8');
   process.env.MERCRUISER_DATA_PATH = targetPath;
 }

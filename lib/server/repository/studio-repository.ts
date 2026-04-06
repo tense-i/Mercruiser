@@ -1,4 +1,5 @@
 import { mutateWorkspaceAtomically, readWorkspace } from '@/lib/server/repository/file-store';
+import { analyzeSourceTextToChapters } from '@/lib/ai/script-analysis';
 import { buildDashboardView, buildEpisodeWorkspaceView, buildSeriesView } from '@/lib/view-models/studio';
 import { StudioCommandSchema, type StudioCommand } from '@/lib/domain/commands';
 import type {
@@ -354,6 +355,38 @@ function syncSeriesEpisodes(workspace: StudioWorkspace, seriesId: string) {
   workspace.episodes.filter((episode) => episode.seriesId === seriesId).forEach((episode) => syncEpisode(workspace, episode.id));
 }
 
+function resetEpisodeDerivedOutputs(workspace: StudioWorkspace, episode: StudioWorkspace['episodes'][number]) {
+  const oldAssetIds = [...episode.assetIds];
+  const oldShotIds = [...episode.shotIds];
+  const oldStoryboardIds = [...episode.storyboardIds];
+  const sharedAssetIds = workspace.assets
+    .filter((asset) => asset.seriesId === episode.seriesId && asset.isShared)
+    .map((asset) => asset.id);
+
+  workspace.assets = workspace.assets.filter((asset) => asset.episodeId !== episode.id);
+  workspace.shots = workspace.shots.filter((shot) => shot.episodeId !== episode.id);
+  workspace.storyboards = workspace.storyboards.filter((storyboard) => storyboard.episodeId !== episode.id);
+  workspace.tasks = workspace.tasks.filter(
+    (task) =>
+      task.targetId !== episode.id &&
+      !episode.chapterIds.includes(task.targetId) &&
+      !oldAssetIds.includes(task.targetId) &&
+      !oldShotIds.includes(task.targetId) &&
+      !oldStoryboardIds.includes(task.targetId),
+  );
+
+  const finalCut = workspace.finalCuts.find((item) => item.id === episode.finalCutId);
+  if (finalCut) {
+    finalCut.tracks = finalCut.tracks.map((track) => ({ ...track, items: [] }));
+    finalCut.updatedAt = nowIso();
+  }
+
+  episode.assetIds = sharedAssetIds;
+  episode.shotIds = [];
+  episode.storyboardIds = [];
+  episode.stationStates = createDefaultStationStates(Boolean(episode.sourceDocumentId));
+}
+
 function recordApiUsage(
   workspace: StudioWorkspace,
   input: Omit<APIUsageRecord, 'id' | 'createdAt' | 'currency'> & { currency?: APIUsageRecord['currency'] },
@@ -530,8 +563,8 @@ export class StudioRepository {
 
   async dispatch(commandInput: unknown) {
     const command = StudioCommandSchema.parse(commandInput);
-    return mutateWorkspaceAtomically((workspace) => {
-      const result = executeCommand(workspace, command);
+    return mutateWorkspaceAtomically(async (workspace) => {
+      const result = await executeCommand(workspace, command);
       workspace.meta.updatedAt = nowIso();
       return result;
     }, this.dataPath);
@@ -557,7 +590,7 @@ export function createStudioRepository(options?: { dataPath?: string }) {
 
 export const studioRepository = new StudioRepository();
 
-function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unknown {
+async function executeCommand(workspace: StudioWorkspace, command: StudioCommand): Promise<unknown> {
   switch (command.type) {
     case 'createSeries': {
       const name = normalizeName(command.name);
@@ -663,7 +696,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           priorityNote: 'Episode overrides > Series strategy > Global settings',
         },
         importMetadata: {
-          source: 'text' as const,
+          source: command.importType,
           importedAt: nowIso(),
           sourceLabel: command.sourceTitle.trim(),
         },
@@ -678,9 +711,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         sourceTitle: command.sourceTitle,
         sourceContent: command.content,
       });
-      executeCommand(workspace, {
+      await executeCommand(workspace, {
         type: 'generateScriptFromSource',
         episodeId: episode.id,
+        forceRegenerate: true,
       });
 
       createTask(workspace, {
@@ -796,9 +830,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         sourceTitle: command.sourceTitle,
         sourceContent: command.sourceContent,
       });
-      executeCommand(workspace, {
+      await executeCommand(workspace, {
         type: 'generateScriptFromSource',
         episodeId: episode.id,
+        forceRegenerate: true,
       });
       syncSeriesEpisodes(workspace, series.id);
       createTask(workspace, {
@@ -856,34 +891,47 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       const source = workspace.sourceDocuments.find((item) => item.id === episode.sourceDocumentId);
       if (!source) throw new Error(`Episode ${command.episodeId} has no source document`);
 
-      const parts = source.content
-        .split(/[。！？\n]/)
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .slice(0, 4);
+      const forceRegenerate = command.forceRegenerate ?? false;
+      if (episode.chapterIds.length && !forceRegenerate) {
+        return { ok: true, chapterCount: episode.chapterIds.length, skipped: true };
+      }
+
+      if (forceRegenerate && episode.chapterIds.length) {
+        const chapterIdSet = new Set(episode.chapterIds);
+        workspace.chapters = workspace.chapters.filter((chapter) => !chapterIdSet.has(chapter.id));
+        resetEpisodeDerivedOutputs(workspace, episode);
+        episode.chapterIds = [];
+      }
+
+      const series = workspace.series.find((item) => item.id === episode.seriesId);
+      const analysis = await analyzeSourceTextToChapters({
+        workspace,
+        seriesName: series?.name ?? episode.seriesId,
+        episodeTitle: episode.title,
+        sourceTitle: source.title,
+        sourceContent: source.content,
+      });
 
       const createdChapterIds: string[] = [];
-      if (!episode.chapterIds.length) {
-        parts.forEach((part, index) => {
-          const chapterId = id('chapter');
-          workspace.chapters.push({
-            id: chapterId,
-            episodeId: episode.id,
-            index: index + 1,
-            title: `段落 ${index + 1}`,
-            content: part,
-            scene: index % 2 === 0 ? '主场景' : '转折场景',
-            dialogues: index === 0 ? [{ speaker: '旁白', content: part.slice(0, 18) }] : [],
-            audioStatus: 'ready',
-            estimatedDurationSeconds: Math.min(35, Math.max(18, part.length)),
-            revision: 1,
-            createdAt: nowIso(),
-            updatedAt: nowIso(),
-          });
-          createdChapterIds.push(chapterId);
+      analysis.chapters.forEach((part, index) => {
+        const chapterId = id('chapter');
+        workspace.chapters.push({
+          id: chapterId,
+          episodeId: episode.id,
+          index: index + 1,
+          title: part.title,
+          content: part.content,
+          scene: part.scene,
+          dialogues: part.dialogues,
+          audioStatus: 'ready',
+          estimatedDurationSeconds: part.estimatedDurationSeconds,
+          revision: 1,
+          createdAt: nowIso(),
+          updatedAt: nowIso(),
         });
-        episode.chapterIds = createdChapterIds;
-      }
+        createdChapterIds.push(chapterId);
+      });
+      episode.chapterIds = createdChapterIds;
       episode.stationStates.script = 'completed';
       syncEpisode(workspace, episode.id);
       const task = createTask(workspace, {
@@ -891,12 +939,12 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 生成剧本章节`,
-        description: `ScriptAgent 根据原文生成 ${episode.chapterIds.length} 个章节。`,
+        description: `ScriptAgent 基于完整原文分析生成 ${episode.chapterIds.length} 个章节。`,
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: ['source document parsed', `chapters: ${episode.chapterIds.length}`],
+        logs: ['source document parsed', `chapters: ${episode.chapterIds.length}`, `analysis mode: ${analysis.mode}${analysis.reason ? ` (${analysis.reason})` : ''}`],
         batch: null,
       });
       upsertWorkflowRun(workspace, {
@@ -904,7 +952,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         stage: 'script_generation',
         agent: 'script',
         status: 'completed',
-        summary: `生成 ${episode.chapterIds.length} 个章节`,
+        summary: `基于完整原文生成 ${episode.chapterIds.length} 个章节`,
         taskId: task.id,
       });
       recordApiUsage(workspace, {
@@ -944,18 +992,26 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         source.revision = (source.revision ?? 0) + 1;
       }
 
-      syncEpisode(workspace, episode.id);
+      if (command.autoAnalyze ?? true) {
+        await executeCommand(workspace, {
+          type: 'generateScriptFromSource',
+          episodeId: episode.id,
+          forceRegenerate: episode.chapterIds.length > 0,
+        });
+      } else {
+        syncEpisode(workspace, episode.id);
+      }
       createTask(workspace, {
         kind: 'script',
         targetType: 'episode',
         targetId: episode.id,
         title: `导入 ${episode.title} 原文`,
-        description: '原文输入已保存，可用于 ScriptAgent 生成剧本。',
+        description: command.autoAnalyze ?? true ? '原文输入已保存，并自动完成 ScriptAgent 全文分析与剧本生成。' : '原文输入已保存，可用于 ScriptAgent 生成剧本。',
         status: 'completed',
         retryable: false,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: ['source document imported'],
+        logs: ['source document imported', `autoAnalyze: ${String(command.autoAnalyze ?? true)}`],
         batch: null,
       });
       return { ok: true, sourceDocumentId: source.id };
@@ -1751,9 +1807,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
 
       if (task.kind === 'script' && task.targetType === 'episode') {
-        const rerun = executeCommand(workspace, {
+        const rerun = await executeCommand(workspace, {
           type: 'generateScriptFromSource',
           episodeId: task.targetId,
+          forceRegenerate: true,
         }) as { chapterCount: number };
         task.status = 'completed';
         task.updatedAt = nowIso();
@@ -1771,7 +1828,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
 
       if (task.kind === 'asset' && task.targetType === 'episode') {
-        const rerun = executeCommand(workspace, {
+        const rerun = await executeCommand(workspace, {
           type: 'generateAssetImages',
           episodeId: task.targetId,
         }) as { renderedCount: number };
@@ -1791,7 +1848,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
 
       if (task.kind === 'storyboard' && task.targetType === 'episode') {
-        const rerun = executeCommand(workspace, {
+        const rerun = await executeCommand(workspace, {
           type: 'generateShotImages',
           episodeId: task.targetId,
         }) as { renderedCount: number };
@@ -1811,7 +1868,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
 
       if (task.kind === 'agent' && task.targetType === 'episode') {
-        const rerun = executeCommand(workspace, {
+        const rerun = await executeCommand(workspace, {
           type: 'generateShotsFromChapters',
           episodeId: task.targetId,
         }) as { generatedCount: number };
