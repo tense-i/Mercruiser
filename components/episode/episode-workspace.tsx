@@ -42,18 +42,30 @@ const tabs = [
   { id: 'final-cut', label: 'Final Video', icon: <Video size={18} /> },
 ] as const;
 
+const assetFilters = [
+  { id: 'all', label: 'All Assets' },
+  { id: 'character', label: 'Characters' },
+  { id: 'scene', label: 'Scenes' },
+  { id: 'prop', label: 'Props' },
+] as const;
+
 export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspaceView }) {
   const [view, setView] = useState(initialView);
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]['id']>('overview');
   const [selectedChapterId, setSelectedChapterId] = useState(initialView.chapters[0]?.id ?? '');
   const [selectedAssetId, setSelectedAssetId] = useState(initialView.assets[0]?.id ?? '');
+  const [assetFilter, setAssetFilter] = useState<(typeof assetFilters)[number]['id']>('all');
   const [selectedShotId, setSelectedShotId] = useState(initialView.shots[0]?.id ?? '');
   const [storyboardMediaType, setStoryboardMediaType] = useState<'image' | 'video'>('image');
   const [pending, setPending] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const selectedChapter = view.chapters.find((chapter) => chapter.id === selectedChapterId) ?? view.chapters[0] ?? null;
-  const selectedAsset = view.assets.find((asset) => asset.id === selectedAssetId) ?? view.assets[0] ?? null;
+  const filteredAssets = useMemo(
+    () => view.assets.filter((asset) => assetFilter === 'all' || asset.type === assetFilter),
+    [assetFilter, view.assets],
+  );
+  const selectedAsset = filteredAssets.find((asset) => asset.id === selectedAssetId) ?? filteredAssets[0] ?? null;
   const selectedShot = view.shots.find((shot) => shot.id === selectedShotId) ?? view.shots[0] ?? null;
   const selectedStoryboard = view.storyboards.find((item) => item.shotId === selectedShot?.id) ?? null;
   const actionMap = useMemo(() => new Map((view.gate?.availableActions ?? []).map((action) => [action.kind, action])), [view.gate]);
@@ -86,6 +98,63 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
   }
 
   const blockedSummary = view.gate?.blockedReasons[0] ?? '当前阶段无硬门禁阻塞。';
+  const nextStepCta = useMemo(() => {
+    const scriptAction = actionMap.get('generate_script');
+    const extractAction = actionMap.get('extract_assets');
+    const assetRenderAction = actionMap.get('generate_asset_images');
+    const shotAction = actionMap.get('generate_shots');
+    const storyboardAction = actionMap.get('generate_shot_images');
+
+    switch (view.gate?.currentStage) {
+      case 'script_generation':
+        if (scriptAction?.enabled) {
+          return {
+            label: scriptAction.label,
+            run: () => dispatch({ type: 'generateScriptFromSource', episodeId: view.episode.id }),
+          };
+        }
+        return {
+          label: 'Complete Source Document',
+          run: () => setActiveTab('script'),
+        };
+      case 'asset_extraction':
+        return {
+          label: extractAction?.label ?? 'Extract Assets',
+          run: () => dispatch({ type: 'extractAssetsFromScript', episodeId: view.episode.id }),
+        };
+      case 'asset_rendering':
+        return {
+          label: assetRenderAction?.label ?? 'Generate Asset Images',
+          run: () => dispatch({ type: 'generateAssetImages', episodeId: view.episode.id }),
+        };
+      case 'shot_generation':
+        return {
+          label: shotAction?.label ?? 'Generate Shot List',
+          run: () => dispatch({ type: 'generateShotsFromChapters', episodeId: view.episode.id }),
+        };
+      case 'shot_rendering':
+        return {
+          label: storyboardAction?.label ?? 'Generate Storyboard Images',
+          run: () => dispatch({ type: 'generateShotImages', episodeId: view.episode.id }),
+        };
+      case 'storyboard':
+        return {
+          label: 'Open Storyboard',
+          run: () => setActiveTab('storyboard'),
+        };
+      case 'final_cut':
+      case 'export':
+        return {
+          label: 'Open Final Video',
+          run: () => setActiveTab('final-cut'),
+        };
+      default:
+        return {
+          label: 'Review Workspace',
+          run: () => setActiveTab('script'),
+        };
+    }
+  }, [actionMap, view.episode.id, view.gate?.currentStage]);
 
   return (
     <div className="flex h-full flex-col">
@@ -126,7 +195,7 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
               <div className="glass-panel rounded-3xl p-8">
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="text-xl font-bold">Recent Activity</h3>
-                  <button className="text-sm text-zinc-500 hover:text-zinc-300">View All</button>
+                  <span className="text-sm text-zinc-500">Workflow runs and recovery history for this episode.</span>
                 </div>
                 <div className="space-y-4">
                   {view.workflowRuns.length ? (
@@ -166,24 +235,11 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                   {blockedSummary}
                 </p>
                 <button
-                  onClick={() =>
-                    void dispatch({
-                      type:
-                        view.gate?.currentStage === 'script_generation'
-                          ? 'generateScriptFromSource'
-                          : view.gate?.currentStage === 'asset_extraction'
-                            ? 'extractAssetsFromScript'
-                            : view.gate?.currentStage === 'asset_rendering'
-                              ? 'generateAssetImages'
-                              : view.gate?.currentStage === 'shot_generation'
-                                ? 'generateShotsFromChapters'
-                                : 'generateShotImages',
-                      episodeId: view.episode.id,
-                    })
-                  }
+                  type="button"
+                  onClick={() => void nextStepCta.run()}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 py-3 font-bold text-white shadow-lg shadow-brand-500/20 transition-all hover:bg-brand-400"
                 >
-                  Execute Next Step
+                  {nextStepCta.label}
                   <ChevronRight size={18} />
                 </button>
               </div>
@@ -327,16 +383,37 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
           </div>
         )}
 
-        {activeTab === 'subjects' && selectedAsset && (
+        {activeTab === 'subjects' && (
           <div className="flex h-full gap-6">
             <div className="flex flex-1 flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <AssetFilter label={`Characters (${view.assets.filter((asset) => asset.type === 'character').length})`} active />
-                  <AssetFilter label={`Scenes (${view.assets.filter((asset) => asset.type === 'scene').length})`} />
-                  <AssetFilter label={`Props (${view.assets.filter((asset) => asset.type === 'prop').length})`} />
+                  {assetFilters.map((filter) => {
+                    const count =
+                      filter.id === 'all'
+                        ? view.assets.length
+                        : view.assets.filter((asset) => asset.type === filter.id).length;
+                    return (
+                      <AssetFilter
+                        key={filter.id}
+                        label={`${filter.label} (${count})`}
+                        active={assetFilter === filter.id}
+                        onClick={() => {
+                          setAssetFilter(filter.id);
+                          const nextAsset =
+                            filter.id === 'all'
+                              ? view.assets[0]
+                              : view.assets.find((asset) => asset.type === filter.id);
+                          if (nextAsset) {
+                            setSelectedAssetId(nextAsset.id);
+                          }
+                        }}
+                      />
+                    );
+                  })}
                 </div>
                 <button
+                  type="button"
                   onClick={() =>
                     void dispatch({
                       type: 'generateAssetImages',
@@ -350,8 +427,16 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                 </button>
               </div>
               <div className="custom-scrollbar grid grid-cols-1 gap-4 overflow-y-auto pb-4 sm:grid-cols-2 lg:grid-cols-3">
-                {view.assets.map((asset) => (
-                  <div key={asset.id} className="group glass-panel flex flex-col overflow-hidden rounded-2xl border border-zinc-800 transition-all hover:border-brand-500/50">
+                {filteredAssets.map((asset) => (
+                  <button
+                    key={asset.id}
+                    type="button"
+                    onClick={() => setSelectedAssetId(asset.id)}
+                    className={cn(
+                      'group glass-panel flex flex-col overflow-hidden rounded-2xl border text-left transition-all hover:border-brand-500/50',
+                      asset.id === selectedAsset?.id ? 'border-brand-500/50' : 'border-zinc-800',
+                    )}
+                  >
                     <div className="flex items-center justify-between border-b border-zinc-800/50 p-3">
                       <h4 className="text-sm font-bold">{asset.name}</h4>
                       {asset.isFaceLocked ? <Camera size={14} className="text-brand-400" /> : null}
@@ -360,122 +445,170 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                       <div className="h-full w-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950" />
                     </div>
                     <div className="flex items-center justify-between bg-zinc-900/50 p-3">
-                      <span className="text-[10px] text-zinc-500">Voice:</span>
-                      <button className="flex items-center gap-1 text-xs font-bold text-zinc-300 transition-colors hover:text-white">
-                        {asset.voice || 'Select Voice'} <ChevronRight size={12} />
-                      </button>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{asset.type}</span>
+                      <span className="text-xs font-bold text-zinc-300">{asset.voice || 'No voice'}</span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
             <div className="glass-panel custom-scrollbar flex h-full w-80 flex-col overflow-y-auto rounded-3xl p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h3 className="font-bold">Generate Asset</h3>
-                <button className="flex items-center gap-1 text-sm font-bold text-brand-400 transition-colors hover:text-brand-300">
-                  <ArrowLeft size={14} /> Smart Breakdown
-                </button>
+                <h3 className="font-bold">{selectedAsset ? `Asset Workspace · ${selectedAsset.name}` : 'Asset Workspace'}</h3>
+                {selectedAsset?.isShared ? <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Shared</span> : null}
               </div>
 
-              <div className="space-y-6">
-                <SectionCard title="Asset Prompt">
-                  <textarea
-                    className="custom-scrollbar h-32 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none"
-                    defaultValue={selectedAsset.prompt}
-                  />
-                </SectionCard>
+              {selectedAsset ? (
+                <div key={selectedAsset.id} className="space-y-6">
+                  <SectionCard title="Asset Prompt">
+                    <textarea
+                      id={`asset-prompt-${selectedAsset.id}`}
+                      className="custom-scrollbar h-32 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none"
+                      defaultValue={selectedAsset.prompt}
+                    />
+                  </SectionCard>
 
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-1 items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2">
-                    <span className="text-[10px] font-bold text-zinc-500">Model</span>
-                    <span className="font-mono text-xs text-brand-400">SiliconFlow | Chat</span>
+                  <SectionCard title="Asset Notes">
+                    <textarea
+                      id={`asset-description-${selectedAsset.id}`}
+                      className="custom-scrollbar h-28 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none"
+                      defaultValue={selectedAsset.description}
+                    />
+                  </SectionCard>
+
+                  <SectionCard title="Voice & Sharing">
+                    <div className="space-y-3">
+                      <input
+                        id={`asset-voice-${selectedAsset.id}`}
+                        className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none"
+                        defaultValue={selectedAsset.voice}
+                        placeholder="e.g. narrator-f1"
+                      />
+                      <label className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-3 text-sm text-zinc-300">
+                        Promote to shared asset
+                        <input id={`asset-shared-${selectedAsset.id}`} type="checkbox" defaultChecked={selectedAsset.isShared} className="h-4 w-4 accent-brand-500" />
+                      </label>
+                    </div>
+                  </SectionCard>
+
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-1 items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2">
+                      <span className="text-[10px] font-bold text-zinc-500">Model</span>
+                      <span className="font-mono text-xs text-brand-400">SiliconFlow | Chat</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void dispatch({
+                          type: 'generateAssetImages',
+                          episodeId: view.episode.id,
+                        })
+                      }
+                      className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-brand-600 py-2 text-sm font-bold text-white shadow-lg shadow-brand-600/20 hover:bg-brand-500"
+                    >
+                      Generate <Zap size={14} /> 2
+                    </button>
                   </div>
+
                   <button
+                    type="button"
                     onClick={() =>
                       void dispatch({
-                        type: 'generateAssetImages',
-                        episodeId: view.episode.id,
+                        type: 'updateAsset',
+                        assetId: selectedAsset.id,
+                        prompt: (document.getElementById(`asset-prompt-${selectedAsset.id}`) as HTMLTextAreaElement | null)?.value ?? selectedAsset.prompt,
+                        description: (document.getElementById(`asset-description-${selectedAsset.id}`) as HTMLTextAreaElement | null)?.value ?? selectedAsset.description,
+                        voice: (document.getElementById(`asset-voice-${selectedAsset.id}`) as HTMLInputElement | null)?.value ?? selectedAsset.voice,
+                        isShared: (document.getElementById(`asset-shared-${selectedAsset.id}`) as HTMLInputElement | null)?.checked ?? selectedAsset.isShared,
                       })
                     }
-                    className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-brand-600 py-2 text-sm font-bold text-white shadow-lg shadow-brand-600/20 hover:bg-brand-500"
+                    className="w-full rounded-xl bg-zinc-800 py-3 text-sm font-bold text-white transition-colors hover:bg-zinc-700"
                   >
-                    Generate <Zap size={14} /> 2
+                    Save Asset Workspace
                   </button>
-                </div>
 
-                <SectionCard title="Generated Materials">
-                  <div className="grid grid-cols-2 gap-2">
-                    {(selectedAsset.images.length ? selectedAsset.images : selectedAsset.versions).map((image) => (
-                      <button
-                        key={image.id}
-                        onClick={() =>
-                          void dispatch({
-                            type: 'selectAssetImage',
-                            assetId: selectedAsset.id,
-                            imageId: image.id,
-                          })
-                        }
-                        className={cn(
-                          'relative aspect-[16/9] overflow-hidden rounded-xl border-2',
-                          image.isSelected ? 'border-brand-500' : 'border-transparent hover:border-zinc-600',
-                        )}
-                      >
-                        <div className="h-full w-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950" />
-                        {image.isSelected ? (
-                          <div className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-500">
-                            <CheckCircle2 size={10} className="text-white" />
-                          </div>
-                        ) : null}
-                      </button>
-                    ))}
-                  </div>
-                </SectionCard>
-              </div>
+                  <SectionCard title="Generated Materials">
+                    <div className="grid grid-cols-2 gap-2">
+                      {(selectedAsset.images.length ? selectedAsset.images : selectedAsset.versions).map((image) => (
+                        <button
+                          key={image.id}
+                          type="button"
+                          onClick={() =>
+                            void dispatch({
+                              type: 'selectAssetImage',
+                              assetId: selectedAsset.id,
+                              imageId: image.id,
+                            })
+                          }
+                          className={cn(
+                            'relative aspect-[16/9] overflow-hidden rounded-xl border-2',
+                            image.isSelected ? 'border-brand-500' : 'border-transparent hover:border-zinc-600',
+                          )}
+                        >
+                          <div className="h-full w-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950" />
+                          {image.isSelected ? (
+                            <div className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-500">
+                              <CheckCircle2 size={10} className="text-white" />
+                            </div>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
+                  </SectionCard>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-6 text-sm text-zinc-500">
+                  No assets in this filter yet. Extract subjects from the script first.
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {activeTab === 'shots' && (
-          <div className="flex h-full flex-col">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold">Smart Shot List</h3>
-              <div className="flex gap-2">
-                <button className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800">
-                  <Upload size={16} /> Import
-                </button>
-                <button className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-800">
-                  <Download size={16} /> Export
-                </button>
+          <div className="flex h-full gap-6">
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold">Smart Shot List</h3>
+                  <p className="mt-1 text-sm text-zinc-500">Edit shot intent here before rendering storyboard images.</p>
+                </div>
                 <button
+                  type="button"
                   onClick={() =>
                     void dispatch({
-                      type: 'generateShotImages',
+                      type: view.shots.length ? 'generateShotImages' : 'generateShotsFromChapters',
                       episodeId: view.episode.id,
                     })
                   }
-                  className="ml-4 flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-500"
+                  className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-500"
                 >
-                  Generate Storyboard <ChevronRight size={16} />
+                  {view.shots.length ? 'Generate Storyboard' : 'Generate Shot List'} <ChevronRight size={16} />
                 </button>
               </div>
-            </div>
 
-            <div className="custom-scrollbar flex-1 space-y-4 overflow-y-auto pr-2">
-              {view.shots.map((shot) => (
-                <div key={shot.id} className="glass-panel overflow-hidden rounded-2xl border border-zinc-800">
+              <div className="custom-scrollbar flex-1 space-y-4 overflow-y-auto pr-2">
+                {view.shots.map((shot) => (
+                  <div
+                    key={shot.id}
+                    className={cn(
+                      'glass-panel overflow-hidden rounded-2xl border transition-colors',
+                      shot.id === selectedShot?.id ? 'border-brand-500/50' : 'border-zinc-800',
+                    )}
+                  >
                   <div className="flex items-start gap-4 border-b border-zinc-800 bg-zinc-900/80 px-4 py-3">
                     <span className="mt-0.5 whitespace-nowrap text-sm font-bold text-brand-400">Shot {shot.index}</span>
                     <p className="flex-1 text-sm leading-relaxed text-zinc-300">{shot.description}</p>
                     <div className="flex gap-2">
                       {shot.continuityIssues.length ? (
-                        <button className="rounded-lg bg-yellow-500/10 p-1.5 text-yellow-500 hover:text-yellow-400">
+                        <div className="rounded-lg bg-yellow-500/10 p-1.5 text-yellow-500">
                           <AlertCircle size={14} />
-                        </button>
+                        </div>
                       ) : null}
-                      <button className="p-1.5 text-zinc-500 hover:text-zinc-300">
-                        <Layers size={14} />
-                      </button>
+                      <div className="rounded-lg bg-zinc-800/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">
+                        {shot.referenceAssetIds.length} refs
+                      </div>
                     </div>
                   </div>
 
@@ -489,14 +622,76 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                       <p className="line-clamp-3 rounded-md border border-zinc-800/50 bg-zinc-950 p-2 font-mono leading-relaxed text-zinc-400">{shot.prompt}</p>
                     </div>
                     <Cell span="2" label="Dialogue" value={shot.dialogue || '-'} strong />
-                    <Cell span="1" label="Duration" value={typeof shot.duration === 'string' ? shot.duration : `${shot.duration}s`} strong />
+                    <Cell span="1" label="Duration" value={`${shot.durationSeconds}s`} strong />
                     <div className="col-span-1 flex flex-col items-end gap-1">
                       <span className="font-medium text-zinc-500">Action</span>
-                      <button className="font-bold text-brand-400 transition-colors hover:text-brand-300">Edit</button>
+                      <button type="button" onClick={() => setSelectedShotId(shot.id)} className="font-bold text-brand-400 transition-colors hover:text-brand-300">
+                        Edit
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
+                ))}
+                {!view.shots.length ? (
+                  <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-6 text-sm text-zinc-500">
+                    No shot list yet. Once assets are locked, generate the first structured shot pass from chapters.
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="glass-panel custom-scrollbar flex h-full w-80 flex-col overflow-y-auto rounded-3xl p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="font-bold">{selectedShot ? `Shot Workspace · ${selectedShot.title}` : 'Shot Workspace'}</h3>
+                {selectedShot ? <span className="rounded-full border border-zinc-800 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400">Shot {selectedShot.index}</span> : null}
+              </div>
+
+              {selectedShot ? (
+                <div key={selectedShot.id} className="space-y-6">
+                  <SectionCard title="Shot Prompt">
+                    <textarea
+                      id={`shot-prompt-${selectedShot.id}`}
+                      className="custom-scrollbar h-32 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none"
+                      defaultValue={selectedShot.prompt}
+                    />
+                  </SectionCard>
+
+                  <SectionCard title="Structured Fields">
+                    <div className="space-y-3">
+                      <input id={`shot-scene-${selectedShot.id}`} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.scene} placeholder="Scene" />
+                      <input id={`shot-composition-${selectedShot.id}`} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.composition} placeholder="Composition" />
+                      <input id={`shot-lighting-${selectedShot.id}`} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.lighting} placeholder="Lighting" />
+                      <input id={`shot-camera-${selectedShot.id}`} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.cameraMotion || selectedShot.cameraMove} placeholder="Camera motion" />
+                      <textarea id={`shot-dialogue-${selectedShot.id}`} className="custom-scrollbar h-24 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.dialogue} placeholder="Dialogue / subtitle cue" />
+                      <input id={`shot-duration-${selectedShot.id}`} type="number" min={1} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.durationSeconds} />
+                    </div>
+                  </SectionCard>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void dispatch({
+                        type: 'updateShot',
+                        shotId: selectedShot.id,
+                        prompt: (document.getElementById(`shot-prompt-${selectedShot.id}`) as HTMLTextAreaElement | null)?.value ?? selectedShot.prompt,
+                        scene: (document.getElementById(`shot-scene-${selectedShot.id}`) as HTMLInputElement | null)?.value ?? selectedShot.scene,
+                        composition: (document.getElementById(`shot-composition-${selectedShot.id}`) as HTMLInputElement | null)?.value ?? selectedShot.composition,
+                        lighting: (document.getElementById(`shot-lighting-${selectedShot.id}`) as HTMLInputElement | null)?.value ?? selectedShot.lighting,
+                        cameraMotion: (document.getElementById(`shot-camera-${selectedShot.id}`) as HTMLInputElement | null)?.value ?? selectedShot.cameraMotion,
+                        dialogue: (document.getElementById(`shot-dialogue-${selectedShot.id}`) as HTMLTextAreaElement | null)?.value ?? selectedShot.dialogue,
+                        durationSeconds: Number((document.getElementById(`shot-duration-${selectedShot.id}`) as HTMLInputElement | null)?.value ?? selectedShot.durationSeconds),
+                      })
+                    }
+                    className="w-full rounded-xl bg-zinc-800 py-3 text-sm font-bold text-white transition-colors hover:bg-zinc-700"
+                  >
+                    Save Shot Workspace
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-6 text-sm text-zinc-500">
+                  Generate shots first, then edit prompts and structured metadata here.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -768,9 +963,13 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
-function AssetFilter({ label, active }: { label: string; active?: boolean }) {
+function AssetFilter({ label, active, onClick }: { label: string; active?: boolean; onClick?: () => void }) {
   return (
-    <button className={cn('rounded-full px-4 py-2 text-sm font-bold transition-all', active ? 'bg-brand-500/10 text-brand-400 border border-brand-500/30' : 'border border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300')}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn('rounded-full border px-4 py-2 text-sm font-bold transition-all', active ? 'border-brand-500/30 bg-brand-500/10 text-brand-400' : 'border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300')}
+    >
       {label}
     </button>
   );
