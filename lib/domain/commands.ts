@@ -80,7 +80,7 @@ export const UpdateSettingsCommandSchema = z.object({
   settings: z.object({
     ai: z
       .object({
-        mode: z.enum(['mock', 'google', 'gateway']).optional(),
+        mode: z.enum(['mock', 'google', 'gateway', 'siliconflow']).optional(),
         model: z.string().optional(),
         systemPrompt: z.string().optional(),
         skillPrompt: z.string().optional(),

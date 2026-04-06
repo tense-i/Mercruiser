@@ -116,4 +116,32 @@ describe('studio api route', () => {
     expect(payload.ok).toBe(true);
     expect(payload.episodeView.sourceDocument.title).toBe('新的第三集原文');
   });
+
+  it('accepts siliconflow mode in persisted settings updates', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateSettings',
+            settings: {
+              ai: {
+                mode: 'siliconflow',
+                model: 'siliconflow/Qwen/Qwen3.5-9B',
+              },
+            },
+          },
+          context: {
+            refreshSettings: true,
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.settings.ai.mode).toBe('siliconflow');
+    expect(payload.settings.ai.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
+  });
 });

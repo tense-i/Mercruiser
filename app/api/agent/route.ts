@@ -25,6 +25,12 @@ export async function POST(request: Request) {
   }
   const { messages, context }: { messages: UIMessage[]; context?: { seriesId?: string; episodeId?: string } } = await request.json();
   const safeContext = context ?? {};
+  const workspace = await studioRepository.getWorkspace();
+  const aiSettings = workspace.settings.ai;
+  const aiConfig = {
+    settingsMode: aiSettings.mode,
+    settingsModel: aiSettings.model,
+  };
   const episodeView = safeContext.episodeId ? await studioRepository.getEpisodeWorkspaceView(safeContext.episodeId) : null;
   const seriesView = safeContext.seriesId ? await studioRepository.getSeriesView(safeContext.seriesId) : null;
 
@@ -32,9 +38,9 @@ export async function POST(request: Request) {
     originalMessages: messages,
     async execute({ writer }) {
       const latestPrompt = extractLatestUserText(messages);
-      const mode = getConfiguredAiMode();
+      const mode = getConfiguredAiMode(aiConfig);
 
-      if (mode === 'mock' || !hasRealCredentials()) {
+      if (mode === 'mock' || !hasRealCredentials(mode)) {
         const fallback = await runFallbackAgent({
           prompt: latestPrompt,
           context: safeContext,
@@ -48,8 +54,11 @@ export async function POST(request: Request) {
 
       const toolCallsLog: Array<{ id: string; name: string; status: 'pending' | 'completed' | 'failed'; summary: string }> = [];
       const result = streamText({
-        model: getStudioModel(),
-        system: buildAgentSystemPrompt({ episodeView, seriesView }),
+        model: getStudioModel(aiConfig),
+        system: [aiSettings.systemPrompt, aiSettings.skillPrompt, buildAgentSystemPrompt({ episodeView, seriesView })]
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .join('\n\n'),
         messages: await convertToModelMessages(messages),
         tools: createStudioTools(safeContext),
         stopWhen: stepCountIs(6),

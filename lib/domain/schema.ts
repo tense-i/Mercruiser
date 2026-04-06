@@ -299,7 +299,7 @@ export const WorkflowRunSchema = z.object({
 export const SettingsSchema = z.object({
   locale: z.string(),
   ai: z.object({
-    mode: z.enum(['mock', 'google', 'gateway']),
+    mode: z.enum(['mock', 'google', 'gateway', 'siliconflow']),
     model: z.string(),
     systemPrompt: z.string(),
     skillPrompt: z.string(),
