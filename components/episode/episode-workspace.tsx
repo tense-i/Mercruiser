@@ -317,6 +317,7 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
             <div className="glass-panel custom-scrollbar flex w-80 flex-col gap-8 overflow-y-auto rounded-3xl p-6">
               <div className="flex flex-col gap-2">
                 <button
+                  type="button"
                   onClick={() =>
                     void dispatch({
                       type: 'extractAssetsFromScript',
@@ -328,20 +329,19 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                   <Wand2 size={16} />
                   Extract Assets & Shots
                 </button>
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-zinc-800 py-3 text-sm font-bold text-brand-400 transition-colors hover:bg-zinc-700">
-                  <Mic size={16} />
-                  Generate Global Audio
-                </button>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-500">
+                  Audio generation is not wired yet—finish chapters here, then continue through assets and storyboard.
+                </div>
               </div>
 
               <SectionCard title="Video Ratio">
                 <div className="grid grid-cols-4 gap-2">
                   {['16:9', '9:16', '4:3', '3:4'].map((ratio, index) => (
-                    <button
+                    <div
                       key={ratio}
                       className={cn(
                         'flex flex-col items-center gap-1 rounded-lg border py-2 text-xs font-bold transition-all',
-                        index === 1 ? 'border-brand-500 bg-brand-500/10 text-brand-400' : 'border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600',
+                        index === 1 ? 'border-brand-500 bg-brand-500/10 text-brand-400' : 'border-zinc-800 bg-zinc-900 text-zinc-500',
                       )}
                     >
                       <div
@@ -349,7 +349,7 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                         style={{ width: ratio === '16:9' ? 24 : ratio === '9:16' ? 14 : 20, height: ratio === '16:9' ? 14 : ratio === '9:16' ? 24 : 15 }}
                       />
                       {ratio}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </SectionCard>

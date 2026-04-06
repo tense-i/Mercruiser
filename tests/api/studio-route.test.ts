@@ -68,7 +68,7 @@ describe('studio api route', () => {
         body: JSON.stringify({
           command: {
             type: 'updateShot',
-            shotId: 'shot_02_a',
+            shotId: 'shot_03',
             prompt: '新的分镜提示词',
             scene: '夜市核心区',
             composition: '近景',
@@ -86,7 +86,7 @@ describe('studio api route', () => {
     const payload = await response.json();
 
     expect(payload.ok).toBe(true);
-    const shot = payload.episodeView.shots.find((item: { id: string }) => item.id === 'shot_02_a');
+    const shot = payload.episodeView.shots.find((item: { id: string }) => item.id === 'shot_03');
     expect(shot.prompt).toBe('新的分镜提示词');
     expect(shot.scene).toBe('夜市核心区');
     expect(shot.cameraMotion).toBe('摇镜');

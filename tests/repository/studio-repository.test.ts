@@ -66,7 +66,7 @@ describe('studio repository', () => {
 
     await repo.dispatch({
       type: 'updateShot',
-      shotId: 'shot_02_a',
+      shotId: 'shot_03',
       prompt: '新的分镜提示词',
       scene: '夜市外环',
       composition: '近景',
@@ -77,7 +77,7 @@ describe('studio repository', () => {
     });
 
     const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
-    const shot = episodeView?.shots.find((item) => item.id === 'shot_02_a');
+    const shot = episodeView?.shots.find((item) => item.id === 'shot_03');
 
     expect(shot?.prompt).toBe('新的分镜提示词');
     expect(shot?.scene).toBe('夜市外环');
