@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Box, CheckCircle2, ChevronRight, Clock, Film, Sparkles } from 'lucide-react';
+import { Box, CheckCircle2, ChevronRight, Clock, Film, Globe2, Sparkles } from 'lucide-react';
 
 import type { SeriesView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
@@ -30,9 +30,10 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
             ) : null}
           </div>
 
-          <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-4">
             <StatBox label="Total Episodes" value={view.episodes.length.toString()} icon={<Film size={16} />} />
             <StatBox label="Overall Progress" value={`${view.series.progress}%`} icon={<CheckCircle2 size={16} />} />
+            <StatBox label="Global Assets" value={view.globalAssets.length.toString()} icon={<Globe2 size={16} />} />
             <StatBox label="Created At" value={view.series.createdAt.slice(0, 10)} icon={<Clock size={16} />} />
           </div>
 
@@ -72,7 +73,7 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
           </div>
         </div>
 
-        <div className="w-full space-y-6 lg:w-80">
+        <div className="w-full space-y-6 lg:w-96">
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="mb-4 flex items-center gap-2 font-bold">
               <Box size={18} className="text-brand-400" />
@@ -80,28 +81,41 @@ export function SeriesDetail({ view }: { view: SeriesView }) {
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {view.sharedAssets.map((asset) => (
-                <div key={asset.id} className="group relative aspect-square overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
-                  <div className="h-full w-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950" />
-                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-transparent to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                    <span className="truncate text-[10px] font-bold">{asset.name}</span>
-                  </div>
+                <div key={asset.id} className="group relative aspect-square overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-3">
+                  <div className="text-xs font-bold text-zinc-200">{asset.name}</div>
+                  <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-zinc-500">{asset.type}</div>
+                  <div className="mt-3 text-[11px] text-zinc-400">{asset.syncSource}</div>
                 </div>
               ))}
-              <div className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/40 px-4 text-center text-zinc-500">
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em]">Shared assets</span>
-                <span className="text-xs leading-5 text-zinc-400">Promote locked episode assets from the workspace instead of creating empty shells here.</span>
-              </div>
+            </div>
+          </div>
+
+          <div className="glass-panel rounded-2xl p-6">
+            <h3 className="mb-4 flex items-center gap-2 font-bold">
+              <Globe2 size={18} className="text-brand-400" />
+              Global Assets
+            </h3>
+            <div className="space-y-3">
+              {view.globalAssets.map((asset) => (
+                <div key={asset.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium text-zinc-100">{asset.name}</span>
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{asset.type}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-zinc-400">{asset.usedInSeries.length} series linked</p>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="mb-4 flex items-center gap-2 font-bold">
               <Sparkles size={18} className="text-brand-400" />
-              Agent Strategy
+              Governance Summary
             </h3>
             <div className="space-y-3">
-              <StrategyItem label="Visual Style" value={view.series.style} />
-              <StrategyItem label="Shared Assets" value={String(view.sharedAssets.length)} />
+              <StrategyItem label="Generation Presets" value={String(view.generationPresets.length)} />
+              <StrategyItem label="Usage Cost" value={`${view.usageSummary.currency} ${view.usageSummary.totalCost.toFixed(2)}`} />
               <StrategyItem label="Open Tasks" value={String(view.tasks.filter((task) => task.status !== 'completed').length)} />
             </div>
           </div>

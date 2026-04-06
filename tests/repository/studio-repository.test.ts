@@ -236,4 +236,152 @@ describe('studio repository', () => {
     expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId !== null)).toBe(true);
     expect(episodeView?.gate?.currentStage).toBe('storyboard');
   });
+
+  it('promotes an episode asset into the global library and imports it into another series', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    const promoteResult = (await repo.dispatch({
+      type: 'promoteAssetToGlobal',
+      assetId: 'asset_agent',
+    } as any)) as {
+      ok: boolean;
+      globalAsset: { id: string; name: string };
+      asset: { globalAssetId: string | null; syncSource: string };
+    };
+
+    const importResult = (await repo.dispatch({
+      type: 'importGlobalAssetToSeries',
+      globalAssetId: promoteResult.globalAsset.id,
+      seriesId: 'series_jade_archive',
+      mode: 'linked',
+    } as any)) as {
+      ok: boolean;
+      asset: { id: string; globalAssetId: string | null; syncSource: string; isShared: boolean; seriesId: string };
+    };
+
+    const jadeSeries = await repo.getSeriesView('series_jade_archive');
+    const importedAsset = jadeSeries?.sharedAssets.find((item) => item.id === importResult.asset.id) as any;
+
+    expect(promoteResult.ok).toBe(true);
+    expect(promoteResult.asset.globalAssetId).toBe(promoteResult.globalAsset.id);
+    expect(promoteResult.asset.syncSource).toBe('linked');
+    expect(importResult.asset.seriesId).toBe('series_jade_archive');
+    expect(importResult.asset.globalAssetId).toBe(promoteResult.globalAsset.id);
+    expect(importResult.asset.syncSource).toBe('linked');
+    expect(importResult.asset.isShared).toBe(true);
+    expect(importedAsset?.globalAssetId).toBe(promoteResult.globalAsset.id);
+  });
+
+  it('marks downstream shots as stale after an upstream asset edit', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await repo.dispatch({
+      type: 'updateAsset',
+      assetId: 'asset_agent',
+      description: '新的主体描述，触发引用过期',
+      expectedRevision: 1,
+    } as any);
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
+    const shot = episodeView?.shots.find((item) => item.id === 'shot_04') as any;
+
+    expect(shot?.assetRefStatus).toBe('stale');
+    expect(Array.isArray(shot?.brokenAssetRefs)).toBe(true);
+  });
+
+  it('rejects stale expected revisions and reports an optimistic-lock conflict', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await repo.dispatch({
+      type: 'updateAsset',
+      assetId: 'asset_agent',
+      description: '第一次修改',
+      expectedRevision: 1,
+    } as any);
+
+    await expect(
+      repo.dispatch({
+        type: 'updateAsset',
+        assetId: 'asset_agent',
+        description: '第二次修改',
+        expectedRevision: 1,
+      } as any),
+    ).rejects.toMatchObject({
+      name: 'StudioCommandConflictError',
+      statusCode: 409,
+      code: 'REVISION_CONFLICT',
+    });
+  });
+
+  it('applies generation presets and records API usage alerts for expensive operations', async () => {
+    const dataPath = await createTempWorkspace((workspace) => {
+      (workspace as any).settings.usage = {
+        currency: 'USD',
+        singleTaskLimit: 0.1,
+        dailyLimit: 0.5,
+        monthlyLimit: 1,
+        notifyMethod: 'block',
+        defaultImageCost: 0.2,
+        defaultVideoSecondCost: 0.4,
+        defaultTextCost: 0.05,
+      };
+    });
+    const repo = createStudioRepository({ dataPath });
+
+    const presetResult = (await repo.dispatch({
+      type: 'applyGenerationPreset',
+      presetId: 'preset_series_storyboard',
+      targetType: 'shot',
+      targetId: 'shot_03',
+    } as any)) as { ok: boolean; shot: { appliedPresetId: string | null; prompt: string } };
+
+    await repo.dispatch({
+      type: 'generateAssetImages',
+      episodeId: 'episode_02',
+      assetSnapshots: [
+        { assetId: 'asset_lan', revision: 1 },
+        { assetId: 'asset_market', revision: 1 },
+        { assetId: 'asset_relic', revision: 1 },
+        { assetId: 'asset_agent', revision: 1 },
+      ],
+    } as any);
+
+    const workspace = JSON.parse(await readFile(dataPath, 'utf8')) as any;
+    const singleTaskAlert = workspace.usageAlerts.find((alert: any) => alert.type === 'single_task_limit');
+
+    expect(presetResult.ok).toBe(true);
+    expect(presetResult.shot.appliedPresetId).toBe('preset_series_storyboard');
+    expect(presetResult.shot.prompt).toContain('Preset');
+    expect(workspace.apiUsageRecords.length).toBeGreaterThan(0);
+    expect(singleTaskAlert?.status).toBe('exceeded');
+  });
+
+  it('skips batch image generation items whose snapshot revisions are stale', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    const result = (await repo.dispatch({
+      type: 'generateAssetImages',
+      episodeId: 'episode_02',
+      assetSnapshots: [
+        { assetId: 'asset_lan', revision: 1 },
+        { assetId: 'asset_market', revision: 999 },
+        { assetId: 'asset_relic', revision: 1 },
+        { assetId: 'asset_agent', revision: 1 },
+      ],
+    } as any)) as {
+      ok: boolean;
+      renderedCount: number;
+      skippedCount: number;
+      skippedAssetIds: string[];
+    };
+
+    expect(result.ok).toBe(true);
+    expect(result.skippedCount).toBe(1);
+    expect(result.skippedAssetIds).toContain('asset_market');
+    expect(result.renderedCount).toBeGreaterThan(0);
+  });
 });

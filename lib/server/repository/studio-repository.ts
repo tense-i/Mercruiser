@@ -1,8 +1,22 @@
 import { mutateWorkspaceAtomically, readWorkspace } from '@/lib/server/repository/file-store';
 import { buildDashboardView, buildEpisodeWorkspaceView, buildSeriesView } from '@/lib/view-models/studio';
 import { StudioCommandSchema, type StudioCommand } from '@/lib/domain/commands';
-import type { AgentRun, Shot, StudioWorkspace, TaskRecord } from '@/lib/domain/types';
+import type {
+  AgentRun,
+  APIUsageRecord,
+  Asset,
+  FinalCut,
+  GenerationPreset,
+  GlobalAsset,
+  Shot,
+  ShotAssetSnapshot,
+  StudioWorkspace,
+  TaskRecord,
+  UsageAlert,
+} from '@/lib/domain/types';
 import { syncEpisodeWorkflow } from '@/lib/workflow/workflow-engine';
+
+type TaskBatchItem = NonNullable<TaskRecord['batch']>['items'][number];
 
 function nowIso() {
   return new Date().toISOString();
@@ -10,6 +24,21 @@ function nowIso() {
 
 function id(prefix: string) {
   return `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
+}
+
+export class StudioCommandConflictError extends Error {
+  statusCode = 409;
+  code = 'REVISION_CONFLICT' as const;
+
+  constructor(
+    public readonly entityType: string,
+    public readonly entityId: string,
+    public readonly expectedRevision: number,
+    public readonly actualRevision: number,
+  ) {
+    super(`${entityType}:${entityId} revision conflict (expected ${String(expectedRevision)}, got ${String(actualRevision)})`);
+    this.name = 'StudioCommandConflictError';
+  }
 }
 
 function computeEpisodeProgress(workspace: StudioWorkspace, episodeId: string) {
@@ -23,7 +52,7 @@ function computeEpisodeProgress(workspace: StudioWorkspace, episodeId: string) {
     workspace.assets.some((asset) => asset.episodeId === episodeId || (asset.isShared && asset.seriesId === episode.seriesId)),
     episode.shotIds.length > 0,
     episode.storyboardIds.length > 0,
-    workspace.finalCuts.some((finalCut) => finalCut.id === episode.finalCutId),
+    workspace.finalCuts.some((finalCut) => finalCut.id === episode.finalCutId && finalCut.tracks.length > 0),
   ];
 
   return Math.round((checkpoints.filter(Boolean).length / checkpoints.length) * 100);
@@ -69,6 +98,75 @@ function createTask(
   return task;
 }
 
+function touchRevision(entity: { revision?: number; updatedAt: string }) {
+  entity.revision = (entity.revision ?? 0) + 1;
+  entity.updatedAt = nowIso();
+}
+
+function assertExpectedRevision(
+  entityType: string,
+  entity: { id: string; revision?: number },
+  expectedRevision?: number,
+) {
+  if (expectedRevision === undefined) {
+    return;
+  }
+
+  const actualRevision = entity.revision ?? 1;
+  if (actualRevision !== expectedRevision) {
+    throw new StudioCommandConflictError(entityType, entity.id, expectedRevision, actualRevision);
+  }
+}
+
+function getSelectedAssetImageId(asset: Asset) {
+  const images = asset.images.length ? asset.images : asset.versions;
+  return images.find((image) => image.isSelected)?.id ?? null;
+}
+
+function buildAssetSnapshots(workspace: StudioWorkspace, assetIds: string[]): ShotAssetSnapshot[] {
+  return assetIds.flatMap((assetId) => {
+    const asset = workspace.assets.find((item) => item.id === assetId);
+    if (!asset) {
+      return [];
+    }
+
+    return [
+      {
+        assetId: asset.id,
+        assetName: asset.name,
+        revision: asset.revision ?? 1,
+        selectedImageId: getSelectedAssetImageId(asset),
+      },
+    ];
+  });
+}
+
+function recomputeShotAssetState(workspace: StudioWorkspace, shot: Shot) {
+  const brokenAssetRefs: Shot['brokenAssetRefs'] = [];
+  let stale = false;
+
+  for (const snapshot of shot.assetSnapshots) {
+    const asset = workspace.assets.find((item) => item.id === snapshot.assetId);
+    if (!asset) {
+      brokenAssetRefs.push({ assetId: snapshot.assetId, reason: 'deleted' });
+      continue;
+    }
+
+    const selectedImageId = getSelectedAssetImageId(asset);
+    if (!selectedImageId) {
+      brokenAssetRefs.push({ assetId: snapshot.assetId, reason: 'no_image' });
+      continue;
+    }
+
+    if (snapshot.revision !== (asset.revision ?? 1) || snapshot.selectedImageId !== selectedImageId) {
+      stale = true;
+    }
+  }
+
+  shot.brokenAssetRefs = brokenAssetRefs;
+  shot.assetRefStatus = brokenAssetRefs.length ? 'broken' : stale ? 'stale' : 'valid';
+}
+
 function syncShotImageTakes(shot: Shot) {
   const selectedImageId = shot.images.find((image) => image.isSelected)?.id ?? shot.images[0]?.id ?? null;
   const existingVideoTakes = shot.takes.filter((take) => take.kind === 'video');
@@ -83,8 +181,183 @@ function syncShotImageTakes(shot: Shot) {
   }));
 
   shot.takes = [...imageTakes, ...existingVideoTakes.map((take) => ({ ...take, isSelected: false }))];
-
   return shot.takes.find((take) => take.kind === 'image' && take.isSelected)?.id ?? null;
+}
+
+function syncEpisodeReferenceState(workspace: StudioWorkspace, episodeId: string) {
+  const shots = workspace.shots.filter((item) => item.episodeId === episodeId);
+  shots.forEach((shot) => recomputeShotAssetState(workspace, shot));
+}
+
+function syncEpisode(workspace: StudioWorkspace, episodeId: string) {
+  const episode = workspace.episodes.find((item) => item.id === episodeId);
+  if (!episode) {
+    return;
+  }
+
+  syncEpisodeReferenceState(workspace, episodeId);
+  episode.progress = computeEpisodeProgress(workspace, episodeId);
+  episode.updatedAt = nowIso();
+  syncEpisodeWorkflow(workspace, episodeId);
+}
+
+function syncSeriesEpisodes(workspace: StudioWorkspace, seriesId: string) {
+  workspace.episodes.filter((episode) => episode.seriesId === seriesId).forEach((episode) => syncEpisode(workspace, episode.id));
+}
+
+function recordApiUsage(
+  workspace: StudioWorkspace,
+  input: Omit<APIUsageRecord, 'id' | 'createdAt' | 'currency'> & { currency?: APIUsageRecord['currency'] },
+) {
+  const record: APIUsageRecord = {
+    id: id('usage'),
+    currency: input.currency ?? workspace.settings.usage.currency,
+    createdAt: nowIso(),
+    ...input,
+  };
+  workspace.apiUsageRecords.unshift(record);
+  refreshUsageAlerts(workspace, record.estimatedCost ?? 0);
+  return record;
+}
+
+function refreshUsageAlerts(workspace: StudioWorkspace, latestCost: number) {
+  const usage = workspace.settings.usage;
+  const now = new Date();
+  const dailySum = workspace.apiUsageRecords
+    .filter((record) => new Date(record.createdAt).toDateString() === now.toDateString())
+    .reduce((sum, record) => sum + (record.estimatedCost ?? 0), 0);
+  const monthKey = `${String(now.getUTCFullYear())}-${String(now.getUTCMonth())}`;
+  const monthlySum = workspace.apiUsageRecords
+    .filter((record) => {
+      const date = new Date(record.createdAt);
+      return `${String(date.getUTCFullYear())}-${String(date.getUTCMonth())}` === monthKey;
+    })
+    .reduce((sum, record) => sum + (record.estimatedCost ?? 0), 0);
+
+  const nextAlerts: UsageAlert[] = [
+    {
+      id: 'usage_single_task',
+      type: 'single_task_limit',
+      threshold: usage.singleTaskLimit,
+      currentValue: latestCost,
+      status: latestCost > usage.singleTaskLimit ? 'exceeded' : latestCost >= usage.singleTaskLimit * 0.7 ? 'warning' : 'normal',
+      notifyMethod: usage.notifyMethod,
+    },
+    {
+      id: 'usage_daily',
+      type: 'daily_limit',
+      threshold: usage.dailyLimit,
+      currentValue: dailySum,
+      status: dailySum > usage.dailyLimit ? 'exceeded' : dailySum >= usage.dailyLimit * 0.7 ? 'warning' : 'normal',
+      notifyMethod: usage.notifyMethod,
+    },
+    {
+      id: 'usage_monthly',
+      type: 'monthly_limit',
+      threshold: usage.monthlyLimit,
+      currentValue: monthlySum,
+      status: monthlySum > usage.monthlyLimit ? 'exceeded' : monthlySum >= usage.monthlyLimit * 0.7 ? 'warning' : 'normal',
+      notifyMethod: usage.notifyMethod,
+    },
+  ];
+
+  workspace.usageAlerts = nextAlerts;
+}
+
+function buildBatchSummary(items: TaskBatchItem[]) {
+  return {
+    total: items.length,
+    processed: items.filter((item) => item.status === 'completed').length,
+    skipped: items.filter((item) => item.status === 'skipped').length,
+    items,
+  };
+}
+
+function makeCascadeWarning(message: string) {
+  return message;
+}
+
+function applyPresetText(basePrompt: string, preset: GenerationPreset) {
+  const presetText = [preset.name, preset.imageConfig?.style, preset.imageConfig?.negativePrompt].filter(Boolean).join(' | ');
+  return `${basePrompt}${basePrompt ? '\n' : ''}[Preset: ${presetText}]`;
+}
+
+function resolveAssetBatch(
+  assets: Asset[],
+  snapshots?: Array<{ assetId?: string; revision: number }>,
+) {
+  const snapshotMap = new Map(
+    (snapshots ?? [])
+      .filter((item): item is { assetId: string; revision: number } => Boolean(item.assetId))
+      .map((item) => [item.assetId, item.revision]),
+  );
+
+  const batchItems: TaskBatchItem[] = [];
+  const selectedAssets: Asset[] = [];
+  const skippedAssetIds: string[] = [];
+
+  for (const asset of assets) {
+    const expectedRevision = snapshotMap.get(asset.id);
+    if (expectedRevision !== undefined && expectedRevision !== (asset.revision ?? 1)) {
+      skippedAssetIds.push(asset.id);
+      batchItems.push({
+        targetId: asset.id,
+        snapshotRevision: expectedRevision,
+        status: 'skipped',
+        skipReason: `revision mismatch: expected ${String(expectedRevision)}, got ${String(asset.revision ?? 1)}`,
+      });
+      continue;
+    }
+
+    selectedAssets.push(asset);
+    batchItems.push({
+      targetId: asset.id,
+      snapshotRevision: expectedRevision ?? (asset.revision ?? 1),
+      status: 'completed',
+      skipReason: null,
+    });
+  }
+
+  return { selectedAssets, batchItems, skippedAssetIds };
+}
+
+function resolveShotBatch(
+  shots: Shot[],
+  snapshots?: Array<{ shotId?: string; revision: number }>,
+) {
+  const snapshotMap = new Map(
+    (snapshots ?? [])
+      .filter((item): item is { shotId: string; revision: number } => Boolean(item.shotId))
+      .map((item) => [item.shotId, item.revision]),
+  );
+
+  const batchItems: TaskBatchItem[] = [];
+  const selectedShots: Shot[] = [];
+  const skippedShotIds: string[] = [];
+
+  for (const shot of shots) {
+    const expectedRevision = snapshotMap.get(shot.id);
+    if (expectedRevision !== undefined && expectedRevision !== (shot.revision ?? 1)) {
+      skippedShotIds.push(shot.id);
+      batchItems.push({
+        targetId: shot.id,
+        snapshotRevision: expectedRevision,
+        status: 'skipped',
+        skipReason: `revision mismatch: expected ${String(expectedRevision)}, got ${String(shot.revision ?? 1)}`,
+      });
+      continue;
+    }
+
+    selectedShots.push(shot);
+    batchItems.push({
+      targetId: shot.id,
+      snapshotRevision: expectedRevision ?? (shot.revision ?? 1),
+      status: 'completed',
+      skipReason: null,
+    });
+  }
+
+  return { selectedShots, batchItems, skippedShotIds };
 }
 
 export class StudioRepository {
@@ -142,13 +415,20 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       if (!chapter) {
         throw new Error(`Chapter ${command.chapterId} not found`);
       }
+
+      assertExpectedRevision('chapter', chapter, command.expectedRevision);
       chapter.content = command.content;
-      chapter.updatedAt = nowIso();
+      touchRevision(chapter);
       const episode = workspace.episodes.find((item) => item.id === chapter.episodeId);
       if (episode) {
-        episode.progress = computeEpisodeProgress(workspace, episode.id);
-        episode.updatedAt = nowIso();
+        episode.stationStates.script = 'editing';
+        syncEpisode(workspace, episode.id);
       }
+
+      const cascadeWarnings = workspace.shots
+        .filter((shot) => shot.chapterId === chapter.id)
+        .map((shot) => makeCascadeWarning(`章节版本已更新，镜头 ${shot.title} 建议重新校对。`));
+
       createTask(workspace, {
         kind: 'script',
         targetType: 'chapter',
@@ -159,9 +439,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         retryable: false,
         link: `/series/${episode?.seriesId}/episodes/${chapter.episodeId}`,
         error: null,
-        logs: ['chapter content updated'],
+        logs: ['chapter content updated', ...cascadeWarnings],
+        batch: null,
       });
-      return { ok: true, chapter };
+      return { ok: true, chapter, cascadeWarnings };
     }
     case 'generateScriptFromSource': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
@@ -189,6 +470,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
             dialogues: index === 0 ? [{ speaker: '旁白', content: part.slice(0, 18) }] : [],
             audioStatus: 'ready',
             estimatedDurationSeconds: Math.min(35, Math.max(18, part.length)),
+            revision: 1,
             createdAt: nowIso(),
             updatedAt: nowIso(),
           });
@@ -197,9 +479,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         episode.chapterIds = createdChapterIds;
       }
       episode.stationStates.script = 'completed';
-      episode.progress = computeEpisodeProgress(workspace, episode.id);
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
+      syncEpisode(workspace, episode.id);
       const task = createTask(workspace, {
         kind: 'script',
         targetType: 'episode',
@@ -211,6 +491,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
         logs: ['source document parsed', `chapters: ${episode.chapterIds.length}`],
+        batch: null,
       });
       upsertWorkflowRun(workspace, {
         episodeId: episode.id,
@@ -218,6 +499,18 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         agent: 'script',
         status: 'completed',
         summary: `生成 ${episode.chapterIds.length} 个章节`,
+        taskId: task.id,
+      });
+      recordApiUsage(workspace, {
+        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
+        model: workspace.settings.ai.model,
+        endpoint: 'script_generation',
+        inputTokens: source.content.length,
+        outputTokens: episode.chapterIds.length * 120,
+        estimatedCost: workspace.settings.usage.defaultTextCost * Math.max(1, episode.chapterIds.length),
+        seriesId: episode.seriesId,
+        episodeId: episode.id,
+        taskType: 'script',
         taskId: task.id,
       });
       return { ok: true, chapterCount: episode.chapterIds.length };
@@ -234,6 +527,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           title: command.title,
           content: command.content,
           importedAt: nowIso(),
+          revision: 1,
         };
         workspace.sourceDocuments.push(source);
         episode.sourceDocumentId = source.id;
@@ -241,10 +535,10 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         source.title = command.title;
         source.content = command.content;
         source.importedAt = nowIso();
+        source.revision = (source.revision ?? 0) + 1;
       }
 
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
+      syncEpisode(workspace, episode.id);
       createTask(workspace, {
         kind: 'script',
         targetType: 'episode',
@@ -256,6 +550,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
         logs: ['source document imported'],
+        batch: null,
       });
       return { ok: true, sourceDocumentId: source.id };
     }
@@ -303,6 +598,11 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
             images: [],
             parentAssetId: null,
             variantName: null,
+            revision: 1,
+            globalAssetId: null,
+            syncSource: 'local',
+            appliedPresetId: null,
+            consistencyConfig: { referenceStrength: 0.7, styleKeywords: ['series-default'] },
             createdAt: nowIso(),
             updatedAt: nowIso(),
           });
@@ -311,9 +611,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
 
       episode.stationStates.subjects = 'ready';
-      episode.progress = computeEpisodeProgress(workspace, episode.id);
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
+      syncEpisode(workspace, episode.id);
       const task = createTask(workspace, {
         kind: 'asset',
         targetType: 'episode',
@@ -325,6 +623,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
         logs: ['asset extraction completed'],
+        batch: null,
       });
       upsertWorkflowRun(workspace, {
         episodeId: episode.id,
@@ -334,13 +633,25 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         summary: '主体抽取完成',
         taskId: task.id,
       });
+      recordApiUsage(workspace, {
+        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
+        model: workspace.settings.ai.model,
+        endpoint: 'asset_extraction',
+        estimatedCost: workspace.settings.usage.defaultTextCost,
+        seriesId: episode.seriesId,
+        episodeId: episode.id,
+        taskType: 'asset_extract',
+        taskId: task.id,
+      });
       return { ok: true, assetCount: episode.assetIds.length };
     }
     case 'generateAssetImages': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
       if (!episode) throw new Error(`Episode ${command.episodeId} not found`);
       const ownAssets = workspace.assets.filter((asset) => asset.episodeId === episode.id);
-      ownAssets.forEach((asset) => {
+      const { selectedAssets, batchItems, skippedAssetIds } = resolveAssetBatch(ownAssets, command.assetSnapshots);
+
+      selectedAssets.forEach((asset) => {
         if (!asset.images.length) {
           const imageId = id('asset_image');
           asset.images = [
@@ -355,39 +666,56 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         }
         asset.versions = asset.images;
         asset.state = 'completed';
-        asset.updatedAt = nowIso();
+        touchRevision(asset);
       });
+
       episode.stationStates.subjects = 'completed';
-      episode.progress = computeEpisodeProgress(workspace, episode.id);
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
+      syncEpisode(workspace, episode.id);
+      const batch = buildBatchSummary(batchItems);
       const task = createTask(workspace, {
         kind: 'asset',
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 批量生成资产图`,
-        description: `共完成 ${ownAssets.length} 个主体的主版本图片。`,
+        description: `共完成 ${selectedAssets.length} 个主体的主版本图片。`,
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: ownAssets.map((asset) => `asset rendered: ${asset.name}`),
+        logs: [
+          ...selectedAssets.map((asset) => `asset rendered: ${asset.name}`),
+          ...skippedAssetIds.map((assetId) => `asset skipped by snapshot conflict: ${assetId}`),
+        ],
+        batch,
       });
       upsertWorkflowRun(workspace, {
         episodeId: episode.id,
         stage: 'asset_rendering',
         agent: 'asset',
         status: 'completed',
-        summary: `完成 ${ownAssets.length} 个资产主版本`,
+        summary: `完成 ${selectedAssets.length} 个资产主版本`,
         taskId: task.id,
       });
-      return { ok: true, renderedCount: ownAssets.length };
+      recordApiUsage(workspace, {
+        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
+        model: workspace.settings.ai.model,
+        endpoint: 'asset_generation',
+        imageCount: selectedAssets.length,
+        estimatedCost: selectedAssets.length * workspace.settings.usage.defaultImageCost,
+        seriesId: episode.seriesId,
+        episodeId: episode.id,
+        taskType: 'asset_generate',
+        taskId: task.id,
+      });
+      return { ok: true, renderedCount: selectedAssets.length, skippedCount: skippedAssetIds.length, skippedAssetIds, batch };
     }
     case 'updateAsset': {
       const asset = workspace.assets.find((item) => item.id === command.assetId);
       if (!asset) {
         throw new Error(`Asset ${command.assetId} not found`);
       }
+
+      assertExpectedRevision('asset', asset, command.expectedRevision);
       asset.description = command.description;
       if (command.prompt !== undefined) {
         asset.prompt = command.prompt;
@@ -398,7 +726,28 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       if (command.isShared !== undefined) {
         asset.isShared = command.isShared;
       }
-      asset.updatedAt = nowIso();
+      touchRevision(asset);
+
+      const globalAsset = asset.globalAssetId ? workspace.globalAssets.find((item) => item.id === asset.globalAssetId) : null;
+      if (globalAsset && asset.syncSource === 'linked') {
+        globalAsset.description = asset.description;
+        globalAsset.prompt = asset.prompt;
+        globalAsset.voiceId = asset.voice || null;
+        globalAsset.selectedImageId = getSelectedAssetImageId(asset);
+        globalAsset.referenceImages = (asset.images.length ? asset.images : asset.versions).map((image) => image.imageUrl);
+        touchRevision(globalAsset);
+      }
+
+      if (asset.episodeId) {
+        syncEpisode(workspace, asset.episodeId);
+      } else {
+        syncSeriesEpisodes(workspace, asset.seriesId);
+      }
+
+      const cascadeWarnings = workspace.shots
+        .filter((shot) => shot.associatedAssetIds.includes(asset.id))
+        .map((shot) => makeCascadeWarning(`镜头 ${shot.title} 引用了已更新资产 ${asset.name}，建议重新生成。`));
+
       createTask(workspace, {
         kind: 'asset',
         targetType: 'asset',
@@ -409,20 +758,36 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         retryable: false,
         link: `/series/${asset.seriesId}`,
         error: null,
-        logs: ['asset updated'],
+        logs: ['asset updated', ...cascadeWarnings],
+        batch: null,
       });
-      return { ok: true, asset };
+      return { ok: true, asset, cascadeWarnings };
     }
     case 'selectAssetImage': {
       const asset = workspace.assets.find((item) => item.id === command.assetId);
       if (!asset) throw new Error(`Asset ${command.assetId} not found`);
+      assertExpectedRevision('asset', asset, command.expectedRevision);
       asset.images = (asset.images.length ? asset.images : asset.versions).map((image) => ({
         ...image,
         isSelected: image.id === command.imageId,
       }));
       asset.versions = asset.images;
-      asset.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, asset.episodeId ?? '');
+      touchRevision(asset);
+
+      if (asset.globalAssetId && asset.syncSource === 'linked') {
+        const globalAsset = workspace.globalAssets.find((item) => item.id === asset.globalAssetId);
+        if (globalAsset) {
+          globalAsset.selectedImageId = command.imageId;
+          globalAsset.referenceImages = asset.images.map((image) => image.imageUrl);
+          touchRevision(globalAsset);
+        }
+      }
+
+      if (asset.episodeId) {
+        syncEpisode(workspace, asset.episodeId);
+      } else {
+        syncSeriesEpisodes(workspace, asset.seriesId);
+      }
       return { ok: true, asset };
     }
     case 'promoteAssetToShared': {
@@ -431,7 +796,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         throw new Error(`Asset ${command.assetId} not found`);
       }
       asset.isShared = true;
-      asset.updatedAt = nowIso();
+      touchRevision(asset);
       createTask(workspace, {
         kind: 'asset',
         targetType: 'asset',
@@ -443,14 +808,124 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${asset.seriesId}`,
         error: null,
         logs: ['asset promoted to shared'],
+        batch: null,
       });
       return { ok: true, asset };
+    }
+    case 'promoteAssetToGlobal': {
+      const asset = workspace.assets.find((item) => item.id === command.assetId);
+      if (!asset) {
+        throw new Error(`Asset ${command.assetId} not found`);
+      }
+
+      let globalAsset = asset.globalAssetId ? workspace.globalAssets.find((item) => item.id === asset.globalAssetId) : undefined;
+      if (!globalAsset) {
+        globalAsset = {
+          id: id('global_asset'),
+          name: asset.name,
+          type: asset.type,
+          ownerId: 'workspace-owner',
+          description: asset.description,
+          prompt: asset.prompt,
+          referenceImages: (asset.images.length ? asset.images : asset.versions).map((image) => image.imageUrl),
+          selectedImageId: getSelectedAssetImageId(asset),
+          voiceId: asset.voice || null,
+          faceLocked: asset.isFaceLocked,
+          consistencyConfig: asset.consistencyConfig,
+          usedInSeries: [],
+          tags: asset.tags,
+          revision: 1,
+          createdAt: nowIso(),
+          updatedAt: nowIso(),
+        } satisfies GlobalAsset;
+        workspace.globalAssets.unshift(globalAsset);
+      }
+
+      if (!globalAsset.usedInSeries.some((item) => item.linkedAssetId === asset.id)) {
+        const series = workspace.series.find((item) => item.id === asset.seriesId);
+        globalAsset.usedInSeries.push({
+          seriesId: asset.seriesId,
+          seriesName: series?.name ?? asset.seriesId,
+          linkedAssetId: asset.id,
+        });
+      }
+
+      asset.globalAssetId = globalAsset.id;
+      asset.syncSource = 'linked';
+      asset.isShared = true;
+      touchRevision(asset);
+      touchRevision(globalAsset);
+      syncSeriesEpisodes(workspace, asset.seriesId);
+      return { ok: true, asset, globalAsset };
+    }
+    case 'importGlobalAssetToSeries': {
+      const globalAsset = workspace.globalAssets.find((item) => item.id === command.globalAssetId);
+      if (!globalAsset) {
+        throw new Error(`Global asset ${command.globalAssetId} not found`);
+      }
+      const series = workspace.series.find((item) => item.id === command.seriesId);
+      if (!series) {
+        throw new Error(`Series ${command.seriesId} not found`);
+      }
+
+      const asset: Asset = {
+        id: id('asset'),
+        seriesId: series.id,
+        episodeId: null,
+        name: globalAsset.name,
+        type: globalAsset.type,
+        description: globalAsset.description,
+        prompt: globalAsset.prompt,
+        chapterIds: [],
+        tags: [...globalAsset.tags, 'imported-global'],
+        isShared: true,
+        isFaceLocked: globalAsset.faceLocked,
+        voice: globalAsset.voiceId ?? '',
+        state: globalAsset.selectedImageId ? 'completed' : 'ready',
+        states: [{ id: id('state'), name: '默认态', notes: '从全局资产导入' }],
+        selectedStateId: null,
+        versions: globalAsset.referenceImages.map((imageUrl, index) => ({
+          id: `${globalAsset.id}_image_${String(index + 1)}`,
+          label: index === 0 ? '主版本' : `候选版本 ${String(index + 1)}`,
+          imageUrl,
+          createdAt: nowIso(),
+          isSelected: globalAsset.selectedImageId === `${globalAsset.id}_image_${String(index + 1)}` || (index === 0 && !globalAsset.selectedImageId),
+        })),
+        images: globalAsset.referenceImages.map((imageUrl, index) => ({
+          id: `${globalAsset.id}_image_${String(index + 1)}`,
+          label: index === 0 ? '主版本' : `候选版本 ${String(index + 1)}`,
+          imageUrl,
+          createdAt: nowIso(),
+          isSelected: globalAsset.selectedImageId === `${globalAsset.id}_image_${String(index + 1)}` || (index === 0 && !globalAsset.selectedImageId),
+        })),
+        parentAssetId: null,
+        variantName: null,
+        revision: 1,
+        globalAssetId: globalAsset.id,
+        syncSource: command.mode,
+        appliedPresetId: null,
+        consistencyConfig: globalAsset.consistencyConfig,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+      };
+      workspace.assets.unshift(asset);
+      if (!globalAsset.usedInSeries.some((item) => item.linkedAssetId === asset.id)) {
+        globalAsset.usedInSeries.push({
+          seriesId: series.id,
+          seriesName: series.name,
+          linkedAssetId: asset.id,
+        });
+      }
+      touchRevision(globalAsset);
+      syncSeriesEpisodes(workspace, series.id);
+      return { ok: true, asset, globalAsset };
     }
     case 'updateShot': {
       const shot = workspace.shots.find((item) => item.id === command.shotId);
       if (!shot) {
         throw new Error(`Shot ${command.shotId} not found`);
       }
+      assertExpectedRevision('shot', shot, command.expectedRevision);
       shot.prompt = command.prompt;
       shot.scene = command.scene;
       shot.composition = command.composition;
@@ -458,7 +933,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       shot.cameraMotion = command.cameraMotion;
       shot.dialogue = command.dialogue;
       shot.durationSeconds = command.durationSeconds;
-      shot.updatedAt = nowIso();
+      touchRevision(shot);
+      syncEpisode(workspace, shot.episodeId);
       createTask(workspace, {
         kind: 'shot',
         targetType: 'shot',
@@ -470,6 +946,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${workspace.episodes.find((episode) => episode.id === shot.episodeId)?.seriesId}/episodes/${shot.episodeId}`,
         error: null,
         logs: ['shot updated'],
+        batch: null,
       });
       return { ok: true, shot };
     }
@@ -478,6 +955,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       if (!shot) {
         throw new Error(`Shot ${command.shotId} not found`);
       }
+      assertExpectedRevision('shot', shot, command.expectedRevision);
       let selectedLabel = '';
       let selectedTakeKind: 'image' | 'video' | null = null;
       let selectedTakeUrl: string | null = null;
@@ -496,12 +974,13 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           isSelected: image.imageUrl === selectedTakeUrl,
         }));
       }
-      shot.updatedAt = nowIso();
+      touchRevision(shot);
       const storyboard = workspace.storyboards.find((item) => item.shotId === shot.id);
       if (storyboard) {
         storyboard.selectedTakeId = command.takeId;
-        storyboard.updatedAt = nowIso();
+        touchRevision(storyboard);
       }
+      syncEpisode(workspace, shot.episodeId);
       createTask(workspace, {
         kind: 'storyboard',
         targetType: 'shot',
@@ -513,14 +992,50 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${workspace.episodes.find((episode) => episode.id === shot.episodeId)?.seriesId}/episodes/${shot.episodeId}`,
         error: null,
         logs: ['take selected'],
+        batch: null,
       });
       return { ok: true, shot };
+    }
+    case 'applyGenerationPreset': {
+      const preset = workspace.generationPresets.find((item) => item.id === command.presetId);
+      if (!preset) {
+        throw new Error(`Preset ${command.presetId} not found`);
+      }
+
+      preset.usageCount += 1;
+      preset.updatedAt = nowIso();
+      if (command.targetType === 'asset') {
+        const asset = workspace.assets.find((item) => item.id === command.targetId);
+        if (!asset) {
+          throw new Error(`Asset ${command.targetId} not found`);
+        }
+        asset.appliedPresetId = preset.id;
+        asset.prompt = applyPresetText(asset.prompt, preset);
+        touchRevision(asset);
+        if (asset.episodeId) {
+          syncEpisode(workspace, asset.episodeId);
+        } else {
+          syncSeriesEpisodes(workspace, asset.seriesId);
+        }
+        return { ok: true, asset, preset };
+      }
+
+      const shot = workspace.shots.find((item) => item.id === command.targetId);
+      if (!shot) {
+        throw new Error(`Shot ${command.targetId} not found`);
+      }
+      shot.appliedPresetId = preset.id;
+      shot.prompt = applyPresetText(shot.prompt, preset);
+      touchRevision(shot);
+      syncEpisode(workspace, shot.episodeId);
+      return { ok: true, shot, preset };
     }
     case 'updateTimelineItem': {
       const finalCut = workspace.finalCuts.find((item) => item.id === command.finalCutId);
       if (!finalCut) {
         throw new Error(`Final cut ${command.finalCutId} not found`);
       }
+      assertExpectedRevision('final_cut', finalCut, command.expectedRevision);
       const track = finalCut.tracks.find((item) => item.id === command.trackId);
       const item = track?.items.find((entry) => entry.id === command.itemId);
       if (!track || !item) {
@@ -528,7 +1043,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       }
       item.label = command.label;
       item.locked = command.locked;
-      finalCut.updatedAt = nowIso();
+      touchRevision(finalCut);
+      syncEpisode(workspace, finalCut.episodeId);
       createTask(workspace, {
         kind: 'final_cut',
         targetType: 'episode',
@@ -540,6 +1056,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: `/series/${workspace.episodes.find((episode) => episode.id === finalCut.episodeId)?.seriesId}/episodes/${finalCut.episodeId}`,
         error: null,
         logs: ['timeline updated'],
+        batch: null,
       });
       return { ok: true, finalCut };
     }
@@ -550,7 +1067,9 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         ai: { ...workspace.settings.ai, ...command.settings.ai },
         workspace: { ...workspace.settings.workspace, ...command.settings.workspace },
         governance: { ...workspace.settings.governance, ...command.settings.governance },
+        usage: { ...workspace.settings.usage, ...command.settings.usage },
       };
+      refreshUsageAlerts(workspace, 0);
       createTask(workspace, {
         kind: 'settings',
         targetType: 'settings',
@@ -562,6 +1081,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         link: '/settings',
         error: null,
         logs: ['settings updated'],
+        batch: null,
       });
       return { ok: true, settings: workspace.settings };
     }
@@ -578,6 +1098,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       if (!assetsReady) {
         throw new Error('All assets must be completed with selected versions before shot generation');
       }
+
+      const { selectedAssets, skippedAssetIds } = resolveAssetBatch(ownAssets, command.assetSnapshots);
       const chapters = workspace.chapters.filter((chapter) => chapter.episodeId === episode.id).sort((left, right) => left.index - right.index);
       let directorPlanId = episode.directorPlanId;
       if (!directorPlanId) {
@@ -603,6 +1125,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           return [];
         }
         const baseId = id('shot');
+        const assetIds = selectedAssets.slice(0, 2).map((asset) => asset.id);
         const shot: Shot = {
           id: baseId,
           episodeId: episode.id,
@@ -611,8 +1134,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           title: `${chapter.title} 开场`,
           description: chapter.content.slice(0, 90),
           scene: chapter.scene,
-          associatedAssetIds: ownAssets.slice(0, 2).map((asset) => asset.id),
-          associatedAssetNames: ownAssets.slice(0, 2).map((asset) => asset.name),
+          associatedAssetIds: assetIds,
+          associatedAssetNames: selectedAssets.slice(0, 2).map((asset) => asset.name),
           duration: Math.min(8, Math.max(3, Math.round(chapter.estimatedDurationSeconds / 8))),
           shotSize: '中景',
           cameraMove: '缓推',
@@ -624,21 +1147,37 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           cameraMotion: '缓推',
           prompt: `根据章节《${chapter.title}》生成高一致性叙事镜头，突出关键动作与场景层次。`,
           videoDesc: `${chapter.scene}，中景，角色动作围绕章节核心冲突展开。`,
-          dialogue: '',
+          dialogue: chapter.dialogues.map((line) => `${line.speaker}: ${line.content}`).join('\n'),
           sfx: '环境音待补充',
           durationSeconds: chapter.estimatedDurationSeconds,
           status: 'ready',
           continuityStatus: 'clear',
           continuityIssues: [],
-          referenceAssetIds: ownAssets.slice(0, 2).map((asset) => asset.id),
+          referenceAssetIds: assetIds,
           takes: [],
           images: [],
           state: 'ready',
           track: 'default',
           trackId: 'track_default',
+          revision: 1,
+          assetSnapshots: buildAssetSnapshots(workspace, assetIds),
+          assetRefStatus: 'valid',
+          brokenAssetRefs: [],
+          appliedPresetId: null,
+          dialogueTrack: {
+            shotId: baseId,
+            audioFile: null,
+            duration: chapter.estimatedDurationSeconds * 1000,
+            transcript: chapter.dialogues.map((line) => line.content).join(' '),
+            characterId: null,
+            voiceId: null,
+            lipSyncEnabled: workspace.settings.workspace.creationMode.toLowerCase().includes('audio'),
+          },
+          multimodalInputs: [{ id: id('mm'), kind: 'text', title: '章节文本', url: null, notes: chapter.content.slice(0, 40) }],
           createdAt: nowIso(),
           updatedAt: nowIso(),
         };
+        recomputeShotAssetState(workspace, shot);
         workspace.shots.push(shot);
         episode.shotIds.push(shot.id);
         const storyboardId = id('story');
@@ -650,6 +1189,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           notes: 'Agent 生成的初始故事板卡片。',
           selectedTakeId: null,
           referenceAssetIds: shot.referenceAssetIds,
+          revision: 1,
           updatedAt: nowIso(),
         });
         episode.storyboardIds.push(storyboardId);
@@ -657,10 +1197,8 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       });
 
       episode.stationStates.shots = generated.length ? 'ready' : episode.stationStates.shots;
-      episode.progress = computeEpisodeProgress(workspace, episode.id);
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
-      createTask(workspace, {
+      syncEpisode(workspace, episode.id);
+      const task = createTask(workspace, {
         kind: 'agent',
         targetType: 'episode',
         targetId: episode.id,
@@ -670,7 +1208,11 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         retryable: false,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: generated.map((shot) => `generated ${shot.id}`),
+        logs: [
+          ...generated.map((shot) => `generated ${shot.id}`),
+          ...skippedAssetIds.map((assetId) => `asset snapshot skipped: ${assetId}`),
+        ],
+        batch: null,
       });
       upsertWorkflowRun(workspace, {
         episodeId: episode.id,
@@ -678,8 +1220,21 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         agent: 'production',
         status: 'completed',
         summary: `生成 ${generated.length} 条分镜`,
+        taskId: task.id,
       });
-      return { ok: true, generatedCount: generated.length };
+      recordApiUsage(workspace, {
+        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
+        model: workspace.settings.ai.model,
+        endpoint: 'shot_generation',
+        inputTokens: chapters.reduce((sum, chapter) => sum + chapter.content.length, 0),
+        outputTokens: generated.length * 160,
+        estimatedCost: Math.max(1, generated.length) * workspace.settings.usage.defaultTextCost,
+        seriesId: episode.seriesId,
+        episodeId: episode.id,
+        taskType: 'shot_generate',
+        taskId: task.id,
+      });
+      return { ok: true, generatedCount: generated.length, skippedAssetIds };
     }
     case 'generateShotImages': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
@@ -687,7 +1242,20 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
       const shots = workspace.shots.filter((shot) => shot.episodeId === episode.id);
       if (!shots.length) throw new Error('Shot list must exist before rendering shot images');
 
-      shots.forEach((shot) => {
+      const { selectedShots, batchItems, skippedShotIds } = resolveShotBatch(shots, command.shotSnapshots);
+
+      selectedShots.forEach((shot) => {
+        recomputeShotAssetState(workspace, shot);
+        if (shot.assetRefStatus === 'broken') {
+          const item = batchItems.find((batchItem: TaskBatchItem) => batchItem.targetId === shot.id);
+          if (item) {
+            item.status = 'skipped';
+            item.skipReason = 'broken asset reference';
+          }
+          skippedShotIds.push(shot.id);
+          return;
+        }
+
         if (!shot.images.length) {
           const imageId = id('shot_image');
           shot.images = [
@@ -705,39 +1273,54 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         const storyboard = workspace.storyboards.find((item) => item.shotId === shot.id);
         if (storyboard) {
           storyboard.selectedTakeId = selectedTakeId;
-          storyboard.updatedAt = nowIso();
+          touchRevision(storyboard);
         }
 
         shot.state = 'completed';
         shot.status = 'rendered';
-        shot.updatedAt = nowIso();
+        touchRevision(shot);
       });
 
       episode.stationStates.storyboard = 'ready';
-      episode.progress = computeEpisodeProgress(workspace, episode.id);
-      episode.updatedAt = nowIso();
-      syncEpisodeWorkflow(workspace, episode.id);
+      syncEpisode(workspace, episode.id);
+      const batch = buildBatchSummary(batchItems);
+      const processedShots = selectedShots.filter((shot) => !skippedShotIds.includes(shot.id));
       const task = createTask(workspace, {
         kind: 'storyboard',
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 批量生成分镜图`,
-        description: `共完成 ${shots.length} 个镜头的分镜主版本图片。`,
+        description: `共完成 ${processedShots.length} 个镜头的分镜主版本图片。`,
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: shots.map((shot) => `shot rendered: ${shot.title}`),
+        logs: [
+          ...processedShots.map((shot) => `shot rendered: ${shot.title}`),
+          ...skippedShotIds.map((shotId) => `shot skipped by snapshot conflict: ${shotId}`),
+        ],
+        batch,
       });
       upsertWorkflowRun(workspace, {
         episodeId: episode.id,
         stage: 'shot_rendering',
         agent: 'production',
         status: 'completed',
-        summary: `完成 ${shots.length} 条分镜图`,
+        summary: `完成 ${processedShots.length} 条分镜图`,
         taskId: task.id,
       });
-      return { ok: true, renderedCount: shots.length };
+      recordApiUsage(workspace, {
+        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
+        model: workspace.settings.ai.model,
+        endpoint: 'shot_image_generation',
+        imageCount: processedShots.length,
+        estimatedCost: processedShots.length * workspace.settings.usage.defaultImageCost,
+        seriesId: episode.seriesId,
+        episodeId: episode.id,
+        taskType: 'asset_generate',
+        taskId: task.id,
+      });
+      return { ok: true, renderedCount: processedShots.length, skippedCount: skippedShotIds.length, skippedShotIds, batch };
     }
     case 'retryTask': {
       const task = workspace.tasks.find((item) => item.id === command.taskId);

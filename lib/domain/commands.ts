@@ -1,9 +1,17 @@
 import { z } from 'zod';
 
+const ExpectedRevisionSchema = z.number().int().positive().optional();
+const BatchSnapshotSchema = z.object({
+  assetId: z.string().optional(),
+  shotId: z.string().optional(),
+  revision: z.number().int().positive(),
+});
+
 export const UpdateChapterCommandSchema = z.object({
   type: z.literal('updateChapter'),
   chapterId: z.string(),
   content: z.string().min(1),
+  expectedRevision: ExpectedRevisionSchema,
 });
 
 export const GenerateScriptFromSourceCommandSchema = z.object({
@@ -26,6 +34,7 @@ export const ExtractAssetsFromScriptCommandSchema = z.object({
 export const GenerateAssetImagesCommandSchema = z.object({
   type: z.literal('generateAssetImages'),
   episodeId: z.string(),
+  assetSnapshots: z.array(BatchSnapshotSchema).optional(),
 });
 
 export const UpdateAssetCommandSchema = z.object({
@@ -35,6 +44,7 @@ export const UpdateAssetCommandSchema = z.object({
   prompt: z.string().optional(),
   voice: z.string().optional(),
   isShared: z.boolean().optional(),
+  expectedRevision: ExpectedRevisionSchema,
 });
 
 export const PromoteAssetCommandSchema = z.object({
@@ -42,10 +52,23 @@ export const PromoteAssetCommandSchema = z.object({
   assetId: z.string(),
 });
 
+export const PromoteAssetToGlobalCommandSchema = z.object({
+  type: z.literal('promoteAssetToGlobal'),
+  assetId: z.string(),
+});
+
+export const ImportGlobalAssetCommandSchema = z.object({
+  type: z.literal('importGlobalAssetToSeries'),
+  globalAssetId: z.string(),
+  seriesId: z.string(),
+  mode: z.enum(['linked', 'detached']).default('linked'),
+});
+
 export const SelectAssetImageCommandSchema = z.object({
   type: z.literal('selectAssetImage'),
   assetId: z.string(),
   imageId: z.string(),
+  expectedRevision: ExpectedRevisionSchema,
 });
 
 export const UpdateShotCommandSchema = z.object({
@@ -58,12 +81,21 @@ export const UpdateShotCommandSchema = z.object({
   cameraMotion: z.string(),
   dialogue: z.string(),
   durationSeconds: z.number().int().positive(),
+  expectedRevision: ExpectedRevisionSchema,
 });
 
 export const SelectTakeCommandSchema = z.object({
   type: z.literal('selectTake'),
   shotId: z.string(),
   takeId: z.string(),
+  expectedRevision: ExpectedRevisionSchema,
+});
+
+export const ApplyGenerationPresetCommandSchema = z.object({
+  type: z.literal('applyGenerationPreset'),
+  presetId: z.string(),
+  targetType: z.enum(['asset', 'shot']),
+  targetId: z.string(),
 });
 
 export const UpdateTimelineItemCommandSchema = z.object({
@@ -73,6 +105,7 @@ export const UpdateTimelineItemCommandSchema = z.object({
   itemId: z.string(),
   label: z.string(),
   locked: z.boolean(),
+  expectedRevision: ExpectedRevisionSchema,
 });
 
 export const UpdateSettingsCommandSchema = z.object({
@@ -99,6 +132,20 @@ export const UpdateSettingsCommandSchema = z.object({
       .object({
         requestLogging: z.boolean().optional(),
         allowAgentWrites: z.boolean().optional(),
+        permissionMode: z.enum(['private', 'invite_only', 'role_based']).optional(),
+        reservedRoles: z.array(z.string()).optional(),
+      })
+      .optional(),
+    usage: z
+      .object({
+        currency: z.enum(['USD', 'CNY']).optional(),
+        singleTaskLimit: z.number().nonnegative().optional(),
+        dailyLimit: z.number().nonnegative().optional(),
+        monthlyLimit: z.number().nonnegative().optional(),
+        notifyMethod: z.enum(['toast', 'email', 'block']).optional(),
+        defaultImageCost: z.number().nonnegative().optional(),
+        defaultVideoSecondCost: z.number().nonnegative().optional(),
+        defaultTextCost: z.number().nonnegative().optional(),
       })
       .optional(),
   }),
@@ -107,11 +154,13 @@ export const UpdateSettingsCommandSchema = z.object({
 export const GenerateShotsCommandSchema = z.object({
   type: z.literal('generateShotsFromChapters'),
   episodeId: z.string(),
+  assetSnapshots: z.array(BatchSnapshotSchema).optional(),
 });
 
 export const GenerateShotImagesCommandSchema = z.object({
   type: z.literal('generateShotImages'),
   episodeId: z.string(),
+  shotSnapshots: z.array(BatchSnapshotSchema).optional(),
 });
 
 export const RetryTaskCommandSchema = z.object({
@@ -127,9 +176,12 @@ export const StudioCommandSchema = z.discriminatedUnion('type', [
   GenerateAssetImagesCommandSchema,
   UpdateAssetCommandSchema,
   PromoteAssetCommandSchema,
+  PromoteAssetToGlobalCommandSchema,
+  ImportGlobalAssetCommandSchema,
   SelectAssetImageCommandSchema,
   UpdateShotCommandSchema,
   SelectTakeCommandSchema,
+  ApplyGenerationPresetCommandSchema,
   UpdateTimelineItemCommandSchema,
   UpdateSettingsCommandSchema,
   GenerateShotsCommandSchema,

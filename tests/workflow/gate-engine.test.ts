@@ -41,4 +41,36 @@ describe('gate engine', () => {
     expect(gate?.currentStage).toBe('storyboard');
     expect(gate?.availableActions.find((action) => action.kind === 'open_storyboard')?.enabled).toBe(true);
   });
+
+  it('blocks downstream generation when a shot has broken asset references', async () => {
+    const workspace = await readWorkspace(await createTempWorkspace());
+    const shot = workspace.shots.find((item) => item.id === 'shot_03') as any;
+
+    shot.assetRefStatus = 'broken';
+    shot.brokenAssetRefs = [{ assetId: 'asset_agent', reason: 'no_image' }];
+
+    const gate = buildGateSnapshot(workspace as any, 'episode_02');
+
+    expect(gate?.blockedReasons.some((reason) => reason.includes('资产引用'))).toBe(true);
+    expect(gate?.availableActions.find((action) => action.kind === 'generate_shot_images')?.enabled).toBe(false);
+  });
+
+  it('blocks export when usage alerts exceed a blocking threshold', async () => {
+    const workspace = await readWorkspace(await createTempWorkspace());
+    (workspace as any).usageAlerts = [
+      {
+        id: 'alert_block',
+        type: 'single_task_limit',
+        threshold: 5,
+        currentValue: 8,
+        status: 'exceeded',
+        notifyMethod: 'block',
+      },
+    ];
+
+    const gate = buildGateSnapshot(workspace as any, 'episode_01');
+
+    expect(gate?.availableActions.find((action) => action.kind === 'export_episode')?.enabled).toBe(false);
+    expect(gate?.blockedReasons.some((reason) => reason.includes('API'))).toBe(true);
+  });
 });

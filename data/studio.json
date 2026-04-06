@@ -164,7 +164,8 @@
       "episodeId": "episode_03",
       "title": "第三集原文",
       "content": "林岚在磁场错乱的废弃车站醒来，站台上的时钟全部停在不同刻度。她听见 relic 用更清晰的声音提醒她不要看向轨道尽头。巡检 Agent 的脚步声从回声里逼近，废旧广告屏开始闪烁她并不记得的童年画面。她必须在逃离、回望和追问真相之间做出第一次主动选择。",
-      "importedAt": "2026-04-05T09:20:00.000Z"
+      "importedAt": "2026-04-05T09:20:00.000Z",
+      "revision": 1
     }
   ],
   "chapters": [
@@ -184,7 +185,8 @@
       "audioStatus": "locked",
       "estimatedDurationSeconds": 28,
       "createdAt": "2026-03-28T10:00:00.000Z",
-      "updatedAt": "2026-03-29T12:00:00.000Z"
+      "updatedAt": "2026-03-29T12:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "chapter_01_b",
@@ -202,7 +204,8 @@
       "audioStatus": "locked",
       "estimatedDurationSeconds": 22,
       "createdAt": "2026-03-28T10:05:00.000Z",
-      "updatedAt": "2026-03-29T12:00:00.000Z"
+      "updatedAt": "2026-03-29T12:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "chapter_02_a",
@@ -215,7 +218,8 @@
       "audioStatus": "ready",
       "estimatedDurationSeconds": 24,
       "createdAt": "2026-04-02T10:00:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "chapter_02_b",
@@ -237,7 +241,8 @@
       "audioStatus": "ready",
       "estimatedDurationSeconds": 30,
       "createdAt": "2026-04-02T10:03:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1
     }
   ],
   "assets": [
@@ -292,7 +297,17 @@
       "parentAssetId": null,
       "variantName": null,
       "createdAt": "2026-04-01T08:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z"
+      "updatedAt": "2026-04-06T04:39:45.014Z",
+      "revision": 1,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.8,
+        "styleKeywords": [
+          "series-default"
+        ]
+      }
     },
     {
       "id": "asset_market",
@@ -344,7 +359,17 @@
       "parentAssetId": null,
       "variantName": null,
       "createdAt": "2026-04-01T09:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z"
+      "updatedAt": "2026-04-06T04:39:45.014Z",
+      "revision": 1,
+      "globalAssetId": "global_asset_neon_gate",
+      "syncSource": "linked",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.65,
+        "styleKeywords": [
+          "series-default"
+        ]
+      }
     },
     {
       "id": "asset_relic",
@@ -396,7 +421,17 @@
       "parentAssetId": null,
       "variantName": null,
       "createdAt": "2026-04-01T09:30:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z"
+      "updatedAt": "2026-04-06T04:39:45.014Z",
+      "revision": 1,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.65,
+        "styleKeywords": [
+          "series-default"
+        ]
+      }
     },
     {
       "id": "asset_agent",
@@ -443,7 +478,17 @@
       "parentAssetId": null,
       "variantName": null,
       "createdAt": "2026-04-03T11:00:00.000Z",
-      "updatedAt": "2026-04-06T04:39:45.014Z"
+      "updatedAt": "2026-04-06T04:39:45.014Z",
+      "revision": 1,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.65,
+        "styleKeywords": [
+          "series-default"
+        ]
+      }
     }
   ],
   "directorPlans": [],
@@ -456,8 +501,14 @@
       "title": "夜市建立镜头",
       "description": "远景建立失控夜市和林岚的动线，前景灯箱遮挡制造压迫感。",
       "scene": "失控夜市入口",
-      "associatedAssetIds": [],
-      "associatedAssetNames": [],
+      "associatedAssetIds": [
+        "asset_lan",
+        "asset_market"
+      ],
+      "associatedAssetNames": [
+        "林岚",
+        "失控夜市"
+      ],
       "duration": 3,
       "shotSize": "中景",
       "cameraMove": "定镜",
@@ -494,7 +545,43 @@
       "track": "default",
       "trackId": "track_default",
       "createdAt": "2026-03-29T10:00:00.000Z",
-      "updatedAt": "2026-03-30T10:00:00.000Z"
+      "updatedAt": "2026-03-30T10:00:00.000Z",
+      "revision": 1,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_lan",
+          "assetName": "林岚",
+          "revision": 1,
+          "selectedImageId": "asset_image_b177e431"
+        },
+        {
+          "assetId": "asset_market",
+          "assetName": "失控夜市",
+          "revision": 1,
+          "selectedImageId": "asset_image_307319b7"
+        }
+      ],
+      "assetRefStatus": "valid",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_01",
+        "audioFile": null,
+        "duration": 7000,
+        "transcript": "",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "shot_01_text",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "远景建立失控夜市和林岚的动线，前景灯箱遮挡制造压迫感。"
+        }
+      ]
     },
     {
       "id": "shot_02",
@@ -504,8 +591,14 @@
       "title": "遗物特写",
       "description": "Relic 在手掌中亮起，电流纹理与角色瞳孔反光形成对照。",
       "scene": "夜市旧物堆",
-      "associatedAssetIds": [],
-      "associatedAssetNames": [],
+      "associatedAssetIds": [
+        "asset_lan",
+        "asset_relic"
+      ],
+      "associatedAssetNames": [
+        "林岚",
+        "遗物 Relic"
+      ],
       "duration": 3,
       "shotSize": "中景",
       "cameraMove": "定镜",
@@ -524,6 +617,7 @@
       "continuityStatus": "clear",
       "continuityIssues": [],
       "referenceAssetIds": [
+        "asset_lan",
         "asset_relic"
       ],
       "takes": [
@@ -541,7 +635,43 @@
       "track": "default",
       "trackId": "track_default",
       "createdAt": "2026-03-29T10:10:00.000Z",
-      "updatedAt": "2026-03-30T10:10:00.000Z"
+      "updatedAt": "2026-03-30T10:10:00.000Z",
+      "revision": 1,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_lan",
+          "assetName": "林岚",
+          "revision": 1,
+          "selectedImageId": "asset_image_b177e431"
+        },
+        {
+          "assetId": "asset_relic",
+          "assetName": "遗物 Relic",
+          "revision": 1,
+          "selectedImageId": "asset_image_b98e9878"
+        }
+      ],
+      "assetRefStatus": "valid",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_02",
+        "audioFile": null,
+        "duration": 5000,
+        "transcript": "Relic：林岚。",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "shot_02_text",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "Relic 在手掌中亮起，电流纹理与角色瞳孔反光形成对照。"
+        }
+      ]
     },
     {
       "id": "shot_03",
@@ -551,8 +681,14 @@
       "title": "回廊压迫",
       "description": "林岚抱着 relic 穿过夜市后巷，灯箱投影从头顶下坠。",
       "scene": "夜市后巷",
-      "associatedAssetIds": [],
-      "associatedAssetNames": [],
+      "associatedAssetIds": [
+        "asset_market",
+        "asset_agent"
+      ],
+      "associatedAssetNames": [
+        "失控夜市",
+        "巡检 Agent"
+      ],
       "duration": 3,
       "shotSize": "中景",
       "cameraMove": "定镜",
@@ -577,9 +713,8 @@
         }
       ],
       "referenceAssetIds": [
-        "asset_lan",
         "asset_market",
-        "asset_relic"
+        "asset_agent"
       ],
       "takes": [
         {
@@ -604,7 +739,43 @@
       "track": "default",
       "trackId": "track_default",
       "createdAt": "2026-04-03T12:00:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_market",
+          "assetName": "失控夜市",
+          "revision": 1,
+          "selectedImageId": "asset_image_307319b7"
+        },
+        {
+          "assetId": "asset_agent",
+          "assetName": "巡检 Agent",
+          "revision": 1,
+          "selectedImageId": "asset_image_9a9e2465"
+        }
+      ],
+      "assetRefStatus": "valid",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_03",
+        "audioFile": null,
+        "duration": 6000,
+        "transcript": "",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "shot_03_text",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "林岚抱着 relic 穿过夜市后巷，灯箱投影从头顶下坠。"
+        }
+      ]
     },
     {
       "id": "shot_04",
@@ -614,8 +785,14 @@
       "title": "交易犹豫",
       "description": "地下摊主提出交易，镜头从中景逐步逼近林岚眼神。",
       "scene": "地下摊位",
-      "associatedAssetIds": [],
-      "associatedAssetNames": [],
+      "associatedAssetIds": [
+        "asset_agent",
+        "asset_relic"
+      ],
+      "associatedAssetNames": [
+        "巡检 Agent",
+        "遗物 Relic"
+      ],
       "duration": 3,
       "shotSize": "中景",
       "cameraMove": "定镜",
@@ -634,9 +811,8 @@
       "continuityStatus": "clear",
       "continuityIssues": [],
       "referenceAssetIds": [
-        "asset_lan",
-        "asset_relic",
-        "asset_market"
+        "asset_agent",
+        "asset_relic"
       ],
       "takes": [
         {
@@ -653,7 +829,43 @@
       "track": "default",
       "trackId": "track_default",
       "createdAt": "2026-04-03T12:10:00.000Z",
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_agent",
+          "assetName": "巡检 Agent",
+          "revision": 1,
+          "selectedImageId": "asset_image_9a9e2465"
+        },
+        {
+          "assetId": "asset_relic",
+          "assetName": "遗物 Relic",
+          "revision": 1,
+          "selectedImageId": "asset_image_b98e9878"
+        }
+      ],
+      "assetRefStatus": "valid",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_04",
+        "audioFile": null,
+        "duration": 8000,
+        "transcript": "摊主：拿你的记忆换路。 林岚：我只要离开这里。",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "shot_04_text",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "地下摊主提出交易，镜头从中景逐步逼近林岚眼神。"
+        }
+      ]
     }
   ],
   "storyboards": [
@@ -667,7 +879,8 @@
       "referenceAssetIds": [
         "asset_market"
       ],
-      "updatedAt": "2026-03-30T10:00:00.000Z"
+      "updatedAt": "2026-03-30T10:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "story_02",
@@ -679,7 +892,8 @@
       "referenceAssetIds": [
         "asset_relic"
       ],
-      "updatedAt": "2026-03-30T10:10:00.000Z"
+      "updatedAt": "2026-03-30T10:10:00.000Z",
+      "revision": 1
     },
     {
       "id": "story_03",
@@ -692,7 +906,8 @@
         "asset_lan",
         "asset_market"
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "story_04",
@@ -705,7 +920,8 @@
         "asset_lan",
         "asset_relic"
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1
     }
   ],
   "finalCuts": [
@@ -759,7 +975,8 @@
           ]
         }
       ],
-      "updatedAt": "2026-04-01T16:00:00.000Z"
+      "updatedAt": "2026-04-01T16:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "final_02",
@@ -811,7 +1028,8 @@
           ]
         }
       ],
-      "updatedAt": "2026-04-06T00:00:00.000Z"
+      "updatedAt": "2026-04-06T00:00:00.000Z",
+      "revision": 1
     },
     {
       "id": "final_03",
@@ -821,7 +1039,8 @@
       "exportStatus": "draft",
       "notes": "第三集尚未进入成片阶段。",
       "tracks": [],
-      "updatedAt": "2026-04-05T09:30:00.000Z"
+      "updatedAt": "2026-04-05T09:30:00.000Z",
+      "revision": 1
     }
   ],
   "tasks": [
@@ -972,7 +1191,25 @@
     },
     "governance": {
       "requestLogging": true,
-      "allowAgentWrites": true
+      "allowAgentWrites": true,
+      "permissionMode": "private",
+      "reservedRoles": [
+        "owner",
+        "producer",
+        "director",
+        "editor",
+        "reviewer"
+      ]
+    },
+    "usage": {
+      "currency": "USD",
+      "singleTaskLimit": 5,
+      "dailyLimit": 50,
+      "monthlyLimit": 500,
+      "notifyMethod": "block",
+      "defaultImageCost": 0.2,
+      "defaultVideoSecondCost": 0.6,
+      "defaultTextCost": 0.05
     }
   },
   "agentRuns": [
@@ -1175,6 +1412,139 @@
         "需要先提取本集主体"
       ],
       "updatedAt": "2026-04-06T05:15:31.064Z"
+    }
+  ],
+  "globalAssets": [
+    {
+      "id": "global_asset_neon_gate",
+      "name": "霓虹夜市摊位",
+      "type": "scene",
+      "ownerId": "workspace-owner",
+      "description": "可跨系列复用的赛博夜市摊位资产。",
+      "prompt": "Cyber oriental market stall, layered neon lights, cinematic clutter.",
+      "referenceImages": [
+        "/generated/asset_market-asset_image_307319b7.jpg"
+      ],
+      "selectedImageId": "global_asset_neon_gate_image_1",
+      "voiceId": null,
+      "faceLocked": false,
+      "consistencyConfig": {
+        "referenceStrength": 0.72,
+        "styleKeywords": [
+          "cyber-oriental",
+          "market"
+        ]
+      },
+      "usedInSeries": [
+        {
+          "seriesId": "series_neon_relic",
+          "seriesName": "Neon Relic",
+          "linkedAssetId": "asset_market"
+        }
+      ],
+      "tags": [
+        "scene",
+        "market"
+      ],
+      "revision": 1,
+      "createdAt": "2026-04-05T08:00:00.000Z",
+      "updatedAt": "2026-04-06T05:15:31.065Z"
+    }
+  ],
+  "generationPresets": [
+    {
+      "id": "preset_series_storyboard",
+      "name": "Series Storyboard Hero",
+      "scope": "series",
+      "scopeId": "series_neon_relic",
+      "type": "image",
+      "imageConfig": {
+        "model": "siliconflow/black-forest-labs/FLUX.1-schnell",
+        "style": "cyber-oriental cinematic",
+        "negativePrompt": "blurry, duplicate limbs, watermark",
+        "aspectRatio": "16:9",
+        "steps": 30,
+        "cfgScale": 6.5
+      },
+      "usageCount": 2,
+      "createdBy": "producer",
+      "createdAt": "2026-04-05T09:00:00.000Z",
+      "updatedAt": "2026-04-06T05:00:00.000Z"
+    },
+    {
+      "id": "preset_global_motion",
+      "name": "Global Motion Base",
+      "scope": "global",
+      "scopeId": null,
+      "type": "video",
+      "videoConfig": {
+        "model": "siliconflow/kling-v1",
+        "motionScale": 0.6,
+        "fps": 24,
+        "duration": 5
+      },
+      "usageCount": 1,
+      "createdBy": "producer",
+      "createdAt": "2026-04-05T10:00:00.000Z",
+      "updatedAt": "2026-04-06T05:00:00.000Z"
+    }
+  ],
+  "apiUsageRecords": [
+    {
+      "id": "usage_seed_script",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "script_generation",
+      "inputTokens": 860,
+      "outputTokens": 320,
+      "estimatedCost": 0.18,
+      "currency": "USD",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "taskType": "script",
+      "taskId": "task_seed_script",
+      "createdAt": "2026-04-06T04:35:00.000Z"
+    },
+    {
+      "id": "usage_seed_shot",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "shot_generation",
+      "inputTokens": 640,
+      "outputTokens": 280,
+      "estimatedCost": 0.22,
+      "currency": "USD",
+      "seriesId": "series_neon_relic",
+      "episodeId": "episode_02",
+      "taskType": "shot_generate",
+      "taskId": "task_seed_shot",
+      "createdAt": "2026-04-06T04:40:00.000Z"
+    }
+  ],
+  "usageAlerts": [
+    {
+      "id": "usage_single_task",
+      "type": "single_task_limit",
+      "threshold": 5,
+      "currentValue": 0.22,
+      "status": "normal",
+      "notifyMethod": "block"
+    },
+    {
+      "id": "usage_daily",
+      "type": "daily_limit",
+      "threshold": 50,
+      "currentValue": 0.4,
+      "status": "normal",
+      "notifyMethod": "block"
+    },
+    {
+      "id": "usage_monthly",
+      "type": "monthly_limit",
+      "threshold": 500,
+      "currentValue": 0.4,
+      "status": "normal",
+      "notifyMethod": "block"
     }
   ]
 }

@@ -28,6 +28,12 @@ export const AssetProcessingStateSchema = z.enum(assetProcessingStates);
 export const WorkflowStageSchema = z.enum(workflowStages);
 export const WorkflowActionKindSchema = z.enum(workflowActionKinds);
 
+const RevisionSchema = z.number().int().positive().default(1);
+const NotifyMethodSchema = z.enum(['toast', 'email', 'block']);
+const CurrencySchema = z.enum(['USD', 'CNY']);
+const SyncSourceSchema = z.enum(['local', 'linked', 'detached']);
+const AssetRefStatusSchema = z.enum(['valid', 'broken', 'stale']);
+
 export const DialogueLineSchema = z.object({
   speaker: z.string(),
   content: z.string(),
@@ -39,6 +45,7 @@ export const SourceDocumentSchema = z.object({
   title: z.string(),
   content: z.string(),
   importedAt: z.string(),
+  revision: RevisionSchema,
 });
 
 export const AssetStateSchema = z.object({
@@ -68,6 +75,125 @@ export const ContinuityIssueSchema = z.object({
   id: z.string(),
   severity: z.enum(['warning', 'error']),
   message: z.string(),
+});
+
+export const BrokenAssetRefSchema = z.object({
+  assetId: z.string(),
+  reason: z.enum(['deleted', 'no_image', 'version_mismatch']),
+});
+
+export const ShotAssetSnapshotSchema = z.object({
+  assetId: z.string(),
+  assetName: z.string(),
+  revision: RevisionSchema,
+  selectedImageId: z.string().nullable().default(null),
+});
+
+export const DialogueTrackSchema = z.object({
+  shotId: z.string(),
+  audioFile: z.string().nullable().default(null),
+  duration: z.number().int().nonnegative().default(0),
+  transcript: z.string().default(''),
+  characterId: z.string().nullable().default(null),
+  voiceId: z.string().nullable().default(null),
+  lipSyncEnabled: z.boolean().default(false),
+});
+
+export const MultimodalInputSchema = z.object({
+  id: z.string(),
+  kind: z.enum(['image', 'audio', 'text']),
+  title: z.string(),
+  url: z.string().nullable().default(null),
+  notes: z.string().default(''),
+});
+
+export const GenerationPresetSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  scope: z.enum(['user', 'series', 'global']),
+  scopeId: z.string().nullable().default(null),
+  type: z.enum(['image', 'video', 'both']),
+  imageConfig: z
+    .object({
+      model: z.string(),
+      style: z.string().optional(),
+      negativePrompt: z.string().optional(),
+      aspectRatio: z.string().optional(),
+      steps: z.number().int().positive().optional(),
+      cfgScale: z.number().positive().optional(),
+    })
+    .optional(),
+  videoConfig: z
+    .object({
+      model: z.string(),
+      motionScale: z.number().positive().optional(),
+      fps: z.number().int().positive().optional(),
+      duration: z.number().int().positive().optional(),
+    })
+    .optional(),
+  usageCount: z.number().int().nonnegative().default(0),
+  createdBy: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const APIUsageRecordSchema = z.object({
+  id: z.string(),
+  provider: z.enum(['openai', 'anthropic', 'siliconflow', 'custom', 'mock']),
+  model: z.string(),
+  endpoint: z.string(),
+  inputTokens: z.number().int().nonnegative().optional(),
+  outputTokens: z.number().int().nonnegative().optional(),
+  imageCount: z.number().int().nonnegative().optional(),
+  videoSeconds: z.number().nonnegative().optional(),
+  estimatedCost: z.number().nonnegative().optional(),
+  currency: CurrencySchema.default('USD'),
+  seriesId: z.string().nullable().default(null),
+  episodeId: z.string().nullable().default(null),
+  taskType: z.enum(['script', 'asset_extract', 'asset_generate', 'shot_generate', 'video_generate', 'tts', 'other']),
+  taskId: z.string().nullable().default(null),
+  createdAt: z.string(),
+});
+
+export const UsageAlertSchema = z.object({
+  id: z.string(),
+  type: z.enum(['daily_limit', 'monthly_limit', 'single_task_limit']),
+  threshold: z.number().nonnegative(),
+  currentValue: z.number().nonnegative(),
+  status: z.enum(['normal', 'warning', 'exceeded']),
+  notifyMethod: NotifyMethodSchema,
+});
+
+export const GlobalAssetSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: AssetTypeSchema,
+  ownerId: z.string(),
+  description: z.string(),
+  prompt: z.string().default(''),
+  referenceImages: z.array(z.string().url().or(z.string().startsWith('/'))).default([]),
+  selectedImageId: z.string().nullable().default(null),
+  voiceId: z.string().nullable().default(null),
+  faceLocked: z.boolean().default(false),
+  consistencyConfig: z
+    .object({
+      referenceStrength: z.number().min(0).max(1).default(0.65),
+      styleKeywords: z.array(z.string()).default([]),
+    })
+    .default({ referenceStrength: 0.65, styleKeywords: [] }),
+  usedInSeries: z
+    .array(
+      z.object({
+        seriesId: z.string(),
+        seriesName: z.string(),
+        linkedAssetId: z.string(),
+      }),
+    )
+    .default([]),
+  tags: z.array(z.string()).default([]),
+  revision: RevisionSchema,
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const SeriesSchema = z.object({
@@ -116,6 +242,7 @@ export const ChapterSchema = z.object({
   dialogues: z.array(DialogueLineSchema).default([]),
   audioStatus: z.enum(['not_ready', 'ready', 'locked']),
   estimatedDurationSeconds: z.number().int().positive(),
+  revision: RevisionSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -140,6 +267,16 @@ export const AssetSchema = z.object({
   images: z.array(AssetVersionSchema).default([]),
   parentAssetId: z.string().nullable().default(null),
   variantName: z.string().nullable().default(null),
+  revision: RevisionSchema,
+  globalAssetId: z.string().nullable().default(null),
+  syncSource: SyncSourceSchema.default('local'),
+  appliedPresetId: z.string().nullable().default(null),
+  consistencyConfig: z
+    .object({
+      referenceStrength: z.number().min(0).max(1).default(0.65),
+      styleKeywords: z.array(z.string()).default([]),
+    })
+    .default({ referenceStrength: 0.65, styleKeywords: [] }),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -190,6 +327,13 @@ export const ShotSchema = z.object({
   state: z.enum(['draft', 'ready', 'generating', 'completed', 'failed']).default('draft'),
   track: z.string().default('default'),
   trackId: z.string().default('track_default'),
+  revision: RevisionSchema,
+  assetSnapshots: z.array(ShotAssetSnapshotSchema).default([]),
+  assetRefStatus: AssetRefStatusSchema.default('valid'),
+  brokenAssetRefs: z.array(BrokenAssetRefSchema).default([]),
+  appliedPresetId: z.string().nullable().default(null),
+  dialogueTrack: DialogueTrackSchema.nullable().default(null),
+  multimodalInputs: z.array(MultimodalInputSchema).default([]),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -202,6 +346,7 @@ export const StoryboardItemSchema = z.object({
   notes: z.string().default(''),
   selectedTakeId: z.string().nullable().default(null),
   referenceAssetIds: z.array(z.string()).default([]),
+  revision: RevisionSchema,
   updatedAt: z.string(),
 });
 
@@ -230,7 +375,15 @@ export const FinalCutSchema = z.object({
   exportStatus: z.enum(['draft', 'review', 'ready']),
   notes: z.string().default(''),
   tracks: z.array(TrackSchema).default([]),
+  revision: RevisionSchema,
   updatedAt: z.string(),
+});
+
+export const TaskBatchItemSchema = z.object({
+  targetId: z.string(),
+  snapshotRevision: z.number().int().positive(),
+  status: z.enum(['pending', 'completed', 'failed', 'skipped']).default('pending'),
+  skipReason: z.string().nullable().default(null),
 });
 
 export const TaskRecordSchema = z.object({
@@ -245,6 +398,15 @@ export const TaskRecordSchema = z.object({
   link: z.string(),
   error: z.string().nullable().default(null),
   logs: z.array(z.string()).default([]),
+  batch: z
+    .object({
+      total: z.number().int().nonnegative(),
+      processed: z.number().int().nonnegative(),
+      skipped: z.number().int().nonnegative(),
+      items: z.array(TaskBatchItemSchema).default([]),
+    })
+    .nullable()
+    .default(null),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -314,7 +476,30 @@ export const SettingsSchema = z.object({
   governance: z.object({
     requestLogging: z.boolean(),
     allowAgentWrites: z.boolean(),
+    permissionMode: z.enum(['private', 'invite_only', 'role_based']).default('private'),
+    reservedRoles: z.array(z.string()).default(['owner', 'producer', 'director', 'editor', 'reviewer']),
   }),
+  usage: z
+    .object({
+      currency: CurrencySchema.default('USD'),
+      singleTaskLimit: z.number().nonnegative().default(5),
+      dailyLimit: z.number().nonnegative().default(50),
+      monthlyLimit: z.number().nonnegative().default(500),
+      notifyMethod: NotifyMethodSchema.default('toast'),
+      defaultImageCost: z.number().nonnegative().default(0.2),
+      defaultVideoSecondCost: z.number().nonnegative().default(0.6),
+      defaultTextCost: z.number().nonnegative().default(0.05),
+    })
+    .default({
+      currency: 'USD',
+      singleTaskLimit: 5,
+      dailyLimit: 50,
+      monthlyLimit: 500,
+      notifyMethod: 'toast',
+      defaultImageCost: 0.2,
+      defaultVideoSecondCost: 0.6,
+      defaultTextCost: 0.05,
+    }),
 });
 
 export const StudioWorkspaceSchema = z.object({
@@ -328,6 +513,10 @@ export const StudioWorkspaceSchema = z.object({
   sourceDocuments: z.array(SourceDocumentSchema).default([]),
   chapters: z.array(ChapterSchema),
   assets: z.array(AssetSchema),
+  globalAssets: z.array(GlobalAssetSchema).default([]),
+  generationPresets: z.array(GenerationPresetSchema).default([]),
+  apiUsageRecords: z.array(APIUsageRecordSchema).default([]),
+  usageAlerts: z.array(UsageAlertSchema).default([]),
   directorPlans: z.array(DirectorPlanSchema).default([]),
   shots: z.array(ShotSchema),
   storyboards: z.array(StoryboardItemSchema),

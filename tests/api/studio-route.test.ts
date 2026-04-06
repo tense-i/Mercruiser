@@ -240,6 +240,77 @@ describe('studio api route', () => {
     expect(payload.settings.ai.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
   });
 
+  it('returns 409 for optimistic-lock conflicts', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+
+    const first = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateAsset',
+            assetId: 'asset_agent',
+            description: '第一次修改',
+            expectedRevision: 1,
+          },
+          context: {
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+
+    expect(first.status).toBe(200);
+
+    const conflict = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateAsset',
+            assetId: 'asset_agent',
+            description: '冲突修改',
+            expectedRevision: 1,
+          },
+          context: {
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+    const payload = await conflict.json();
+
+    expect(conflict.status).toBe(409);
+    expect(payload.ok).toBe(false);
+    expect(payload.code).toBe('REVISION_CONFLICT');
+  });
+
+  it('promotes a local asset into the global library through the api', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'promoteAssetToGlobal',
+            assetId: 'asset_agent',
+          },
+          context: {
+            seriesId: 'series_neon_relic',
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.result.globalAsset.id).toBeTruthy();
+    const asset = payload.episodeView.assets.find((item: { id: string }) => item.id === 'asset_agent');
+    expect(asset.globalAssetId).toBe(payload.result.globalAsset.id);
+    expect(payload.seriesView.globalAssets.some((item: { id: string }) => item.id === payload.result.globalAsset.id)).toBe(true);
+  });
+
   it('retries failed tasks through the dedicated retry route', async () => {
     const { POST } = await import('@/app/api/tasks/[taskId]/retry/route');
     const response = await POST(new Request('http://localhost/api/tasks/task_failed_storyboard/retry', { method: 'POST' }), {

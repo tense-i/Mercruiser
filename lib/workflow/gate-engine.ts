@@ -11,24 +11,26 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
     return null;
   }
 
-  const { episode, sourceDocument, chapters, ownAssets, shots } = data;
+  const { sourceDocument, chapters, ownAssets, shots, storyboards, finalCut } = data;
+  const hasBrokenAssetRefs = shots.some((shot) => shot.assetRefStatus === 'broken');
+  const hasStaleAssetRefs = shots.some((shot) => shot.assetRefStatus === 'stale');
+  const blockingUsageAlert = workspace.usageAlerts.find((alert) => alert.status === 'exceeded' && alert.notifyMethod === 'block');
+
   const assetsReady = ownAssets.length > 0 && ownAssets.every((asset) => {
     const images = asset.images.length ? asset.images : asset.versions;
     return asset.state === 'completed' && images.some((image) => image.isSelected);
   });
-  const shotsReady = shots.length > 0;
-  const shotImagesReady = shotsReady && shots.every((shot) => {
-    const images = shot.images.length ? shot.images : [];
-    return images.some((image) => image.isSelected);
-  });
+  const shotsReady = shots.length > 0 && !hasBrokenAssetRefs;
+  const shotImagesReady = shotsReady && shots.every((shot) => shot.images.some((image) => image.isSelected));
+  const storyboardReady = shotImagesReady && storyboards.length > 0 && storyboards.every((item) => item.selectedTakeId !== null);
 
   let currentStage: GateSnapshot['currentStage'] = 'script_generation';
   if (chapters.length > 0) currentStage = 'asset_extraction';
   if (ownAssets.length > 0) currentStage = 'asset_rendering';
   if (assetsReady) currentStage = 'shot_generation';
-  if (shotsReady) currentStage = 'shot_rendering';
+  if (shots.length > 0) currentStage = 'shot_rendering';
   if (shotImagesReady) currentStage = 'storyboard';
-  if (data.storyboards.length > 0 && data.finalCut?.tracks.length) currentStage = 'final_cut';
+  if (finalCut?.tracks.length) currentStage = 'final_cut';
 
   const blockedReasons: string[] = [];
   const requiredInputs: string[] = [];
@@ -45,11 +47,20 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
   if (ownAssets.length > 0 && !assetsReady) {
     blockedReasons.push('仍有主体未完成图片生成或未选定主版本');
   }
-  if (assetsReady && !shotsReady) {
+  if (assetsReady && !shots.length) {
     requiredInputs.push('可以触发分镜表生成');
   }
-  if (shotsReady && !shotImagesReady) {
+  if (hasBrokenAssetRefs) {
+    blockedReasons.push('存在资产引用异常，必须先修复 broken 资产引用');
+  }
+  if (hasStaleAssetRefs) {
+    blockedReasons.push('存在资产引用过期，建议重新生成相关分镜图');
+  }
+  if (shots.length > 0 && !shotImagesReady) {
     blockedReasons.push('仍有分镜未完成图片生成或未选定主版本');
+  }
+  if (blockingUsageAlert) {
+    blockedReasons.push(`API 用量预警已超限：${blockingUsageAlert.type}`);
   }
 
   return {
@@ -82,9 +93,9 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
       },
       {
         kind: 'generate_shot_images',
-        enabled: shotsReady,
+        enabled: shots.length > 0 && !hasBrokenAssetRefs,
         label: '生成分镜图片',
-        reason: shotsReady ? null : '分镜表尚未生成',
+        reason: shots.length === 0 ? '分镜表尚未生成' : hasBrokenAssetRefs ? '存在 broken 资产引用' : null,
       },
       {
         kind: 'open_storyboard',
@@ -94,15 +105,15 @@ export function buildGateSnapshot(workspace: StudioWorkspace, episodeId: string)
       },
       {
         kind: 'open_final_cut',
-        enabled: shotImagesReady,
+        enabled: storyboardReady,
         label: '进入成片',
-        reason: shotImagesReady ? null : '需要先完成故事板主版本选择',
+        reason: storyboardReady ? null : '需要先完成故事板主版本选择',
       },
       {
         kind: 'export_episode',
-        enabled: Boolean(data.finalCut?.tracks.length),
+        enabled: Boolean(finalCut?.tracks.length) && !hasBrokenAssetRefs && !blockingUsageAlert,
         label: '导出成片',
-        reason: data.finalCut?.tracks.length ? null : '成片工位尚未装配完成',
+        reason: finalCut?.tracks.length ? blockingUsageAlert ? 'API 用量超限，已阻止导出' : hasBrokenAssetRefs ? '存在 broken 资产引用' : null : '成片工位尚未装配完成',
       },
     ],
     blockedReasons,

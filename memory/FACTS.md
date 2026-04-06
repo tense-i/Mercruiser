@@ -13,6 +13,7 @@
 - The runtime stack is now `Next.js 16` App Router + `Vercel AI SDK v6` + local JSON persistence.
 - The local-first workspace source of truth lives at `data/studio.json` unless `MERCRUISER_DATA_PATH` overrides it.
 - All workspace mutations are funneled through `lib/server/repository/studio-repository.ts`; UI and agent routes should not write JSON files directly.
+- The PRD v3.1 baseline extends the local workspace schema with `globalAssets`, `generationPresets`, `apiUsageRecords`, `usageAlerts`, per-entity `revision`, and shot-level asset reference snapshots/status so gate logic and UI can reason about stale/broken downstream dependencies.
 - The AI surface is split into:
   - `app/api/agent/route.ts` for chat/agent orchestration
   - `lib/ai/tools.ts` for structured workspace tool calls

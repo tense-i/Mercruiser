@@ -56,6 +56,21 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
           </Link>
         ))}
       </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="glass-panel rounded-3xl p-6">
+          <h3 className="text-sm font-bold text-zinc-100">Usage Summary</h3>
+          <p className="mt-3 text-sm text-zinc-400">
+            {dashboard.usageSummary.currency} {dashboard.usageSummary.totalCost.toFixed(2)} across {dashboard.usageSummary.requestCount} tracked calls.
+          </p>
+        </div>
+        <div className="glass-panel rounded-3xl p-6">
+          <h3 className="text-sm font-bold text-zinc-100">Alert State</h3>
+          <p className="mt-3 text-sm text-zinc-400">
+            {dashboard.usageSummary.alerts.filter((alert) => alert.status !== 'normal').length} active usage alerts in the local workspace.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

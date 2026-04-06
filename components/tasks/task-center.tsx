@@ -84,6 +84,11 @@ export function TaskCenter({ initialTasks }: { initialTasks: TaskRecord[] }) {
                       </p>
                     ) : null}
                     <p className="mt-3 text-xs text-white/40">回溯位置：{task.link}</p>
+                    {task.batch ? (
+                      <p className="mt-2 text-xs text-white/40">
+                        Batch {task.batch.processed}/{task.batch.total} · skipped {task.batch.skipped}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-3 text-right">

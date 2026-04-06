@@ -243,6 +243,30 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                   <ChevronRight size={18} />
                 </button>
               </div>
+
+              <div className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6">
+                <h4 className="text-sm font-bold text-zinc-100">Governance Signals</h4>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <InfoPill label="Global Assets" value={String(view.globalAssets.length)} />
+                  <InfoPill label="Presets" value={String(view.generationPresets.length)} />
+                  <InfoPill label="Usage" value={`${view.usageSummary.currency} ${view.usageSummary.totalCost.toFixed(2)}`} />
+                  <InfoPill label="Warnings" value={String(view.cascadeWarnings.length)} />
+                </div>
+              </div>
+
+              {view.cascadeWarnings.length ? (
+                <div className="rounded-3xl border border-amber-500/20 bg-amber-500/10 p-6">
+                  <h4 className="text-sm font-bold text-amber-200">Cascade Warnings</h4>
+                  <div className="mt-4 space-y-3">
+                    {view.cascadeWarnings.slice(0, 3).map((warning) => (
+                      <div key={warning.shotId} className="rounded-2xl border border-amber-400/10 bg-black/20 px-4 py-3 text-xs text-amber-100/90">
+                        <div className="font-semibold">{warning.shotTitle}</div>
+                        <div className="mt-1 leading-6">{warning.message}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         )}
@@ -448,6 +472,10 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                       <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{asset.type}</span>
                       <span className="text-xs font-bold text-zinc-300">{asset.voice || 'No voice'}</span>
                     </div>
+                    <div className="flex items-center justify-between px-3 py-2 text-[10px] text-zinc-500">
+                      <span>{asset.syncSource}</span>
+                      <span>{asset.globalAssetId ? 'Global linked' : 'Episode local'}</span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -489,6 +517,15 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                         Promote to shared asset
                         <input id={`asset-shared-${selectedAsset.id}`} type="checkbox" defaultChecked={selectedAsset.isShared} className="h-4 w-4 accent-brand-500" />
                       </label>
+                    </div>
+                  </SectionCard>
+
+                  <SectionCard title="Governance">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <InfoPill label="Revision" value={String(selectedAsset.revision)} />
+                      <InfoPill label="Preset" value={selectedAsset.appliedPresetId ?? 'None'} />
+                      <InfoPill label="Sync" value={selectedAsset.syncSource} />
+                      <InfoPill label="Global" value={selectedAsset.globalAssetId ?? 'None'} />
                     </div>
                   </SectionCard>
 
@@ -601,6 +638,16 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                     <span className="mt-0.5 whitespace-nowrap text-sm font-bold text-brand-400">Shot {shot.index}</span>
                     <p className="flex-1 text-sm leading-relaxed text-zinc-300">{shot.description}</p>
                     <div className="flex gap-2">
+                      <div className={cn(
+                        'rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em]',
+                        shot.assetRefStatus === 'broken'
+                          ? 'bg-rose-500/15 text-rose-200'
+                          : shot.assetRefStatus === 'stale'
+                            ? 'bg-amber-500/15 text-amber-200'
+                            : 'bg-emerald-500/15 text-emerald-200',
+                      )}>
+                        {shot.assetRefStatus}
+                      </div>
                       {shot.continuityIssues.length ? (
                         <div className="rounded-lg bg-yellow-500/10 p-1.5 text-yellow-500">
                           <AlertCircle size={14} />
@@ -665,6 +712,25 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                       <textarea id={`shot-dialogue-${selectedShot.id}`} className="custom-scrollbar h-24 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-sm leading-relaxed text-zinc-300 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.dialogue} placeholder="Dialogue / subtitle cue" />
                       <input id={`shot-duration-${selectedShot.id}`} type="number" min={1} className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-brand-500 focus:outline-none" defaultValue={selectedShot.durationSeconds} />
                     </div>
+                  </SectionCard>
+
+                  <SectionCard title="Reference Health">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <InfoPill label="Revision" value={String(selectedShot.revision)} />
+                      <InfoPill label="Preset" value={selectedShot.appliedPresetId ?? 'None'} />
+                      <InfoPill label="Asset refs" value={selectedShot.assetRefStatus} />
+                      <InfoPill label="Multimodal" value={String(selectedShot.multimodalInputs.length)} />
+                    </div>
+                    {selectedShot.brokenAssetRefs.length ? (
+                      <div className="mt-3 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-3 text-xs text-rose-100">
+                        {selectedShot.brokenAssetRefs.map((item) => `${item.assetId}:${item.reason}`).join(' / ')}
+                      </div>
+                    ) : null}
+                    {selectedShot.dialogueTrack ? (
+                      <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-3 text-xs text-zinc-300">
+                        Audio-first · {Math.round(selectedShot.dialogueTrack.duration / 1000)}s · lip sync {selectedShot.dialogueTrack.lipSyncEnabled ? 'on' : 'off'}
+                      </div>
+                    ) : null}
                   </SectionCard>
 
                   <button
@@ -959,6 +1025,15 @@ function SectionCard({ title, children }: { title: string; children: React.React
     <div>
       <h4 className="mb-2 text-xs font-bold text-zinc-500">{title}</h4>
       {children}
+    </div>
+  );
+}
+
+function InfoPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-3">
+      <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">{label}</div>
+      <div className="mt-2 break-all text-sm font-medium text-zinc-200">{value}</div>
     </div>
   );
 }
