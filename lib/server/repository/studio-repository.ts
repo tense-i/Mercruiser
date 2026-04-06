@@ -69,6 +69,24 @@ function createTask(
   return task;
 }
 
+function syncShotImageTakes(shot: Shot) {
+  const selectedImageId = shot.images.find((image) => image.isSelected)?.id ?? shot.images[0]?.id ?? null;
+  const existingVideoTakes = shot.takes.filter((take) => take.kind === 'video');
+
+  const imageTakes = shot.images.map((image) => ({
+    id: `take_${image.id}`,
+    kind: 'image' as const,
+    label: image.label,
+    url: image.imageUrl,
+    durationSeconds: null,
+    isSelected: image.id === selectedImageId,
+  }));
+
+  shot.takes = [...imageTakes, ...existingVideoTakes.map((take) => ({ ...take, isSelected: false }))];
+
+  return shot.takes.find((take) => take.kind === 'image' && take.isSelected)?.id ?? null;
+}
+
 export class StudioRepository {
   constructor(private readonly dataPath?: string) {}
 
@@ -461,13 +479,23 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
         throw new Error(`Shot ${command.shotId} not found`);
       }
       let selectedLabel = '';
+      let selectedTakeKind: 'image' | 'video' | null = null;
+      let selectedTakeUrl: string | null = null;
       shot.takes = shot.takes.map((take) => {
         const isSelected = take.id === command.takeId;
         if (isSelected) {
           selectedLabel = take.label;
+          selectedTakeKind = take.kind;
+          selectedTakeUrl = take.url;
         }
         return { ...take, isSelected };
       });
+      if (selectedTakeKind === 'image') {
+        shot.images = shot.images.map((image) => ({
+          ...image,
+          isSelected: image.imageUrl === selectedTakeUrl,
+        }));
+      }
       shot.updatedAt = nowIso();
       const storyboard = workspace.storyboards.find((item) => item.shotId === shot.id);
       if (storyboard) {
@@ -603,16 +631,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           continuityStatus: 'clear',
           continuityIssues: [],
           referenceAssetIds: ownAssets.slice(0, 2).map((asset) => asset.id),
-          takes: [
-            {
-              id: id('take'),
-              kind: 'image',
-              label: '主版本',
-              url: '/placeholder-shot-a.jpg',
-              durationSeconds: null,
-              isSelected: true,
-            },
-          ],
+          takes: [],
           images: [],
           state: 'ready',
           track: 'default',
@@ -629,7 +648,7 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
           shotId: shot.id,
           subtitle: '',
           notes: 'Agent 生成的初始故事板卡片。',
-          selectedTakeId: shot.takes[0]?.id ?? null,
+          selectedTakeId: null,
           referenceAssetIds: shot.referenceAssetIds,
           updatedAt: nowIso(),
         });
@@ -681,20 +700,16 @@ function executeCommand(workspace: StudioWorkspace, command: StudioCommand): unk
             },
           ];
         }
+
+        const selectedTakeId = syncShotImageTakes(shot);
+        const storyboard = workspace.storyboards.find((item) => item.shotId === shot.id);
+        if (storyboard) {
+          storyboard.selectedTakeId = selectedTakeId;
+          storyboard.updatedAt = nowIso();
+        }
+
         shot.state = 'completed';
         shot.status = 'rendered';
-        if (!shot.takes.length) {
-          shot.takes = [
-            {
-              id: id('take'),
-              kind: 'image',
-              label: '主版本',
-              url: shot.images[0].imageUrl,
-              durationSeconds: null,
-              isSelected: true,
-            },
-          ];
-        }
         shot.updatedAt = nowIso();
       });
 
