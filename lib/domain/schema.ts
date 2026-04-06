@@ -33,6 +33,7 @@ const NotifyMethodSchema = z.enum(['toast', 'email', 'block']);
 const CurrencySchema = z.enum(['USD', 'CNY']);
 const SyncSourceSchema = z.enum(['local', 'linked', 'detached']);
 const AssetRefStatusSchema = z.enum(['valid', 'broken', 'stale']);
+const SeriesImportSourceSchema = z.enum(['manual', 'text']);
 
 export const DialogueLineSchema = z.object({
   speaker: z.string(),
@@ -196,6 +197,35 @@ export const GlobalAssetSchema = z.object({
   updatedAt: z.string(),
 });
 
+export const SeriesSettingsSchema = z.object({
+  worldEra: z.string().default(''),
+  worldDescription: z.string().default(''),
+  coreRules: z.array(z.string()).default([]),
+  visualStylePreset: z.string().default(''),
+  visualStylePrompt: z.string().default(''),
+  referenceImages: z.array(z.string().url().or(z.string().startsWith('/'))).default([]),
+  defaultShotStrategy: z.string().default(''),
+  defaultDurationStrategy: z.string().default(''),
+  cameraMotionPreference: z.string().default(''),
+  inheritToEpisodes: z.boolean().default(true),
+});
+
+export const SeriesStrategySchema = z.object({
+  model: z.string().default(''),
+  stylePreference: z.string().default(''),
+  aspectRatio: z.string().default(''),
+  creationMode: z.string().default(''),
+  promptGuidance: z.string().default(''),
+  inheritToEpisodes: z.boolean().default(true),
+  priorityNote: z.string().default('Episode overrides > Series strategy > Global settings'),
+});
+
+export const SeriesImportMetadataSchema = z.object({
+  source: SeriesImportSourceSchema.default('manual'),
+  importedAt: z.string().nullable().default(null),
+  sourceLabel: z.string().default(''),
+});
+
 export const SeriesSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -207,6 +237,9 @@ export const SeriesSchema = z.object({
   worldRules: z.array(z.string()).default([]),
   episodeIds: z.array(z.string()).default([]),
   progress: z.number().int().min(0).max(100),
+  settings: SeriesSettingsSchema.default({}),
+  strategy: SeriesStrategySchema.default({}),
+  importMetadata: SeriesImportMetadataSchema.default({}),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
