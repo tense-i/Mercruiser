@@ -25,6 +25,128 @@ describe('studio repository', () => {
     expect(dashboard.stats[0]?.value).toBe('2');
   });
 
+  it('creates manual and imported series shells for the dashboard', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    const manual = (await repo.dispatch({
+      type: 'createSeries',
+      name: '  Lunar Trial  ',
+      description: 'New series shell',
+    })) as {
+      ok: boolean;
+      series: { id: string; name: string; status: string; importMetadata: { source: string } };
+    };
+
+    const imported = (await repo.dispatch({
+      type: 'importSeries',
+      name: 'Archive Import',
+      description: '',
+      sourceTitle: 'Pilot Manuscript',
+      content: '第一段。第二段。',
+      firstEpisodeTitle: 'Episode Alpha',
+    })) as {
+      ok: boolean;
+      series: { id: string; importMetadata: { source: string; sourceLabel: string } };
+      episode: { id: string; title: string; sourceDocumentId: string | null };
+    };
+
+    const dashboard = await repo.getDashboardView();
+
+    expect(manual.ok).toBe(true);
+    expect(manual.series.name).toBe('Lunar Trial');
+    expect(manual.series.status).toBe('setting');
+    expect(manual.series.importMetadata.source).toBe('manual');
+    expect(imported.ok).toBe(true);
+    expect(imported.series.importMetadata.source).toBe('text');
+    expect(imported.series.importMetadata.sourceLabel).toBe('Pilot Manuscript');
+    expect(imported.episode.title).toBe('Episode Alpha');
+    expect(imported.episode.sourceDocumentId).toBeTruthy();
+    expect(dashboard.series[0]?.id).toBe(imported.series.id);
+    expect(dashboard.series.some((series) => series.id === manual.series.id)).toBe(true);
+  });
+
+  it('updates series settings and strategy, then creates inherited episodes', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    const settingsResult = (await repo.dispatch({
+      type: 'updateSeriesSettings',
+      seriesId: 'series_neon_relic',
+      settings: {
+        worldEra: 'Near future',
+        worldDescription: 'A neon archive city',
+        coreRules: ['Rule A', 'Rule B'],
+        visualStylePreset: 'cyber-noir',
+        visualStylePrompt: 'moody neon rain',
+        defaultShotStrategy: 'close-first',
+        defaultDurationStrategy: '3-5 seconds',
+        cameraMotionPreference: 'slow push',
+      },
+    })) as {
+      ok: boolean;
+      series: { settings: { worldEra: string; coreRules: string[]; visualStylePrompt: string } };
+    };
+
+    const strategyResult = (await repo.dispatch({
+      type: 'updateSeriesStrategy',
+      seriesId: 'series_neon_relic',
+      strategy: {
+        model: 'siliconflow/Qwen/Qwen3.5-9B',
+        stylePreference: 'graphic',
+        aspectRatio: '9:16',
+        creationMode: 'audio-first',
+        promptGuidance: 'Prioritize continuity',
+      },
+    })) as {
+      ok: boolean;
+      series: { strategy: { model: string; creationMode: string; promptGuidance: string } };
+    };
+
+    const blankEpisode = (await repo.dispatch({
+      type: 'createEpisode',
+      seriesId: 'series_neon_relic',
+      title: 'Episode Blank',
+      logline: 'blank path',
+    })) as {
+      ok: boolean;
+      episode: { id: string; assetIds: string[]; sourceDocumentId: string | null; directorPlanId: string | null };
+    };
+
+    const sourcedEpisode = (await repo.dispatch({
+      type: 'createEpisodeFromSource',
+      seriesId: 'series_neon_relic',
+      title: 'Episode Source',
+      logline: 'source path',
+      sourceTitle: 'Source Draft',
+      sourceContent: '第一幕。第二幕。',
+    })) as {
+      ok: boolean;
+      episode: { id: string; assetIds: string[]; sourceDocumentId: string | null };
+    };
+
+    const seriesView = await repo.getSeriesView('series_neon_relic');
+    const sharedAssetIds = new Set(seriesView?.sharedAssets.map((asset) => asset.id));
+
+    expect(settingsResult.ok).toBe(true);
+    expect(settingsResult.series.settings.worldEra).toBe('Near future');
+    expect(settingsResult.series.settings.coreRules).toEqual(['Rule A', 'Rule B']);
+    expect(settingsResult.series.settings.visualStylePrompt).toBe('moody neon rain');
+    expect(strategyResult.ok).toBe(true);
+    expect(strategyResult.series.strategy.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
+    expect(strategyResult.series.strategy.creationMode).toBe('audio-first');
+    expect(strategyResult.series.strategy.promptGuidance).toBe('Prioritize continuity');
+    expect(blankEpisode.ok).toBe(true);
+    expect(blankEpisode.episode.sourceDocumentId).toBeNull();
+    expect(blankEpisode.episode.directorPlanId).toBeTruthy();
+    expect(blankEpisode.episode.assetIds.every((assetId) => sharedAssetIds.has(assetId))).toBe(true);
+    expect(sourcedEpisode.ok).toBe(true);
+    expect(sourcedEpisode.episode.sourceDocumentId).toBeTruthy();
+    expect(sourcedEpisode.episode.assetIds.every((assetId) => sharedAssetIds.has(assetId))).toBe(true);
+    expect(seriesView?.episodes.some((episode) => episode.id === blankEpisode.episode.id)).toBe(true);
+    expect(seriesView?.episodes.some((episode) => episode.id === sourcedEpisode.episode.id)).toBe(true);
+  });
+
   it('updates chapter content and persists it', async () => {
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });

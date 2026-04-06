@@ -48,7 +48,6 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
     const seriesId = payload?.result?.series?.id as string | undefined;
     if (seriesId) {
       router.push(`/series/${seriesId}`);
-      router.refresh();
     }
   }
 
@@ -70,7 +69,6 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
     const seriesId = payload?.result?.series?.id as string | undefined;
     if (seriesId) {
       router.push(`/series/${seriesId}`);
-      router.refresh();
     }
   }
 

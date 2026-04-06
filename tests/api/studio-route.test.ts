@@ -63,6 +63,88 @@ describe('studio api route', () => {
     expect(asset.voice).toBe('voice-02');
   });
 
+  it('creates episodes from source and returns refreshed series view', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'createEpisodeFromSource',
+            seriesId: 'series_neon_relic',
+            title: 'API Episode',
+            logline: 'api lane',
+            sourceTitle: 'API Source',
+            sourceContent: '第一幕。第二幕。',
+          },
+          context: {
+            seriesId: 'series_neon_relic',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.result.episode.title).toBe('API Episode');
+    expect(payload.result.episode.sourceDocumentId).toBeTruthy();
+    expect(payload.seriesView.episodes.some((episode: { id: string }) => episode.id === payload.result.episode.id)).toBe(true);
+  });
+
+  it('saves series settings and strategy through the api', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const settingsResponse = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateSeriesSettings',
+            seriesId: 'series_neon_relic',
+            settings: {
+              worldEra: 'API era',
+              coreRules: ['No retcon'],
+              visualStylePrompt: 'API style',
+            },
+          },
+          context: {
+            seriesId: 'series_neon_relic',
+          },
+        }),
+      }),
+    );
+    const settingsPayload = await settingsResponse.json();
+
+    const strategyResponse = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateSeriesStrategy',
+            seriesId: 'series_neon_relic',
+            strategy: {
+              model: 'siliconflow/Qwen/Qwen3.5-9B',
+              creationMode: 'audio-first',
+              promptGuidance: 'Keep continuity',
+            },
+          },
+          context: {
+            seriesId: 'series_neon_relic',
+          },
+        }),
+      }),
+    );
+    const strategyPayload = await strategyResponse.json();
+
+    expect(settingsPayload.ok).toBe(true);
+    expect(settingsPayload.seriesView.series.settings.worldEra).toBe('API era');
+    expect(settingsPayload.seriesView.series.settings.coreRules).toEqual(['No retcon']);
+    expect(settingsPayload.seriesView.series.settings.visualStylePrompt).toBe('API style');
+    expect(strategyPayload.ok).toBe(true);
+    expect(strategyPayload.seriesView.series.strategy.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
+    expect(strategyPayload.seriesView.series.strategy.creationMode).toBe('audio-first');
+    expect(strategyPayload.seriesView.series.strategy.promptGuidance).toBe('Keep continuity');
+  });
+
   it('rejects remote write attempts by default', async () => {
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(

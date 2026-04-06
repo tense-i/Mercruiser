@@ -53,14 +53,22 @@ export async function POST(request: Request) {
       }
 
       const toolCallsLog: Array<{ id: string; name: string; status: 'pending' | 'completed' | 'failed'; summary: string }> = [];
+      const systemPrompt = [aiSettings.systemPrompt, aiSettings.skillPrompt, buildAgentSystemPrompt({ episodeView, seriesView })]
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .join('\n\n');
+      const useSiliconFlowCompatibility = mode === 'siliconflow';
       const result = streamText({
         model: getStudioModel(aiConfig),
-        system: [aiSettings.systemPrompt, aiSettings.skillPrompt, buildAgentSystemPrompt({ episodeView, seriesView })]
-          .map((part) => part.trim())
-          .filter(Boolean)
-          .join('\n\n'),
-        messages: await convertToModelMessages(messages),
-        tools: createStudioTools(safeContext),
+        ...(useSiliconFlowCompatibility
+          ? {
+              prompt: [systemPrompt, `User request:\n${latestPrompt}`].filter(Boolean).join('\n\n'),
+            }
+          : {
+              system: systemPrompt,
+              messages: await convertToModelMessages(messages),
+              tools: createStudioTools(safeContext),
+            }),
         stopWhen: stepCountIs(6),
         onStepFinish: ({ toolCalls, toolResults }) => {
           toolCalls.forEach((call, index) => {

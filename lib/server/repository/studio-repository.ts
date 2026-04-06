@@ -163,7 +163,7 @@ function createEpisodeScaffold(
     .filter((asset) => asset.seriesId === series.id && asset.isShared)
     .map((asset) => asset.id);
 
-  const episode = {
+  const episode: StudioWorkspace['episodes'][number] = {
     id: episodeId,
     seriesId: series.id,
     index: series.episodeIds.length + 1,
