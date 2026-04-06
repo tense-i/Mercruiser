@@ -42,6 +42,8 @@ describe('studio api route', () => {
             type: 'updateAsset',
             assetId: 'asset_agent',
             description: '更新后的描述',
+            prompt: '更新后的主体提示词',
+            voice: 'voice-02',
           },
           context: {
             episodeId: 'episode_02',
@@ -52,7 +54,43 @@ describe('studio api route', () => {
     const payload = await response.json();
 
     expect(payload.ok).toBe(true);
-    expect(payload.episodeView.assets.find((asset: { id: string }) => asset.id === 'asset_agent').description).toBe('更新后的描述');
+    const asset = payload.episodeView.assets.find((item: { id: string }) => item.id === 'asset_agent');
+    expect(asset.description).toBe('更新后的描述');
+    expect(asset.prompt).toBe('更新后的主体提示词');
+    expect(asset.voice).toBe('voice-02');
+  });
+
+  it('updates structured shot fields through the api', async () => {
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'updateShot',
+            shotId: 'shot_02_a',
+            prompt: '新的分镜提示词',
+            scene: '夜市核心区',
+            composition: '近景',
+            lighting: '顶部聚光',
+            cameraMotion: '摇镜',
+            dialogue: '新的台词',
+            durationSeconds: 7,
+          },
+          context: {
+            episodeId: 'episode_02',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    const shot = payload.episodeView.shots.find((item: { id: string }) => item.id === 'shot_02_a');
+    expect(shot.prompt).toBe('新的分镜提示词');
+    expect(shot.scene).toBe('夜市核心区');
+    expect(shot.cameraMotion).toBe('摇镜');
+    expect(shot.durationSeconds).toBe(7);
   });
 
   it('imports source documents through the api', async () => {

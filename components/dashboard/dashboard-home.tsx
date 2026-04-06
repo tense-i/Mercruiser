@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { CheckCircle2, Clock, Film, Plus } from 'lucide-react';
+import { Film } from 'lucide-react';
 
 import type { DashboardView } from '@/lib/view-models/studio';
 import { cn } from '@/lib/utils';
 
 export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
+  const primarySeries = dashboard.series[0] ?? null;
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-8 flex items-center justify-between">
@@ -12,10 +14,12 @@ export function DashboardHome({ dashboard }: { dashboard: DashboardView }) {
           <h2 className="mb-1 text-3xl font-bold tracking-tight">Welcome back, Producer</h2>
           <p className="text-zinc-500">Manage your series and continue your production journey.</p>
         </div>
-        <button className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-medium text-white shadow-lg shadow-brand-600/20 transition-all hover:scale-105 hover:bg-brand-500 active:scale-95">
-          <Plus size={20} />
-          New Series
-        </button>
+        <Link
+          href={primarySeries ? `/series/${primarySeries.id}` : '/tasks'}
+          className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-medium text-white shadow-lg shadow-brand-600/20 transition-all hover:scale-105 hover:bg-brand-500 active:scale-95"
+        >
+          {primarySeries ? 'Continue Series' : 'Open Task Center'}
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -38,6 +38,56 @@ describe('studio repository', () => {
     expect(episodeView?.chapters[0]?.content).toBe('新的章节内容');
   });
 
+  it('updates asset workspace fields and persists them', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await repo.dispatch({
+      type: 'updateAsset',
+      assetId: 'asset_agent',
+      description: '新的主体描述',
+      prompt: '新的主体提示词',
+      voice: 'narrator-f1',
+      isShared: true,
+    });
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
+    const asset = episodeView?.assets.find((item) => item.id === 'asset_agent');
+
+    expect(asset?.description).toBe('新的主体描述');
+    expect(asset?.prompt).toBe('新的主体提示词');
+    expect(asset?.voice).toBe('narrator-f1');
+    expect(asset?.isShared).toBe(true);
+  });
+
+  it('updates shot fields and persists them', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await repo.dispatch({
+      type: 'updateShot',
+      shotId: 'shot_02_a',
+      prompt: '新的分镜提示词',
+      scene: '夜市外环',
+      composition: '近景',
+      lighting: '霓虹背光',
+      cameraMotion: '手持跟拍',
+      dialogue: '台词更新',
+      durationSeconds: 9,
+    });
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
+    const shot = episodeView?.shots.find((item) => item.id === 'shot_02_a');
+
+    expect(shot?.prompt).toBe('新的分镜提示词');
+    expect(shot?.scene).toBe('夜市外环');
+    expect(shot?.composition).toBe('近景');
+    expect(shot?.lighting).toBe('霓虹背光');
+    expect(shot?.cameraMotion).toBe('手持跟拍');
+    expect(shot?.dialogue).toBe('台词更新');
+    expect(shot?.durationSeconds).toBe(9);
+  });
+
   it('generates structured shots from chapters', async () => {
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
