@@ -2799,4 +2799,159 @@ interface SubtitleStyle {
 - 页面响应速度
 - 导出成功率
 
+---
+
+## 19. 无限画布模块设计
+
+### 19.1 概述
+
+无限画布（Infinite Canvas）是单集工作台的全局可视化视图，以空间化的方式展示章节、主体、分镜三类节点及它们之间的关系，并集成 AI 助手以支持直接在画布上进行内容修改。
+
+入口：单集工作台顶部 Tab 栏中的「画布」按钮，点击后以全屏覆盖层方式打开，左侧侧边导航栏（240px）保持可见。
+
+### 19.2 布局结构
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  [顶部控制栏]  标题 · 无限画布  [过滤器] [缩放] [AI助手] [×]  │
+├─────────────────────────────────────────┬────────────────────┤
+│                                         │                    │
+│  [节点详情面板]   [无限画布视口]         │  [AI 助手聊天面板] │
+│   280px 可收起        ∞                 │     340px 固定     │
+│                                         │                    │
+└─────────────────────────────────────────┴────────────────────┘
+```
+
+- **整体定位**: `position: fixed; left: 240px; inset: 0;` 覆盖主内容区，Z 层级 50
+- **节点详情面板**: 点击节点后从左侧滑入（280px），带 CSS `transition-all duration-200`
+- **画布视口**: 弹性占满剩余宽度，支持鼠标拖拽平移、滚轮缩放
+- **AI 聊天面板**: 右侧固定宽度 340px，可通过顶栏按钮收起/展开
+
+### 19.3 节点类型
+
+| 节点类型 | 对应数据 | 主色 | 最小显示字段 |
+|---------|---------|------|------------|
+| **ChapterNode** | Chapter | 紫色 (violet) | 序号、标题、场景、内容摘要 |
+| **AssetNode** | Asset | 天蓝 (sky) | 名称、类型、状态、缩略图 |
+| **ShotNode** | Shot | 琥珀 (amber) | 序号、标题、景别、时长、缩略图 |
+| **DiffNode** | AI Proposal | 绿色 (emerald) | 变更摘要、字段 diff、Keep/Discard |
+
+所有节点：
+- 卡片宽度约 220px，高度根据内容自适应
+- Header 带 grip 图标，按住可拖动节点
+- 点击节点 body 打开左侧详情面板
+- 选中状态：边框亮色高亮
+
+### 19.4 画布交互
+
+#### 19.4.1 视口变换
+- **平移（Pan）**: 在空白区域按住鼠标左键拖拽，`transform: translate(tx, ty)`
+- **缩放（Zoom）**: 鼠标滚轮，范围 20%–200%，步长 15%
+- **适配视图**: 顶栏「适配视图」按钮，自动计算 scale/translate 使所有节点完整可见
+- 缩放/平移状态存储在 `transform: { x, y, scale }` state
+
+#### 19.4.2 节点拖拽
+- 拖拽触发：鼠标按下节点 header 的 grip 区域（`onMouseDown` → `draggingRef`）
+- 坐标换算：`nodeDelta = mouseDelta / transform.scale`（保证缩放下拖拽精确）
+- 拖拽位置存储在独立的 `nodePositions` map，覆盖自动布局坐标
+- 释放鼠标（`onMouseUp` / `onMouseLeave`）结束拖拽
+
+#### 19.4.3 自动布局引擎
+初始布局由 `buildCanvasLayout()` 计算，将三类节点分列排布：
+
+```
+Col 0: ChapterNodes (y 步长 300px)
+Col 1: AssetNodes   (y 步长 280px)
+Col 2: ShotNodes    (y 步长 260px，每列满 N 个后新起一列)
+```
+
+坐标为逻辑坐标，通过 CSS transform 映射到屏幕空间。
+
+#### 19.4.4 节点过滤
+顶栏三个 Toggle 按钮分别控制章节、主体、分镜节点的可见性，至少保留一类可见。
+
+### 19.5 AI 助手聊天面板
+
+#### 19.5.1 请求/响应模式
+- **非流式 JSON**：`POST /api/canvas-chat` 返回 `{ reply: string; proposals: Proposal[] }`
+- AI 分析上下文（当前集所有章节/主体/分镜）后：
+  - 若为问答：直接在 reply 中回答
+  - 若需修改内容：通过工具调用生成 Proposal，**不立即 dispatch**，等用户确认
+
+#### 19.5.2 工具（Tools）
+
+| 工具 | 作用 | 入参 |
+|-----|------|------|
+| `updateChapter` | 修改章节内容/场景 | chapterId, 变更字段 |
+| `updateAsset` | 修改主体描述/Prompt | assetId, 变更字段 |
+| `updateShot` | 修改分镜字段 | shotId, 变更字段 |
+| `generateShotImages` | 触发分镜图片重新生成 | shotIds |
+
+工具返回 Proposal 对象，不直接写库。
+
+#### 19.5.3 Proposal 数据结构
+
+```typescript
+interface Proposal {
+  proposalId: string;         // 唯一 ID
+  kind: string;               // 'updateChapter' | 'updateAsset' | 'updateShot' | ...
+  anchorNodeId: string;       // 关联节点 ID（用于定位 DiffNode 位置）
+  args: Record<string, unknown>; // 工具调用参数（Keep 时直接 dispatch）
+  diff: Array<{
+    field: string;
+    before: string;
+    after: string;
+  }>;
+  summary: string;            // 一句话变更摘要
+  position?: { x: number; y: number }; // 画布上的显示位置（运行时填充）
+}
+```
+
+### 19.6 DiffNode（AI 建议节点）
+
+参考 Cursor 的代码 diff 交互设计，当 AI 提出内容修改建议时：
+
+1. 在锚点节点右侧 320px 处生成 **DiffNode**
+2. DiffNode 显示：
+   - 标题：变更摘要（`summary`）
+   - 变更类型 badge
+   - 字段 diff 列表（`before` → `after`，删除线 / 绿色高亮）
+   - **Keep（保留）** 按钮：`POST /api/studio` dispatch 实际命令，移除 DiffNode
+   - **Discard（撤销）** 按钮：直接移除 DiffNode，不做任何修改
+3. DiffNode 同样可拖拽（`proposal:id` 前缀区分拖拽目标）
+4. 顶栏显示待确认数量 badge：`N 条 AI 建议待确认`
+
+### 19.7 节点详情面板
+
+点击任意节点（ChapterNode / AssetNode / ShotNode）后，从画布左侧滑入 280px 详情面板，展示完整字段：
+
+| 节点类型 | 展示内容 |
+|---------|---------|
+| **ChapterNode** | 标题、场景、正文全文、对白列表（speaker + content） |
+| **AssetNode** | 封面图及所有版本图、名称/类型/状态、描述、prompt（mono）、配音 |
+| **ShotNode** | 封面图及所有 Take 缩略图、景别/运镜/时长、场景描述、对白（蓝）、音效（紫）、prompt（mono）、关联主体 chips |
+
+点击面板右上角 X 或再次点击同节点关闭面板。
+
+### 19.8 文件结构
+
+```
+components/canvas/
+├── episode-canvas.tsx     # 主组件：视口、平移缩放、节点渲染、Proposal 管理
+├── canvas-nodes.tsx       # ChapterNode / AssetNode / ShotNode / DiffNode + 布局引擎
+├── canvas-chat.tsx        # AI 聊天面板（非流式 JSON fetch）
+└── node-detail-panel.tsx  # 节点详情侧边面板
+
+app/api/canvas-chat/
+└── route.ts               # POST 接口：generateText + tools → { reply, proposals }
+```
+
+### 19.9 集成方式
+
+在 `episode-workspace.tsx` 中：
+- 新增 `canvasOpen` state
+- 顶部 Tab 栏添加「画布」按钮，点击设置 `canvasOpen = true`
+- 当 `canvasOpen` 时渲染 `<EpisodeCanvas view={view} onClose={() => setCanvasOpen(false)} />`
+- EpisodeCanvas 通过 `position: fixed; left: 240px` 覆盖整个主内容区
+
 

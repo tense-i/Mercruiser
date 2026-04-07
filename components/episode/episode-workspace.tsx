@@ -10,6 +10,7 @@ import {
   History,
   Layers,
   LayoutDashboard,
+  LayoutGrid,
   ListTree,
   Mic,
   MonitorPlay,
@@ -23,6 +24,8 @@ import {
   Wand2,
   Zap,
 } from 'lucide-react';
+
+import { EpisodeCanvas } from '@/components/canvas/episode-canvas';
 
 import type { EpisodeStationId, EpisodeWorkspaceView } from '@/lib/view-models/studio';
 import { readSourceFile } from '@/lib/source-file';
@@ -171,6 +174,7 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
     pollingRef.current = setInterval(poll, 3000);
     return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
   }, [asyncJob]);
+  const [canvasOpen, setCanvasOpen] = useState(false);
   const [importSourceOpen, setImportSourceOpen] = useState(false);
   const [generateScriptOpen, setGenerateScriptOpen] = useState(false);
   const [generateShotsOpen, setGenerateShotsOpen] = useState(false);
@@ -394,6 +398,11 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
 
   return (
     <div className="flex h-full flex-col">
+      {/* ── Infinite Canvas overlay ── */}
+      {canvasOpen && (
+        <EpisodeCanvas view={view} onClose={() => setCanvasOpen(false)} />
+      )}
+
       {/* Fixed toast notification */}
       {toast ? (
         <div
@@ -481,6 +490,20 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
                 </button>
               );
             })}
+          </div>
+
+          {/* Canvas toggle */}
+          <div className="my-2 w-px shrink-0" style={{ background: 'rgba(63,63,70,0.5)' }} />
+          <div className="flex shrink-0 items-center px-3">
+            <button
+              type="button"
+              onClick={() => setCanvasOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800/60 px-3 py-1.5 text-[11px] font-bold text-zinc-400 transition-all hover:border-brand-600/50 hover:bg-brand-600/15 hover:text-brand-300"
+              title="打开无限画布"
+            >
+              <LayoutGrid size={12} />
+              画布
+            </button>
           </div>
 
           {/* Vertical divider */}
