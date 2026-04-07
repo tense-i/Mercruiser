@@ -2,6 +2,7 @@
   "name": "mercruiser-studio",
   "private": true,
   "version": "0.1.0",
+  "main": "electron-dist/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,13 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "test:integration:siliconflow": "node tests/integration/siliconflow-smoke.mjs"
+    "test:integration:siliconflow": "node tests/integration/siliconflow-smoke.mjs",
+    "electron:dev": "tsx scripts/electron-dev.ts",
+    "electron:build": "tsx scripts/electron-build.ts",
+    "electron:dist": "npm run electron:build && electron-builder",
+    "electron:dist:win": "npm run electron:build && electron-builder --win",
+    "electron:dist:mac": "npm run electron:build && electron-builder --mac",
+    "electron:dist:linux": "npm run electron:build && electron-builder --linux"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.58",
@@ -31,7 +38,11 @@
     "@types/node": "^24.6.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "esbuild": "^0.25.0",
+    "electron": "^36.0.0",
+    "electron-builder": "^26.0.0",
     "tailwindcss": "^4.1.14",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

@@ -1,0 +1,67 @@
+appId: com.mercruiser.studio
+productName: Mercruiser Studio
+copyright: Copyright © 2026
+
+directories:
+  output: dist-electron
+  buildResources: electron/resources
+
+# Only the bundled main process goes into the asar
+files:
+  - electron-dist/**/*
+  - package.json
+
+asar: true
+
+# Next.js standalone server + seed data go outside asar as extraResources
+extraResources:
+  - from: .next/standalone
+    to: nextapp
+    filter:
+      - "**/*"
+  - from: data
+    to: data
+    filter:
+      - studio.json
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+  icon: electron/resources/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  shortcutName: ${productName}
+  artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
+  installerIcon: electron/resources/icon.ico
+  uninstallerIcon: electron/resources/icon.ico
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: electron/resources/icon.icns
+  category: public.app-category.developer-tools
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+  entitlements: electron/resources/entitlements.mac.plist
+  entitlementsInherit: electron/resources/entitlements.mac.plist
+  hardenedRuntime: true
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
+  icon: electron/resources/icon.png
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
+  category: Development
+
+publish: null
