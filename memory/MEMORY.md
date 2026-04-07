@@ -1,0 +1,1 @@
+- [PRD-first product quality bar](feedback_prd_first_product_quality_bar.md) — User expects hard-nosed PRD alignment review and rejects cosmetic UI work when core workflow is broken.

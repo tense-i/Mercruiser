@@ -1,0 +1,1812 @@
+{
+    "ok": true,
+    "result": {
+        "ok": true,
+        "assetCount": 2
+    },
+    "episodeView": {
+        "series": {
+            "id": "series_60bfa5e1",
+            "name": "游戏冒险小说_迷雾之城",
+            "description": "",
+            "status": "setting",
+            "coverUrl": "/generated/series-imported.jpg",
+            "genre": "导入项目",
+            "style": "赛博东方",
+            "worldRules": [],
+            "episodeIds": [
+                "episode_179babf9"
+            ],
+            "progress": 0,
+            "settings": {
+                "worldEra": "",
+                "worldDescription": "",
+                "coreRules": [],
+                "visualStylePreset": "赛博东方",
+                "visualStylePrompt": "",
+                "referenceImages": [],
+                "defaultShotStrategy": "",
+                "defaultDurationStrategy": "",
+                "cameraMotionPreference": "",
+                "inheritToEpisodes": true
+            },
+            "strategy": {
+                "model": "siliconflow/Qwen/Qwen3.5-9B",
+                "stylePreference": "赛博东方",
+                "aspectRatio": "16:9",
+                "creationMode": "Audio First",
+                "promptGuidance": "Imported series baseline",
+                "inheritToEpisodes": true,
+                "priorityNote": "Episode overrides > Series strategy > Global settings"
+            },
+            "importMetadata": {
+                "source": "file",
+                "importedAt": "2026-04-06T13:56:44.945Z",
+                "sourceLabel": "游戏冒险小说_迷雾之城"
+            },
+            "createdAt": "2026-04-06T13:56:44.945Z",
+            "updatedAt": "2026-04-06T13:56:44.945Z"
+        },
+        "episode": {
+            "id": "episode_179babf9",
+            "seriesId": "series_60bfa5e1",
+            "index": 1,
+            "title": "游戏冒险小说_迷雾之城",
+            "logline": "Imported from 游戏冒险小说_迷雾之城",
+            "status": "not_started",
+            "progress": 40,
+            "stationStates": {
+                "overview": "completed",
+                "script": "completed",
+                "subjects": "ready",
+                "shots": "idle",
+                "storyboard": "idle",
+                "final-cut": "idle"
+            },
+            "sourceDocumentId": "source_26fed012",
+            "currentStage": "asset_rendering",
+            "chapterIds": [
+                "chapter_d2c80115",
+                "chapter_4bcb38be",
+                "chapter_b20fe6f2",
+                "chapter_ff16f5f3"
+            ],
+            "assetIds": [
+                "asset_ba4db207",
+                "asset_34773f98"
+            ],
+            "shotIds": [],
+            "storyboardIds": [],
+            "directorPlanId": "director_plan_ccfd107b",
+            "finalCutId": "final_7ffb9181",
+            "createdAt": "2026-04-06T13:56:44.945Z",
+            "updatedAt": "2026-04-06T15:44:31.456Z"
+        },
+        "sourceDocument": {
+            "id": "source_26fed012",
+            "episodeId": "episode_179babf9",
+            "title": "游戏冒险小说_迷雾之城",
+            "content": "《迷雾之城》\n\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。传送光芒散去时，他已站在一座被迷雾笼罩的古城前。城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。”\n\n林澈原本只想试试新游戏，却发现退出键消失了。\n\n城中寂静得可怕，只有风吹动残破旗帜的声音。他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。”\n\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。\n\n可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。”\n\n林澈愣住了。还没来得及追问，少女便化作流光消失，只留下一张古老地图。地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。\n\n他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。风声像低语，整座城仿佛正在等待新的挑战者。\n\n林澈收起碎片，深吸一口气，朝钟楼方向走去。他知道，真正的冒险才刚刚开始。而这场游戏，或许从一开始，就不只是游戏。",
+            "importedAt": "2026-04-06T14:02:33.786Z",
+            "revision": 2
+        },
+        "chapters": [
+            {
+                "id": "chapter_d2c80115",
+                "episodeId": "episode_179babf9",
+                "index": 1,
+                "title": "迷失入境",
+                "content": "凌晨两点，林澈戴上头盔进入《遗迹边境》。传送光芒散去，他站于被迷雾笼罩的古城前，石壁上刻有猩红文字：进入者，唯有通关者可归。他尝试退出却发现退出键消失，被困城中。",
+                "scene": "虚拟古城入口",
+                "dialogues": [],
+                "audioStatus": "ready",
+                "estimatedDurationSeconds": 25,
+                "revision": 1,
+                "createdAt": "2026-04-06T14:08:18.575Z",
+                "updatedAt": "2026-04-06T14:08:18.575Z"
+            },
+            {
+                "id": "chapter_4bcb38be",
+                "episodeId": "episode_179babf9",
+                "index": 2,
+                "title": "守门者显形",
+                "content": "林澈踏入广场，地面忽然裂开，一只巨大黑甲怪物爬出。系统提示骤然响起，告知守门者出现，击败可获得第一枚核心碎片。",
+                "scene": "广场中心",
+                "dialogues": [
+                    {
+                        "speaker": "系统",
+                        "content": "守门者出现，击败它可获得第一枚核心碎片。"
+                    }
+                ],
+                "audioStatus": "ready",
+                "estimatedDurationSeconds": 25,
+                "revision": 1,
+                "createdAt": "2026-04-06T14:08:18.575Z",
+                "updatedAt": "2026-04-06T14:08:18.575Z"
+            },
+            {
+                "id": "chapter_b20fe6f2",
+                "episodeId": "episode_179babf9",
+                "index": 3,
+                "title": "击杀与碎片",
+                "content": "怪物挥爪攻击，林澈翻滚躲到石柱后。他抓住怪物胸口蓝色晶核暴露的瞬间，一跃而起将短剑刺入。怪物轰然倒下，发光碎片缓缓升起，林澈伸手触碰。",
+                "scene": "竞技场",
+                "dialogues": [],
+                "audioStatus": "ready",
+                "estimatedDurationSeconds": 30,
+                "revision": 1,
+                "createdAt": "2026-04-06T14:08:18.575Z",
+                "updatedAt": "2026-04-06T14:08:18.575Z"
+            },
+            {
+                "id": "chapter_ff16f5f3",
+                "episodeId": "episode_179babf9",
+                "index": 4,
+                "title": "幽灵指引",
+                "content": "四周迷雾翻涌，浮现披银甲少女。她警告别相信系统，集齐三枚碎片才能唤醒城主，随后化作流光消失，留下标记钟楼、水道和祭坛的古老地图。林澈收起碎片，走向钟楼，冒险真正开始。",
+                "scene": "迷雾通道",
+                "dialogues": [
+                    {
+                        "speaker": "银甲少女",
+                        "content": "别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。"
+                    }
+                ],
+                "audioStatus": "ready",
+                "estimatedDurationSeconds": 30,
+                "revision": 1,
+                "createdAt": "2026-04-06T14:08:18.575Z",
+                "updatedAt": "2026-04-06T14:08:18.575Z"
+            }
+        ],
+        "assets": [
+            {
+                "id": "asset_ba4db207",
+                "seriesId": "series_60bfa5e1",
+                "episodeId": "episode_179babf9",
+                "name": "地下摊主",
+                "type": "character",
+                "description": "交易场景中的关键角色，面部褶皱明显，眼神精明而克制。",
+                "prompt": "A shrewd underground market trader, cinematic portrait, layered neon light, detailed costume.",
+                "chapterIds": [
+                    "chapter_d2c80115",
+                    "chapter_4bcb38be",
+                    "chapter_b20fe6f2",
+                    "chapter_ff16f5f3"
+                ],
+                "tags": [
+                    "agent-extracted"
+                ],
+                "isShared": false,
+                "isFaceLocked": true,
+                "voice": "",
+                "state": "ready",
+                "states": [
+                    {
+                        "id": "state_0189befe",
+                        "name": "默认态",
+                        "notes": "Agent 初始提取状态"
+                    }
+                ],
+                "selectedStateId": null,
+                "versions": [],
+                "images": [],
+                "parentAssetId": null,
+                "variantName": null,
+                "revision": 1,
+                "globalAssetId": null,
+                "syncSource": "local",
+                "appliedPresetId": null,
+                "consistencyConfig": {
+                    "referenceStrength": 0.7,
+                    "styleKeywords": [
+                        "series-default"
+                    ]
+                },
+                "createdAt": "2026-04-06T14:17:40.047Z",
+                "updatedAt": "2026-04-06T14:17:40.047Z"
+            },
+            {
+                "id": "asset_34773f98",
+                "seriesId": "series_60bfa5e1",
+                "episodeId": "episode_179babf9",
+                "name": "地下摊位",
+                "type": "scene",
+                "description": "被旧显示器和铁皮包围的狭窄摊位，暖色台灯与外部冷色霓虹形成反差。",
+                "prompt": "A cramped underground stall, layered props, warm desk lamp against blue neon haze.",
+                "chapterIds": [
+                    "chapter_d2c80115",
+                    "chapter_4bcb38be",
+                    "chapter_b20fe6f2",
+                    "chapter_ff16f5f3"
+                ],
+                "tags": [
+                    "agent-extracted"
+                ],
+                "isShared": false,
+                "isFaceLocked": false,
+                "voice": "",
+                "state": "ready",
+                "states": [
+                    {
+                        "id": "state_3e350b0c",
+                        "name": "默认态",
+                        "notes": "Agent 初始提取状态"
+                    }
+                ],
+                "selectedStateId": null,
+                "versions": [],
+                "images": [],
+                "parentAssetId": null,
+                "variantName": null,
+                "revision": 1,
+                "globalAssetId": null,
+                "syncSource": "local",
+                "appliedPresetId": null,
+                "consistencyConfig": {
+                    "referenceStrength": 0.7,
+                    "styleKeywords": [
+                        "series-default"
+                    ]
+                },
+                "createdAt": "2026-04-06T14:17:40.047Z",
+                "updatedAt": "2026-04-06T14:17:40.047Z"
+            }
+        ],
+        "globalAssets": [],
+        "generationPresets": [
+            {
+                "id": "preset_global_motion",
+                "name": "Global Motion Base",
+                "scope": "global",
+                "scopeId": null,
+                "type": "video",
+                "videoConfig": {
+                    "model": "siliconflow/kling-v1",
+                    "motionScale": 0.6,
+                    "fps": 24,
+                    "duration": 5
+                },
+                "usageCount": 1,
+                "createdBy": "producer",
+                "createdAt": "2026-04-05T10:00:00.000Z",
+                "updatedAt": "2026-04-06T05:00:00.000Z"
+            }
+        ],
+        "usageSummary": {
+            "totalCost": 1.5000000000000002,
+            "requestCount": 24,
+            "records": [
+                {
+                    "id": "usage_34dc474c",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_7c2e6b67",
+                    "createdAt": "2026-04-06T15:44:31.456Z"
+                },
+                {
+                    "id": "usage_28718c87",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_c943b2d1",
+                    "createdAt": "2026-04-06T15:44:21.487Z"
+                },
+                {
+                    "id": "usage_d9d580f2",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_533bfe9b",
+                    "createdAt": "2026-04-06T15:44:20.625Z"
+                },
+                {
+                    "id": "usage_9a5ab7a7",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_10885737",
+                    "createdAt": "2026-04-06T15:40:41.682Z"
+                },
+                {
+                    "id": "usage_dab0f7c1",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_1f0c539c",
+                    "createdAt": "2026-04-06T15:40:36.661Z"
+                },
+                {
+                    "id": "usage_3f0b1efe",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_964bb669",
+                    "createdAt": "2026-04-06T15:26:51.332Z"
+                },
+                {
+                    "id": "usage_03cefb49",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_b62152da",
+                    "createdAt": "2026-04-06T15:26:50.732Z"
+                },
+                {
+                    "id": "usage_1d87da35",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_2b1b9486",
+                    "createdAt": "2026-04-06T15:26:50.515Z"
+                },
+                {
+                    "id": "usage_4e31bf27",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_d11f90b3",
+                    "createdAt": "2026-04-06T15:26:50.264Z"
+                },
+                {
+                    "id": "usage_3d00ea26",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_f90ede43",
+                    "createdAt": "2026-04-06T15:26:49.686Z"
+                },
+                {
+                    "id": "usage_7c508d30",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_fb890302",
+                    "createdAt": "2026-04-06T15:26:47.558Z"
+                },
+                {
+                    "id": "usage_a3f229c3",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_23f02c5d",
+                    "createdAt": "2026-04-06T14:43:55.968Z"
+                },
+                {
+                    "id": "usage_484d9375",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_864ff4a8",
+                    "createdAt": "2026-04-06T14:25:52.595Z"
+                },
+                {
+                    "id": "usage_4acee2c7",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_6e98abcf",
+                    "createdAt": "2026-04-06T14:25:50.274Z"
+                },
+                {
+                    "id": "usage_89eaba80",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_b5ffb7dc",
+                    "createdAt": "2026-04-06T14:25:50.063Z"
+                },
+                {
+                    "id": "usage_32f383aa",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_1c02a117",
+                    "createdAt": "2026-04-06T14:25:49.241Z"
+                },
+                {
+                    "id": "usage_81c1ffcf",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_29f42639",
+                    "createdAt": "2026-04-06T14:18:00.189Z"
+                },
+                {
+                    "id": "usage_82980fa2",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_dad350cd",
+                    "createdAt": "2026-04-06T14:17:49.945Z"
+                },
+                {
+                    "id": "usage_d9fafb54",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_647ca47e",
+                    "createdAt": "2026-04-06T14:17:49.696Z"
+                },
+                {
+                    "id": "usage_34e79120",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_41a4bc4f",
+                    "createdAt": "2026-04-06T14:17:49.237Z"
+                }
+            ],
+            "alerts": [
+                {
+                    "id": "usage_single_task",
+                    "type": "single_task_limit",
+                    "threshold": 5,
+                    "currentValue": 0.05,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                },
+                {
+                    "id": "usage_daily",
+                    "type": "daily_limit",
+                    "threshold": 50,
+                    "currentValue": 3.1000000000000005,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                },
+                {
+                    "id": "usage_monthly",
+                    "type": "monthly_limit",
+                    "threshold": 500,
+                    "currentValue": 3.1000000000000005,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                }
+            ],
+            "currency": "USD"
+        },
+        "cascadeWarnings": [],
+        "directorPlan": {
+            "id": "director_plan_ccfd107b",
+            "episodeId": "episode_179babf9",
+            "theme": "游戏冒险小说_迷雾之城 default theme",
+            "visualStyle": "赛博东方 · 赛博东方",
+            "narrativeStructure": "Audio First",
+            "sceneIntent": "Carry series-level directing intent into this episode",
+            "soundDirection": "Imported series baseline",
+            "transitionStrategy": "Use smooth transitions aligned with the series camera preference",
+            "createdAt": "2026-04-06T13:56:44.945Z",
+            "updatedAt": "2026-04-06T13:56:44.945Z"
+        },
+        "shots": [],
+        "storyboards": [],
+        "finalCut": {
+            "id": "final_7ffb9181",
+            "episodeId": "episode_179babf9",
+            "resolution": "1080p",
+            "fps": 24,
+            "exportStatus": "draft",
+            "notes": "",
+            "tracks": [
+                {
+                    "id": "track_b315ccbb",
+                    "type": "video",
+                    "name": "Video",
+                    "items": []
+                },
+                {
+                    "id": "track_08e1294c",
+                    "type": "dialogue",
+                    "name": "Dialogue",
+                    "items": []
+                },
+                {
+                    "id": "track_fe1eec9b",
+                    "type": "audio",
+                    "name": "Audio",
+                    "items": []
+                }
+            ],
+            "revision": 1,
+            "updatedAt": "2026-04-06T14:02:33.786Z"
+        },
+        "tasks": [
+            {
+                "id": "task_7c2e6b67",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:31.456Z",
+                "updatedAt": "2026-04-06T15:44:31.456Z"
+            },
+            {
+                "id": "task_c943b2d1",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:21.487Z",
+                "updatedAt": "2026-04-06T15:44:21.487Z"
+            },
+            {
+                "id": "task_533bfe9b",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:20.624Z",
+                "updatedAt": "2026-04-06T15:44:20.624Z"
+            },
+            {
+                "id": "task_10885737",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:40:41.682Z",
+                "updatedAt": "2026-04-06T15:40:41.682Z"
+            },
+            {
+                "id": "task_1f0c539c",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:40:36.658Z",
+                "updatedAt": "2026-04-06T15:40:36.658Z"
+            },
+            {
+                "id": "task_964bb669",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:51.332Z",
+                "updatedAt": "2026-04-06T15:26:51.332Z"
+            },
+            {
+                "id": "task_b62152da",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:50.732Z",
+                "updatedAt": "2026-04-06T15:26:50.732Z"
+            },
+            {
+                "id": "task_2b1b9486",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:50.515Z",
+                "updatedAt": "2026-04-06T15:26:50.515Z"
+            },
+            {
+                "id": "task_d11f90b3",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:50.264Z",
+                "updatedAt": "2026-04-06T15:26:50.264Z"
+            },
+            {
+                "id": "task_f90ede43",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:49.686Z",
+                "updatedAt": "2026-04-06T15:26:49.686Z"
+            }
+        ],
+        "agentRuns": [],
+        "gate": {
+            "episodeId": "episode_179babf9",
+            "currentStage": "asset_rendering",
+            "availableActions": [
+                {
+                    "kind": "generate_script",
+                    "enabled": true,
+                    "label": "从原文生成剧本",
+                    "reason": null
+                },
+                {
+                    "kind": "extract_assets",
+                    "enabled": true,
+                    "label": "提取本集主体",
+                    "reason": null
+                },
+                {
+                    "kind": "generate_asset_images",
+                    "enabled": true,
+                    "label": "批量生成资产图片",
+                    "reason": null
+                },
+                {
+                    "kind": "generate_shots",
+                    "enabled": false,
+                    "label": "生成分镜表",
+                    "reason": "所有资产必须完成并选定主版本"
+                },
+                {
+                    "kind": "generate_shot_images",
+                    "enabled": false,
+                    "label": "生成分镜图片",
+                    "reason": "分镜表尚未生成"
+                },
+                {
+                    "kind": "open_storyboard",
+                    "enabled": false,
+                    "label": "进入故事板",
+                    "reason": "分镜图片尚未收敛"
+                },
+                {
+                    "kind": "open_final_cut",
+                    "enabled": false,
+                    "label": "进入成片",
+                    "reason": "需要先完成故事板主版本选择"
+                },
+                {
+                    "kind": "export_episode",
+                    "enabled": false,
+                    "label": "导出成片",
+                    "reason": "成片工位尚未装配完成"
+                }
+            ],
+            "blockedReasons": [
+                "仍有主体未完成图片生成或未选定主版本"
+            ],
+            "requiredInputs": [],
+            "updatedAt": "2026-04-06T15:44:31.465Z"
+        },
+        "workflow": {
+            "currentStation": "subjects",
+            "stations": [
+                {
+                    "id": "overview",
+                    "label": "概览",
+                    "description": "查看当前集状态、门禁、告警与下一步建议",
+                    "status": "completed",
+                    "progress": 40,
+                    "isCurrent": false,
+                    "isDirty": false,
+                    "canEnter": true,
+                    "blockingReasons": [],
+                    "primaryAction": null
+                },
+                {
+                    "id": "script",
+                    "label": "剧本",
+                    "description": "维护原文与章节剧本，并控制上游返工",
+                    "status": "completed",
+                    "progress": 100,
+                    "isCurrent": false,
+                    "isDirty": false,
+                    "canEnter": true,
+                    "blockingReasons": [],
+                    "primaryAction": {
+                        "kind": "generate_script",
+                        "enabled": true,
+                        "label": "从原文生成剧本",
+                        "reason": null
+                    }
+                },
+                {
+                    "id": "subjects",
+                    "label": "主体",
+                    "description": "提取与维护角色、场景、道具等主体资产",
+                    "status": "ready",
+                    "progress": 0,
+                    "isCurrent": true,
+                    "isDirty": false,
+                    "canEnter": true,
+                    "blockingReasons": [
+                        "仍有主体未完成图片生成或未选定主版本"
+                    ],
+                    "primaryAction": {
+                        "kind": "extract_assets",
+                        "enabled": true,
+                        "label": "提取本集主体",
+                        "reason": null
+                    }
+                },
+                {
+                    "id": "shots",
+                    "label": "分镜",
+                    "description": "生成并修订结构化镜头，检查资产引用",
+                    "status": "idle",
+                    "progress": 0,
+                    "isCurrent": false,
+                    "isDirty": false,
+                    "canEnter": true,
+                    "blockingReasons": [],
+                    "primaryAction": {
+                        "kind": "generate_shots",
+                        "enabled": false,
+                        "label": "生成分镜表",
+                        "reason": "所有资产必须完成并选定主版本"
+                    }
+                },
+                {
+                    "id": "storyboard",
+                    "label": "故事板",
+                    "description": "选择镜头主版本并收敛故事板输出",
+                    "status": "idle",
+                    "progress": 0,
+                    "isCurrent": false,
+                    "isDirty": false,
+                    "canEnter": false,
+                    "blockingReasons": [],
+                    "primaryAction": {
+                        "kind": "generate_shot_images",
+                        "enabled": false,
+                        "label": "生成分镜图片",
+                        "reason": "分镜表尚未生成"
+                    }
+                },
+                {
+                    "id": "final-cut",
+                    "label": "成片",
+                    "description": "装配时间线并准备导出成片",
+                    "status": "idle",
+                    "progress": 0,
+                    "isCurrent": false,
+                    "isDirty": true,
+                    "canEnter": false,
+                    "blockingReasons": [],
+                    "primaryAction": {
+                        "kind": "open_final_cut",
+                        "enabled": false,
+                        "label": "进入成片",
+                        "reason": "需要先完成故事板主版本选择"
+                    }
+                }
+            ],
+            "blockedReasons": [
+                "仍有主体未完成图片生成或未选定主版本"
+            ],
+            "requiredInputs": [],
+            "recommendedAction": {
+                "kind": "extract_assets",
+                "enabled": true,
+                "label": "提取本集主体",
+                "reason": null
+            }
+        },
+        "workflowRuns": [
+            {
+                "id": "workflow_45f2b8a7",
+                "episodeId": "episode_179babf9",
+                "stage": "script_generation",
+                "agent": "script",
+                "status": "completed",
+                "summary": "基于完整原文生成 4 个章节",
+                "taskId": "task_287db04e",
+                "createdAt": "2026-04-06T14:00:22.668Z",
+                "updatedAt": "2026-04-06T14:00:22.668Z"
+            },
+            {
+                "id": "workflow_7c267a0f",
+                "episodeId": "episode_179babf9",
+                "stage": "script_generation",
+                "agent": "script",
+                "status": "completed",
+                "summary": "基于完整原文生成 4 个章节",
+                "taskId": "task_92140c5c",
+                "createdAt": "2026-04-06T14:08:18.576Z",
+                "updatedAt": "2026-04-06T14:08:18.576Z"
+            },
+            {
+                "id": "workflow_44fb4b97",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_49e40651",
+                "createdAt": "2026-04-06T14:17:40.048Z",
+                "updatedAt": "2026-04-06T14:17:40.048Z"
+            },
+            {
+                "id": "workflow_19b1bef0",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_44dde200",
+                "createdAt": "2026-04-06T14:17:48.607Z",
+                "updatedAt": "2026-04-06T14:17:48.607Z"
+            },
+            {
+                "id": "workflow_0cd2cd7c",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_41a4bc4f",
+                "createdAt": "2026-04-06T14:17:49.237Z",
+                "updatedAt": "2026-04-06T14:17:49.237Z"
+            },
+            {
+                "id": "workflow_a9d5a68e",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_647ca47e",
+                "createdAt": "2026-04-06T14:17:49.696Z",
+                "updatedAt": "2026-04-06T14:17:49.696Z"
+            },
+            {
+                "id": "workflow_86a5eaf7",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_dad350cd",
+                "createdAt": "2026-04-06T14:17:49.945Z",
+                "updatedAt": "2026-04-06T14:17:49.945Z"
+            },
+            {
+                "id": "workflow_83a35dab",
+                "episodeId": "episode_179babf9",
+                "stage": "asset_extraction",
+                "agent": "asset",
+                "status": "completed",
+                "summary": "主体抽取完成",
+                "taskId": "task_29f42639",
+                "createdAt": "2026-04-06T14:18:00.189Z",
+                "updatedAt": "2026-04-06T14:18:00.189Z"
+            }
+        ]
+    },
+    "seriesView": {
+        "series": {
+            "id": "series_60bfa5e1",
+            "name": "游戏冒险小说_迷雾之城",
+            "description": "",
+            "status": "setting",
+            "coverUrl": "/generated/series-imported.jpg",
+            "genre": "导入项目",
+            "style": "赛博东方",
+            "worldRules": [],
+            "episodeIds": [
+                "episode_179babf9"
+            ],
+            "progress": 0,
+            "settings": {
+                "worldEra": "",
+                "worldDescription": "",
+                "coreRules": [],
+                "visualStylePreset": "赛博东方",
+                "visualStylePrompt": "",
+                "referenceImages": [],
+                "defaultShotStrategy": "",
+                "defaultDurationStrategy": "",
+                "cameraMotionPreference": "",
+                "inheritToEpisodes": true
+            },
+            "strategy": {
+                "model": "siliconflow/Qwen/Qwen3.5-9B",
+                "stylePreference": "赛博东方",
+                "aspectRatio": "16:9",
+                "creationMode": "Audio First",
+                "promptGuidance": "Imported series baseline",
+                "inheritToEpisodes": true,
+                "priorityNote": "Episode overrides > Series strategy > Global settings"
+            },
+            "importMetadata": {
+                "source": "file",
+                "importedAt": "2026-04-06T13:56:44.945Z",
+                "sourceLabel": "游戏冒险小说_迷雾之城"
+            },
+            "createdAt": "2026-04-06T13:56:44.945Z",
+            "updatedAt": "2026-04-06T13:56:44.945Z"
+        },
+        "episodes": [
+            {
+                "id": "episode_179babf9",
+                "seriesId": "series_60bfa5e1",
+                "index": 1,
+                "title": "游戏冒险小说_迷雾之城",
+                "logline": "Imported from 游戏冒险小说_迷雾之城",
+                "status": "not_started",
+                "progress": 40,
+                "stationStates": {
+                    "overview": "completed",
+                    "script": "completed",
+                    "subjects": "ready",
+                    "shots": "idle",
+                    "storyboard": "idle",
+                    "final-cut": "idle"
+                },
+                "sourceDocumentId": "source_26fed012",
+                "currentStage": "asset_rendering",
+                "chapterIds": [
+                    "chapter_d2c80115",
+                    "chapter_4bcb38be",
+                    "chapter_b20fe6f2",
+                    "chapter_ff16f5f3"
+                ],
+                "assetIds": [
+                    "asset_ba4db207",
+                    "asset_34773f98"
+                ],
+                "shotIds": [],
+                "storyboardIds": [],
+                "directorPlanId": "director_plan_ccfd107b",
+                "finalCutId": "final_7ffb9181",
+                "createdAt": "2026-04-06T13:56:44.945Z",
+                "updatedAt": "2026-04-06T15:44:31.456Z",
+                "gate": {
+                    "episodeId": "episode_179babf9",
+                    "currentStage": "asset_rendering",
+                    "availableActions": [
+                        {
+                            "kind": "generate_script",
+                            "enabled": true,
+                            "label": "从原文生成剧本",
+                            "reason": null
+                        },
+                        {
+                            "kind": "extract_assets",
+                            "enabled": true,
+                            "label": "提取本集主体",
+                            "reason": null
+                        },
+                        {
+                            "kind": "generate_asset_images",
+                            "enabled": true,
+                            "label": "批量生成资产图片",
+                            "reason": null
+                        },
+                        {
+                            "kind": "generate_shots",
+                            "enabled": false,
+                            "label": "生成分镜表",
+                            "reason": "所有资产必须完成并选定主版本"
+                        },
+                        {
+                            "kind": "generate_shot_images",
+                            "enabled": false,
+                            "label": "生成分镜图片",
+                            "reason": "分镜表尚未生成"
+                        },
+                        {
+                            "kind": "open_storyboard",
+                            "enabled": false,
+                            "label": "进入故事板",
+                            "reason": "分镜图片尚未收敛"
+                        },
+                        {
+                            "kind": "open_final_cut",
+                            "enabled": false,
+                            "label": "进入成片",
+                            "reason": "需要先完成故事板主版本选择"
+                        },
+                        {
+                            "kind": "export_episode",
+                            "enabled": false,
+                            "label": "导出成片",
+                            "reason": "成片工位尚未装配完成"
+                        }
+                    ],
+                    "blockedReasons": [
+                        "仍有主体未完成图片生成或未选定主版本"
+                    ],
+                    "requiredInputs": [],
+                    "updatedAt": "2026-04-06T15:44:31.472Z"
+                }
+            }
+        ],
+        "sharedAssets": [],
+        "promotableAssets": [
+            {
+                "id": "asset_ba4db207",
+                "seriesId": "series_60bfa5e1",
+                "episodeId": "episode_179babf9",
+                "name": "地下摊主",
+                "type": "character",
+                "description": "交易场景中的关键角色，面部褶皱明显，眼神精明而克制。",
+                "prompt": "A shrewd underground market trader, cinematic portrait, layered neon light, detailed costume.",
+                "chapterIds": [
+                    "chapter_d2c80115",
+                    "chapter_4bcb38be",
+                    "chapter_b20fe6f2",
+                    "chapter_ff16f5f3"
+                ],
+                "tags": [
+                    "agent-extracted"
+                ],
+                "isShared": false,
+                "isFaceLocked": true,
+                "voice": "",
+                "state": "ready",
+                "states": [
+                    {
+                        "id": "state_0189befe",
+                        "name": "默认态",
+                        "notes": "Agent 初始提取状态"
+                    }
+                ],
+                "selectedStateId": null,
+                "versions": [],
+                "images": [],
+                "parentAssetId": null,
+                "variantName": null,
+                "revision": 1,
+                "globalAssetId": null,
+                "syncSource": "local",
+                "appliedPresetId": null,
+                "consistencyConfig": {
+                    "referenceStrength": 0.7,
+                    "styleKeywords": [
+                        "series-default"
+                    ]
+                },
+                "createdAt": "2026-04-06T14:17:40.047Z",
+                "updatedAt": "2026-04-06T14:17:40.047Z"
+            },
+            {
+                "id": "asset_34773f98",
+                "seriesId": "series_60bfa5e1",
+                "episodeId": "episode_179babf9",
+                "name": "地下摊位",
+                "type": "scene",
+                "description": "被旧显示器和铁皮包围的狭窄摊位，暖色台灯与外部冷色霓虹形成反差。",
+                "prompt": "A cramped underground stall, layered props, warm desk lamp against blue neon haze.",
+                "chapterIds": [
+                    "chapter_d2c80115",
+                    "chapter_4bcb38be",
+                    "chapter_b20fe6f2",
+                    "chapter_ff16f5f3"
+                ],
+                "tags": [
+                    "agent-extracted"
+                ],
+                "isShared": false,
+                "isFaceLocked": false,
+                "voice": "",
+                "state": "ready",
+                "states": [
+                    {
+                        "id": "state_3e350b0c",
+                        "name": "默认态",
+                        "notes": "Agent 初始提取状态"
+                    }
+                ],
+                "selectedStateId": null,
+                "versions": [],
+                "images": [],
+                "parentAssetId": null,
+                "variantName": null,
+                "revision": 1,
+                "globalAssetId": null,
+                "syncSource": "local",
+                "appliedPresetId": null,
+                "consistencyConfig": {
+                    "referenceStrength": 0.7,
+                    "styleKeywords": [
+                        "series-default"
+                    ]
+                },
+                "createdAt": "2026-04-06T14:17:40.047Z",
+                "updatedAt": "2026-04-06T14:17:40.047Z"
+            }
+        ],
+        "globalAssets": [],
+        "availableGlobalAssets": [
+            {
+                "id": "global_asset_neon_gate",
+                "name": "霓虹夜市摊位",
+                "type": "scene",
+                "ownerId": "workspace-owner",
+                "description": "可跨系列复用的赛博夜市摊位资产。",
+                "prompt": "Cyber oriental market stall, layered neon lights, cinematic clutter.",
+                "referenceImages": [
+                    "/generated/asset_market-asset_image_307319b7.jpg"
+                ],
+                "selectedImageId": "global_asset_neon_gate_image_1",
+                "voiceId": null,
+                "faceLocked": false,
+                "consistencyConfig": {
+                    "referenceStrength": 0.72,
+                    "styleKeywords": [
+                        "cyber-oriental",
+                        "market"
+                    ]
+                },
+                "usedInSeries": [
+                    {
+                        "seriesId": "series_neon_relic",
+                        "seriesName": "Neon Relic",
+                        "linkedAssetId": "asset_market"
+                    }
+                ],
+                "tags": [
+                    "scene",
+                    "market"
+                ],
+                "revision": 1,
+                "createdAt": "2026-04-05T08:00:00.000Z",
+                "updatedAt": "2026-04-06T05:15:31.065Z"
+            }
+        ],
+        "sharedAssetUsage": [],
+        "generationPresets": [
+            {
+                "id": "preset_global_motion",
+                "name": "Global Motion Base",
+                "scope": "global",
+                "scopeId": null,
+                "type": "video",
+                "videoConfig": {
+                    "model": "siliconflow/kling-v1",
+                    "motionScale": 0.6,
+                    "fps": 24,
+                    "duration": 5
+                },
+                "usageCount": 1,
+                "createdBy": "producer",
+                "createdAt": "2026-04-05T10:00:00.000Z",
+                "updatedAt": "2026-04-06T05:00:00.000Z"
+            }
+        ],
+        "usageSummary": {
+            "totalCost": 1.5000000000000002,
+            "requestCount": 24,
+            "records": [
+                {
+                    "id": "usage_34dc474c",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_7c2e6b67",
+                    "createdAt": "2026-04-06T15:44:31.456Z"
+                },
+                {
+                    "id": "usage_28718c87",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_c943b2d1",
+                    "createdAt": "2026-04-06T15:44:21.487Z"
+                },
+                {
+                    "id": "usage_d9d580f2",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_533bfe9b",
+                    "createdAt": "2026-04-06T15:44:20.625Z"
+                },
+                {
+                    "id": "usage_9a5ab7a7",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_10885737",
+                    "createdAt": "2026-04-06T15:40:41.682Z"
+                },
+                {
+                    "id": "usage_dab0f7c1",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_1f0c539c",
+                    "createdAt": "2026-04-06T15:40:36.661Z"
+                },
+                {
+                    "id": "usage_3f0b1efe",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_964bb669",
+                    "createdAt": "2026-04-06T15:26:51.332Z"
+                },
+                {
+                    "id": "usage_03cefb49",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_b62152da",
+                    "createdAt": "2026-04-06T15:26:50.732Z"
+                },
+                {
+                    "id": "usage_1d87da35",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_2b1b9486",
+                    "createdAt": "2026-04-06T15:26:50.515Z"
+                },
+                {
+                    "id": "usage_4e31bf27",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_d11f90b3",
+                    "createdAt": "2026-04-06T15:26:50.264Z"
+                },
+                {
+                    "id": "usage_3d00ea26",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_f90ede43",
+                    "createdAt": "2026-04-06T15:26:49.686Z"
+                },
+                {
+                    "id": "usage_7c508d30",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_fb890302",
+                    "createdAt": "2026-04-06T15:26:47.558Z"
+                },
+                {
+                    "id": "usage_a3f229c3",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_23f02c5d",
+                    "createdAt": "2026-04-06T14:43:55.968Z"
+                },
+                {
+                    "id": "usage_484d9375",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_864ff4a8",
+                    "createdAt": "2026-04-06T14:25:52.595Z"
+                },
+                {
+                    "id": "usage_4acee2c7",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_6e98abcf",
+                    "createdAt": "2026-04-06T14:25:50.274Z"
+                },
+                {
+                    "id": "usage_89eaba80",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_b5ffb7dc",
+                    "createdAt": "2026-04-06T14:25:50.063Z"
+                },
+                {
+                    "id": "usage_32f383aa",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_1c02a117",
+                    "createdAt": "2026-04-06T14:25:49.241Z"
+                },
+                {
+                    "id": "usage_81c1ffcf",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_29f42639",
+                    "createdAt": "2026-04-06T14:18:00.189Z"
+                },
+                {
+                    "id": "usage_82980fa2",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_dad350cd",
+                    "createdAt": "2026-04-06T14:17:49.945Z"
+                },
+                {
+                    "id": "usage_d9fafb54",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_647ca47e",
+                    "createdAt": "2026-04-06T14:17:49.696Z"
+                },
+                {
+                    "id": "usage_34e79120",
+                    "provider": "siliconflow",
+                    "model": "siliconflow/Qwen/Qwen3.5-72B",
+                    "endpoint": "asset_extraction",
+                    "estimatedCost": 0.05,
+                    "currency": "USD",
+                    "seriesId": "series_60bfa5e1",
+                    "episodeId": "episode_179babf9",
+                    "taskType": "asset_extract",
+                    "taskId": "task_41a4bc4f",
+                    "createdAt": "2026-04-06T14:17:49.237Z"
+                }
+            ],
+            "alerts": [
+                {
+                    "id": "usage_single_task",
+                    "type": "single_task_limit",
+                    "threshold": 5,
+                    "currentValue": 0.05,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                },
+                {
+                    "id": "usage_daily",
+                    "type": "daily_limit",
+                    "threshold": 50,
+                    "currentValue": 3.1000000000000005,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                },
+                {
+                    "id": "usage_monthly",
+                    "type": "monthly_limit",
+                    "threshold": 500,
+                    "currentValue": 3.1000000000000005,
+                    "status": "normal",
+                    "notifyMethod": "block"
+                }
+            ],
+            "currency": "USD"
+        },
+        "tasks": [
+            {
+                "id": "task_7c2e6b67",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:31.456Z",
+                "updatedAt": "2026-04-06T15:44:31.456Z"
+            },
+            {
+                "id": "task_c943b2d1",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:21.487Z",
+                "updatedAt": "2026-04-06T15:44:21.487Z"
+            },
+            {
+                "id": "task_533bfe9b",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:44:20.624Z",
+                "updatedAt": "2026-04-06T15:44:20.624Z"
+            },
+            {
+                "id": "task_10885737",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:40:41.682Z",
+                "updatedAt": "2026-04-06T15:40:41.682Z"
+            },
+            {
+                "id": "task_1f0c539c",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已基于结构化返回提取 2 个主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed",
+                    "assets: 2",
+                    "analysis mode: ai"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:40:36.658Z",
+                "updatedAt": "2026-04-06T15:40:36.658Z"
+            },
+            {
+                "id": "task_964bb669",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:51.332Z",
+                "updatedAt": "2026-04-06T15:26:51.332Z"
+            },
+            {
+                "id": "task_b62152da",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:50.732Z",
+                "updatedAt": "2026-04-06T15:26:50.732Z"
+            },
+            {
+                "id": "task_2b1b9486",
+                "kind": "asset",
+                "targetType": "episode",
+                "targetId": "episode_179babf9",
+                "title": "为 游戏冒险小说_迷雾之城 提取主体",
+                "description": "AssetAgent 已根据章节抽取角色、场景和道具主体。",
+                "status": "completed",
+                "retryable": true,
+                "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+                "error": null,
+                "logs": [
+                    "asset extraction completed"
+                ],
+                "batch": null,
+                "createdAt": "2026-04-06T15:26:50.515Z",
+                "updatedAt": "2026-04-06T15:26:50.515Z"
+            }
+        ]
+    }
+}

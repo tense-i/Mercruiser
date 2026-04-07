@@ -2,9 +2,177 @@
   "version": 1,
   "meta": {
     "name": "Mercruiser Studio",
-    "updatedAt": "2026-04-06T09:32:24.313Z"
+    "updatedAt": "2026-04-07T07:08:03.735Z"
   },
   "series": [
+    {
+      "id": "series_60bfa5e1",
+      "name": "游戏冒险小说_迷雾之城",
+      "description": "",
+      "status": "setting",
+      "coverUrl": "/generated/series-imported.jpg",
+      "genre": "导入项目",
+      "style": "赛博东方",
+      "worldRules": [],
+      "episodeIds": [
+        "episode_179babf9"
+      ],
+      "progress": 0,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "赛博东方",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "siliconflow/Qwen/Qwen3.5-9B",
+        "stylePreference": "赛博东方",
+        "aspectRatio": "16:9",
+        "creationMode": "Audio First",
+        "promptGuidance": "Imported series baseline",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "file",
+        "importedAt": "2026-04-06T13:56:44.945Z",
+        "sourceLabel": "游戏冒险小说_迷雾之城"
+      },
+      "createdAt": "2026-04-06T13:56:44.945Z",
+      "updatedAt": "2026-04-06T13:56:44.945Z"
+    },
+    {
+      "id": "series_f6ae3605",
+      "name": "test2",
+      "description": "",
+      "status": "setting",
+      "coverUrl": "/generated/series-imported.jpg",
+      "genre": "导入项目",
+      "style": "赛博东方",
+      "worldRules": [],
+      "episodeIds": [
+        "episode_6b693398"
+      ],
+      "progress": 0,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "赛博东方",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "google/gemini-2.5-flash",
+        "stylePreference": "赛博东方",
+        "aspectRatio": "16:9",
+        "creationMode": "Audio First",
+        "promptGuidance": "Imported series baseline",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "file",
+        "importedAt": "2026-04-06T13:09:52.433Z",
+        "sourceLabel": "游戏冒险小说_迷雾之城"
+      },
+      "createdAt": "2026-04-06T13:09:52.433Z",
+      "updatedAt": "2026-04-06T13:09:52.433Z"
+    },
+    {
+      "id": "series_29b1f871",
+      "name": "冒险者4",
+      "description": "",
+      "status": "setting",
+      "coverUrl": "/generated/series-imported.jpg",
+      "genre": "导入项目",
+      "style": "赛博东方",
+      "worldRules": [],
+      "episodeIds": [
+        "episode_c2ff06f1"
+      ],
+      "progress": 0,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "赛博东方",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "google/gemini-2.5-flash",
+        "stylePreference": "赛博东方",
+        "aspectRatio": "16:9",
+        "creationMode": "Audio First",
+        "promptGuidance": "Imported series baseline",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "file",
+        "importedAt": "2026-04-06T12:48:32.229Z",
+        "sourceLabel": "游戏冒险小说_迷雾之城"
+      },
+      "createdAt": "2026-04-06T12:48:32.229Z",
+      "updatedAt": "2026-04-06T12:48:32.229Z"
+    },
+    {
+      "id": "series_dd06596f",
+      "name": "冒险者3",
+      "description": "",
+      "status": "setting",
+      "coverUrl": "/generated/series-imported.jpg",
+      "genre": "导入项目",
+      "style": "赛博东方",
+      "worldRules": [],
+      "episodeIds": [
+        "episode_99697595"
+      ],
+      "progress": 0,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "赛博东方",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "google/gemini-2.5-flash",
+        "stylePreference": "赛博东方",
+        "aspectRatio": "16:9",
+        "creationMode": "Audio First",
+        "promptGuidance": "Imported series baseline",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "text",
+        "importedAt": "2026-04-06T12:03:22.023Z",
+        "sourceLabel": "冒险者3"
+      },
+      "createdAt": "2026-04-06T12:03:22.023Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
     {
       "id": "series_neon_relic",
       "name": "Neon Relic",
@@ -24,6 +192,32 @@
         "episode_03"
       ],
       "progress": 62,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "",
+        "stylePreference": "",
+        "aspectRatio": "",
+        "creationMode": "",
+        "promptGuidance": "",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "manual",
+        "importedAt": null,
+        "sourceLabel": ""
+      },
       "createdAt": "2026-03-28T10:00:00.000Z",
       "updatedAt": "2026-04-06T00:00:00.000Z"
     },
@@ -41,6 +235,32 @@
       ],
       "episodeIds": [],
       "progress": 18,
+      "settings": {
+        "worldEra": "",
+        "worldDescription": "",
+        "coreRules": [],
+        "visualStylePreset": "",
+        "visualStylePrompt": "",
+        "referenceImages": [],
+        "defaultShotStrategy": "",
+        "defaultDurationStrategy": "",
+        "cameraMotionPreference": "",
+        "inheritToEpisodes": true
+      },
+      "strategy": {
+        "model": "",
+        "stylePreference": "",
+        "aspectRatio": "",
+        "creationMode": "",
+        "promptGuidance": "",
+        "inheritToEpisodes": true,
+        "priorityNote": "Episode overrides > Series strategy > Global settings"
+      },
+      "importMetadata": {
+        "source": "manual",
+        "importedAt": null,
+        "sourceLabel": ""
+      },
       "createdAt": "2026-04-02T09:00:00.000Z",
       "updatedAt": "2026-04-05T08:00:00.000Z"
     }
@@ -156,6 +376,146 @@
       "finalCutId": "final_03",
       "createdAt": "2026-04-05T09:30:00.000Z",
       "updatedAt": "2026-04-05T09:30:00.000Z"
+    },
+    {
+      "id": "episode_99697595",
+      "seriesId": "series_dd06596f",
+      "index": 1,
+      "title": "冒险者3",
+      "logline": "Imported from 冒险者3",
+      "status": "not_started",
+      "progress": 20,
+      "stationStates": {
+        "overview": "completed",
+        "script": "completed",
+        "subjects": "editing",
+        "shots": "idle",
+        "storyboard": "idle",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": "source_c120db0a",
+      "currentStage": "asset_extraction",
+      "chapterIds": [
+        "chapter_e8a89092",
+        "chapter_df9ddb04",
+        "chapter_bcaff9e4",
+        "chapter_b319a608"
+      ],
+      "assetIds": [],
+      "shotIds": [],
+      "storyboardIds": [],
+      "directorPlanId": "director_plan_4a91a3f0",
+      "finalCutId": "final_95f7aaf0",
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T15:36:48.411Z"
+    },
+    {
+      "id": "episode_c2ff06f1",
+      "seriesId": "series_29b1f871",
+      "index": 1,
+      "title": "冒险者4",
+      "logline": "Imported from 游戏冒险小说_迷雾之城",
+      "status": "not_started",
+      "progress": 20,
+      "stationStates": {
+        "overview": "completed",
+        "script": "completed",
+        "subjects": "idle",
+        "shots": "idle",
+        "storyboard": "idle",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": "source_888c7c08",
+      "currentStage": "asset_extraction",
+      "chapterIds": [
+        "chapter_4931e32c",
+        "chapter_92d8af6c",
+        "chapter_ef60d82c",
+        "chapter_f1fee5ff"
+      ],
+      "assetIds": [],
+      "shotIds": [],
+      "storyboardIds": [],
+      "directorPlanId": "director_plan_e7289158",
+      "finalCutId": "final_bfe8b671",
+      "createdAt": "2026-04-06T12:48:32.229Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "episode_6b693398",
+      "seriesId": "series_f6ae3605",
+      "index": 1,
+      "title": "游戏冒险小说_迷雾之城",
+      "logline": "Imported from 游戏冒险小说_迷雾之城",
+      "status": "not_started",
+      "progress": 0,
+      "stationStates": {
+        "overview": "completed",
+        "script": "editing",
+        "subjects": "idle",
+        "shots": "idle",
+        "storyboard": "idle",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": "source_29536cdd",
+      "currentStage": "script_generation",
+      "chapterIds": [],
+      "assetIds": [],
+      "shotIds": [],
+      "storyboardIds": [],
+      "directorPlanId": "director_plan_0fe50e50",
+      "finalCutId": "final_fb0e21ec",
+      "createdAt": "2026-04-06T13:09:52.433Z",
+      "updatedAt": "2026-04-06T14:31:14.259Z"
+    },
+    {
+      "id": "episode_179babf9",
+      "seriesId": "series_60bfa5e1",
+      "index": 1,
+      "title": "游戏冒险小说_迷雾之城",
+      "logline": "Imported from 游戏冒险小说_迷雾之城",
+      "status": "not_started",
+      "progress": 80,
+      "stationStates": {
+        "overview": "completed",
+        "script": "completed",
+        "subjects": "ready",
+        "shots": "ready",
+        "storyboard": "ready",
+        "final-cut": "idle"
+      },
+      "sourceDocumentId": "source_26fed012",
+      "currentStage": "storyboard",
+      "chapterIds": [
+        "chapter_70505b69",
+        "chapter_09898277",
+        "chapter_8f31f5fb",
+        "chapter_a83b282f"
+      ],
+      "assetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_5f6f8ae4",
+        "asset_c26f6a4f",
+        "asset_2aac28fe",
+        "asset_93fceca9"
+      ],
+      "shotIds": [
+        "shot_1ad7b114",
+        "shot_404f2bd4",
+        "shot_f9be2f38",
+        "shot_e46ad555"
+      ],
+      "storyboardIds": [
+        "story_cf690c6d",
+        "story_02dc6c9a",
+        "story_152dfe5e",
+        "story_e57b6a6f"
+      ],
+      "directorPlanId": "director_plan_ccfd107b",
+      "finalCutId": "final_7ffb9181",
+      "createdAt": "2026-04-06T13:56:44.945Z",
+      "updatedAt": "2026-04-07T07:08:03.735Z"
     }
   ],
   "sourceDocuments": [
@@ -166,6 +526,38 @@
       "content": "林岚在磁场错乱的废弃车站醒来，站台上的时钟全部停在不同刻度。她听见 relic 用更清晰的声音提醒她不要看向轨道尽头。巡检 Agent 的脚步声从回声里逼近，废旧广告屏开始闪烁她并不记得的童年画面。她必须在逃离、回望和追问真相之间做出第一次主动选择。",
       "importedAt": "2026-04-05T09:20:00.000Z",
       "revision": 1
+    },
+    {
+      "id": "source_c120db0a",
+      "episodeId": "episode_99697595",
+      "title": "冒险者3",
+      "content": "《迷雾之城》\n\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。传送光芒散去时，他已站在一座被迷雾笼罩的古城前。城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。”\n\n林澈原本只想试试新游戏，却发现退出键消失了。\n\n城中寂静得可怕，只有风吹动残破旗帜的声音。他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。”\n\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。\n\n可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。”\n\n林澈愣住了。还没来得及追问，少女便化作流光消失，只留下一张古老地图。地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。\n\n他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。风声像低语，整座城仿佛正在等待新的挑战者。\n\n林澈收起碎片，深吸一口气，朝钟楼方向走去。他知道，真正的冒险才刚刚开始。而这场游戏，或许从一开始，就不只是游戏。",
+      "importedAt": "2026-04-06T12:03:22.024Z",
+      "revision": 1
+    },
+    {
+      "id": "source_888c7c08",
+      "episodeId": "episode_c2ff06f1",
+      "title": "游戏冒险小说_迷雾之城",
+      "content": "《迷雾之城》\n\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。传送光芒散去时，他已站在一座被迷雾笼罩的古城前。城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。”\n\n林澈原本只想试试新游戏，却发现退出键消失了。\n\n城中寂静得可怕，只有风吹动残破旗帜的声音。他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。”\n\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。\n\n可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。”\n\n林澈愣住了。还没来得及追问，少女便化作流光消失，只留下一张古老地图。地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。\n\n他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。风声像低语，整座城仿佛正在等待新的挑战者。\n\n林澈收起碎片，深吸一口气，朝钟楼方向走去。他知道，真正的冒险才刚刚开始。而这场游戏，或许从一开始，就不只是游戏。",
+      "importedAt": "2026-04-06T12:48:32.229Z",
+      "revision": 1
+    },
+    {
+      "id": "source_29536cdd",
+      "episodeId": "episode_6b693398",
+      "title": "游戏冒险小说_迷雾之城",
+      "content": "《迷雾之城》\n\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。传送光芒散去时，他已站在一座被迷雾笼罩的古城前。城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。”\n\n林澈原本只想试试新游戏，却发现退出键消失了。\n\n城中寂静得可怕，只有风吹动残破旗帜的声音。他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。”\n\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。\n\n可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。”\n\n林澈愣住了。还没来得及追问，少女便化作流光消失，只留下一张古老地图。地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。\n\n他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。风声像低语，整座城仿佛正在等待新的挑战者。\n\n林澈收起碎片，深吸一口气，朝钟楼方向走去。他知道，真正的冒险才刚刚开始。而这场游戏，或许从一开始，就不只是游戏。",
+      "importedAt": "2026-04-06T13:09:52.433Z",
+      "revision": 1
+    },
+    {
+      "id": "source_26fed012",
+      "episodeId": "episode_179babf9",
+      "title": "游戏冒险小说_迷雾之城",
+      "content": "《迷雾之城》\n\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。传送光芒散去时，他已站在一座被迷雾笼罩的古城前。城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。”\n\n林澈原本只想试试新游戏，却发现退出键消失了。\n\n城中寂静得可怕，只有风吹动残破旗帜的声音。他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。”\n\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。\n\n可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。”\n\n林澈愣住了。还没来得及追问，少女便化作流光消失，只留下一张古老地图。地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。\n\n他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。风声像低语，整座城仿佛正在等待新的挑战者。\n\n林澈收起碎片，深吸一口气，朝钟楼方向走去。他知道，真正的冒险才刚刚开始。而这场游戏，或许从一开始，就不只是游戏。",
+      "importedAt": "2026-04-06T15:47:53.720Z",
+      "revision": 4
     }
   ],
   "chapters": [
@@ -243,6 +635,194 @@
       "revision": 1,
       "createdAt": "2026-04-02T10:03:00.000Z",
       "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "chapter_e8a89092",
+      "episodeId": "episode_99697595",
+      "index": 1,
+      "title": "段落 1",
+      "content": "《迷雾之城》",
+      "scene": "主场景",
+      "dialogues": [
+        {
+          "speaker": "旁白",
+          "content": "《迷雾之城》"
+        }
+      ],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 18,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "chapter_df9ddb04",
+      "episodeId": "episode_99697595",
+      "index": 2,
+      "title": "段落 2",
+      "content": "凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》",
+      "scene": "转折场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 29,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "chapter_bcaff9e4",
+      "episodeId": "episode_99697595",
+      "index": 3,
+      "title": "段落 3",
+      "content": "传送光芒散去时，他已站在一座被迷雾笼罩的古城前",
+      "scene": "主场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 23,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "chapter_b319a608",
+      "episodeId": "episode_99697595",
+      "index": 4,
+      "title": "段落 4",
+      "content": "城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归",
+      "scene": "转折场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 29,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "chapter_4931e32c",
+      "episodeId": "episode_c2ff06f1",
+      "index": 1,
+      "title": "章节 1",
+      "content": "《迷雾之城》\n凌晨两点，林澈戴上头盔，进入了新上线的全息游戏《遗迹边境》。\n传送光芒散去时，他已站在一座被迷雾笼罩的古城前。\n城门半掩，石壁上刻着一行猩红文字：“进入者，唯有通关者可归。\n”\n林澈原本只想试试新游戏，却发现退出键消失了。\n城中寂静得可怕，只有风吹动残破旗帜的声音。",
+      "scene": "主场景",
+      "dialogues": [
+        {
+          "speaker": "旁白",
+          "content": "《迷雾之城》\n凌晨两点，林澈戴上头盔，进入了新上"
+        }
+      ],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 18,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "chapter_92d8af6c",
+      "episodeId": "episode_c2ff06f1",
+      "index": 2,
+      "title": "章节 2",
+      "content": "他刚踏进广场，地面忽然裂开，一只巨大的黑甲怪物从深坑中爬出，双眼像燃烧的炭火。\n系统提示骤然响起：“守门者出现，击败它可获得第一枚核心碎片。\n”\n林澈握紧手中的初始短剑，侧身躲过怪物的重击，翻滚到石柱后方。\n他发现怪物每次挥爪后，胸口的蓝色晶核都会短暂暴露。\n连续几次闪避后，他抓住时机，一跃而起，将短剑狠狠刺入晶核。\n伴随着震耳欲聋的咆哮，怪物轰然倒下，一枚发光碎片缓缓升起。",
+      "scene": "转场场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 18,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "chapter_ef60d82c",
+      "episodeId": "episode_c2ff06f1",
+      "index": 3,
+      "title": "章节 3",
+      "content": "可就在他伸手触碰碎片时，四周迷雾忽然翻涌，空中浮现出一道模糊的人影。\n那是一个身披银甲的少女，声音冰冷却急促：“别相信系统，它在骗你。\n集齐三枚碎片，你会唤醒真正的城主。\n”\n林澈愣住了。\n还没来得及追问，少女便化作流光消失，只留下一张古老地图。\n地图上标记着钟楼、地下水道和王城祭坛，正是另外两枚碎片所在的位置。",
+      "scene": "主场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 18,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "chapter_f1fee5ff",
+      "episodeId": "episode_c2ff06f1",
+      "index": 4,
+      "title": "章节 4",
+      "content": "他抬头望向远处，钟楼顶端有一道幽蓝火焰在黑夜中摇曳。\n风声像低语，整座城仿佛正在等待新的挑战者。\n林澈收起碎片，深吸一口气，朝钟楼方向走去。\n他知道，真正的冒险才刚刚开始。\n而这场游戏，或许从一开始，就不只是游戏。",
+      "scene": "转场场景",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 18,
+      "revision": 1,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "chapter_70505b69",
+      "episodeId": "episode_179babf9",
+      "index": 1,
+      "title": "无法退出的古城",
+      "content": "凌晨两点，林澈进入“遗迹边境”全息游戏，站在迷雾笼罩的古城前。石壁刻有猩红警示语，当他发现退出键消失，四周陷入诡异寂静，意识到自己已被困在游戏之中。",
+      "scene": "古城城门",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 35,
+      "revision": 1,
+      "createdAt": "2026-04-06T17:33:49.678Z",
+      "updatedAt": "2026-04-06T17:33:49.678Z"
+    },
+    {
+      "id": "chapter_09898277",
+      "episodeId": "episode_179babf9",
+      "index": 2,
+      "title": "黑甲怪物突袭",
+      "content": "林澈踏入广场，地面突然裂开，一只黑甲怪物从中爬出。系统提示立即响起，告知他击败获得核心碎片。林澈紧握短剑，在怪物重击下寻找闪避机会。",
+      "scene": "古城广场",
+      "dialogues": [
+        {
+          "speaker": "系统",
+          "content": "守门者出现，击败它可获得第一枚核心碎片。"
+        }
+      ],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 45,
+      "revision": 1,
+      "createdAt": "2026-04-06T17:33:49.678Z",
+      "updatedAt": "2026-04-06T17:33:49.678Z"
+    },
+    {
+      "id": "chapter_8f31f5fb",
+      "episodeId": "episode_179babf9",
+      "index": 3,
+      "title": "弱点与胜利",
+      "content": "林澈利用怪物攻击间隙，发现其胸口蓝色晶核为弱点。连续三次闪避后，他跃起将短剑刺入晶核，怪物倒下，一枚发光碎片缓缓升起在空气中。",
+      "scene": "战斗空地",
+      "dialogues": [],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 40,
+      "revision": 1,
+      "createdAt": "2026-04-06T17:33:49.678Z",
+      "updatedAt": "2026-04-06T17:33:49.678Z"
+    },
+    {
+      "id": "chapter_a83b282f",
+      "episodeId": "episode_179babf9",
+      "index": 4,
+      "title": "神秘指引与启程",
+      "content": "触碰碎片时迷雾翻涌，银甲少女现身警示林澈，称系统欺骗他并告知唤醒城主的条件。少女化作流光留下地图，林澈看到新目标后深吸一口气，决定冒险走向钟楼。",
+      "scene": "迷雾深处",
+      "dialogues": [
+        {
+          "speaker": "银甲少女",
+          "content": "别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。"
+        }
+      ],
+      "audioStatus": "ready",
+      "estimatedDurationSeconds": 50,
+      "revision": 1,
+      "createdAt": "2026-04-06T17:33:49.678Z",
+      "updatedAt": "2026-04-06T17:33:49.678Z"
     }
   ],
   "assets": [
@@ -489,6 +1069,366 @@
       },
       "createdAt": "2026-04-03T11:00:00.000Z",
       "updatedAt": "2026-04-06T04:39:45.014Z"
+    },
+    {
+      "id": "asset_b52f743e",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "林澈",
+      "type": "character",
+      "description": "本作主角，被困作品中的冒险者，全剧核心行动角色，负责战斗与探索视觉表现。",
+      "prompt": "Lin Che, young male adventurer, detailed facial expression, wearing rugged fantasy gear, holding a short sword, cinematic lighting, foggy game world atmosphere, 8k render, Unreal Engine 5 style",
+      "chapterIds": [
+        "chapter_70505b69",
+        "chapter_09898277",
+        "chapter_8f31f5fb",
+        "chapter_a83b282f"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": true,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_c6bd64af",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_7afdec0c",
+          "label": "AI生成 2026-04-07T05:37:50.601Z",
+          "imageUrl": "/api/media?path=assets/asset_b52f743e/img_7afdec0c.jpg",
+          "createdAt": "2026-04-07T05:37:50.601Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_7afdec0c",
+          "label": "AI生成 2026-04-07T05:37:50.601Z",
+          "imageUrl": "/api/media?path=assets/asset_b52f743e/img_7afdec0c.jpg",
+          "createdAt": "2026-04-07T05:37:50.601Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:37:50.601Z"
+    },
+    {
+      "id": "asset_2023d69d",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "守门者",
+      "type": "character",
+      "description": "Ch2 Ch3 关键敌对怪物，黑甲重击与战斗弱点展示对象，视觉压迫感的来源。",
+      "prompt": "Black armored monster, heavy stone armor, glowing red eyes, emerging from cracked ground, aggressive stance, dark fantasy style, volumetric lighting, high detail",
+      "chapterIds": [
+        "chapter_09898277",
+        "chapter_8f31f5fb"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": true,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_1dee9fc5",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_752e75a5",
+          "label": "AI生成 2026-04-07T05:37:54.519Z",
+          "imageUrl": "/api/media?path=assets/asset_2023d69d/img_752e75a5.jpg",
+          "createdAt": "2026-04-07T05:37:54.519Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_752e75a5",
+          "label": "AI生成 2026-04-07T05:37:54.519Z",
+          "imageUrl": "/api/media?path=assets/asset_2023d69d/img_752e75a5.jpg",
+          "createdAt": "2026-04-07T05:37:54.519Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:37:54.519Z"
+    },
+    {
+      "id": "asset_5f6f8ae4",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "银甲少女",
+      "type": "character",
+      "description": "Ch4 神秘引导 NPC，揭示系统真相与指引，化作光流视觉特效，剧情转折点关键角色。",
+      "prompt": "Silver armored girl, ethereal appearance, floating in thick fog, glowing magical aura, mysterious expression, flowing robes, fantasy RPG art style, sharp focus",
+      "chapterIds": [
+        "chapter_a83b282f"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": true,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_a00e2924",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_bf318408",
+          "label": "AI生成 2026-04-07T05:37:58.473Z",
+          "imageUrl": "/api/media?path=assets/asset_5f6f8ae4/img_bf318408.jpg",
+          "createdAt": "2026-04-07T05:37:58.473Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_bf318408",
+          "label": "AI生成 2026-04-07T05:37:58.473Z",
+          "imageUrl": "/api/media?path=assets/asset_5f6f8ae4/img_bf318408.jpg",
+          "createdAt": "2026-04-07T05:37:58.473Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:37:58.473Z"
+    },
+    {
+      "id": "asset_c26f6a4f",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "古城城门",
+      "type": "scene",
+      "description": "Ch1 开篇起始场景，石壁苍茫，红色警示语视觉焦点，象征无法退出的困境。",
+      "prompt": "Ancient stone city gate covered in thick fog, scarlet warning text carved on wall, gloomy atmosphere, dim blue holographic light, mysterious architecture, wide angle view, cinematic composition",
+      "chapterIds": [
+        "chapter_70505b69"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": false,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_d8508cab",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_b48acd88",
+          "label": "AI生成 2026-04-07T05:38:03.804Z",
+          "imageUrl": "/api/media?path=assets/asset_c26f6a4f/img_b48acd88.jpg",
+          "createdAt": "2026-04-07T05:38:03.804Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_b48acd88",
+          "label": "AI生成 2026-04-07T05:38:03.804Z",
+          "imageUrl": "/api/media?path=assets/asset_c26f6a4f/img_b48acd88.jpg",
+          "createdAt": "2026-04-07T05:38:03.804Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:38:03.804Z"
+    },
+    {
+      "id": "asset_2aac28fe",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "古城广场",
+      "type": "scene",
+      "description": "Ch2 战斗发生地，地面裂开处，怪物诞生背景，支撑战斗分镜的空间环境。",
+      "prompt": "Ancient city square, mysterious stone paving, cracked ground splitting open, gloomy foggy environment, ominous mood, game adventure setting, medium shot, realistic textures",
+      "chapterIds": [
+        "chapter_09898277"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": false,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_8c49bf3d",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_1be070a4",
+          "label": "AI生成 2026-04-07T05:38:08.168Z",
+          "imageUrl": "/api/media?path=assets/asset_2aac28fe/img_1be070a4.jpg",
+          "createdAt": "2026-04-07T05:38:08.168Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_1be070a4",
+          "label": "AI生成 2026-04-07T05:38:08.168Z",
+          "imageUrl": "/api/media?path=assets/asset_2aac28fe/img_1be070a4.jpg",
+          "createdAt": "2026-04-07T05:38:08.168Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:38:08.168Z"
+    },
+    {
+      "id": "asset_93fceca9",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "name": "核心碎片",
+      "type": "prop",
+      "description": "Ch2 Ch3 Ch4 核心交互物品，掉落并指引玩家，发光特效视觉锚点，叙事进度象征。",
+      "prompt": "Glowing game core fragment, sharp geometric shape, neon blue light, floating levitation effect, magical item design, bokeh background, unreal engine 5 render quality",
+      "chapterIds": [
+        "chapter_09898277",
+        "chapter_8f31f5fb",
+        "chapter_a83b282f"
+      ],
+      "tags": [
+        "agent-extracted"
+      ],
+      "isShared": false,
+      "isFaceLocked": false,
+      "voice": "",
+      "state": "completed",
+      "states": [
+        {
+          "id": "state_975d750b",
+          "name": "默认态",
+          "notes": "Agent 初始提取状态"
+        }
+      ],
+      "selectedStateId": null,
+      "versions": [
+        {
+          "id": "img_0d0cf2d9",
+          "label": "AI生成 2026-04-07T05:38:12.602Z",
+          "imageUrl": "/api/media?path=assets/asset_93fceca9/img_0d0cf2d9.jpg",
+          "createdAt": "2026-04-07T05:38:12.602Z",
+          "isSelected": true
+        }
+      ],
+      "images": [
+        {
+          "id": "img_0d0cf2d9",
+          "label": "AI生成 2026-04-07T05:38:12.602Z",
+          "imageUrl": "/api/media?path=assets/asset_93fceca9/img_0d0cf2d9.jpg",
+          "createdAt": "2026-04-07T05:38:12.602Z",
+          "isSelected": true
+        }
+      ],
+      "parentAssetId": null,
+      "variantName": null,
+      "revision": 2,
+      "globalAssetId": null,
+      "syncSource": "local",
+      "appliedPresetId": null,
+      "consistencyConfig": {
+        "referenceStrength": 0.7,
+        "styleKeywords": [
+          "series-default"
+        ]
+      },
+      "createdAt": "2026-04-07T04:31:58.032Z",
+      "updatedAt": "2026-04-07T05:38:12.602Z"
     }
   ],
   "globalAssets": [
@@ -568,18 +1508,561 @@
   ],
   "apiUsageRecords": [
     {
-      "id": "usage_1f47a276",
+      "id": "usage_c57b8b29",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
       "currency": "USD",
-      "createdAt": "2026-04-06T09:32:24.313Z",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_0b0baab5",
+      "createdAt": "2026-04-07T07:06:39.208Z"
+    },
+    {
+      "id": "usage_1caf768d",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 4,
+      "estimatedCost": 0.8,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_eb7a5725",
+      "createdAt": "2026-04-07T07:04:09.440Z"
+    },
+    {
+      "id": "usage_629c4490",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_29e8026e",
+      "createdAt": "2026-04-07T06:55:19.281Z"
+    },
+    {
+      "id": "usage_2e85e249",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_2832dd50",
+      "createdAt": "2026-04-07T06:40:54.985Z"
+    },
+    {
+      "id": "usage_93206d44",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_3be7ce10",
+      "createdAt": "2026-04-07T06:37:06.787Z"
+    },
+    {
+      "id": "usage_93675356",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_4a6345a9",
+      "createdAt": "2026-04-07T06:36:05.229Z"
+    },
+    {
+      "id": "usage_5879126c",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_50463de7",
+      "createdAt": "2026-04-07T06:31:17.412Z"
+    },
+    {
+      "id": "usage_9fd5bfbe",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_d7b6f8a5",
+      "createdAt": "2026-04-07T06:24:56.169Z"
+    },
+    {
+      "id": "usage_6d8c1199",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 4,
+      "estimatedCost": 0.8,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_cb505b61",
+      "createdAt": "2026-04-07T06:24:44.477Z"
+    },
+    {
+      "id": "usage_0ba90060",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 1,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_d335b0c4",
+      "createdAt": "2026-04-07T06:15:52.776Z"
+    },
+    {
+      "id": "usage_b6ccbf33",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_image_generation",
+      "imageCount": 4,
+      "estimatedCost": 0.8,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_generate",
+      "taskId": "task_3a387f32",
+      "createdAt": "2026-04-07T06:04:05.652Z"
+    },
+    {
+      "id": "usage_037cc84b",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "shot_generation",
+      "inputTokens": 275,
+      "outputTokens": 640,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "shot_generate",
+      "taskId": "task_947d75f6",
+      "createdAt": "2026-04-07T04:56:32.323Z"
+    },
+    {
+      "id": "usage_fe2a0ae4",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-9B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_1d9974d3",
+      "createdAt": "2026-04-07T04:31:58.033Z"
+    },
+    {
+      "id": "usage_82c24063",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-9B",
+      "endpoint": "script_generation",
+      "inputTokens": 587,
+      "outputTokens": 480,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "script",
+      "taskId": "task_216453da",
+      "createdAt": "2026-04-06T17:33:49.681Z"
+    },
+    {
+      "id": "usage_34dc474c",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_7c2e6b67",
+      "createdAt": "2026-04-06T15:44:31.456Z"
+    },
+    {
+      "id": "usage_28718c87",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_c943b2d1",
+      "createdAt": "2026-04-06T15:44:21.487Z"
+    },
+    {
+      "id": "usage_d9d580f2",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_533bfe9b",
+      "createdAt": "2026-04-06T15:44:20.625Z"
+    },
+    {
+      "id": "usage_9a5ab7a7",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_10885737",
+      "createdAt": "2026-04-06T15:40:41.682Z"
+    },
+    {
+      "id": "usage_dab0f7c1",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_1f0c539c",
+      "createdAt": "2026-04-06T15:40:36.661Z"
+    },
+    {
+      "id": "usage_3f0b1efe",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_964bb669",
+      "createdAt": "2026-04-06T15:26:51.332Z"
+    },
+    {
+      "id": "usage_03cefb49",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_b62152da",
+      "createdAt": "2026-04-06T15:26:50.732Z"
+    },
+    {
+      "id": "usage_1d87da35",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_2b1b9486",
+      "createdAt": "2026-04-06T15:26:50.515Z"
+    },
+    {
+      "id": "usage_4e31bf27",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_d11f90b3",
+      "createdAt": "2026-04-06T15:26:50.264Z"
+    },
+    {
+      "id": "usage_3d00ea26",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_f90ede43",
+      "createdAt": "2026-04-06T15:26:49.686Z"
+    },
+    {
+      "id": "usage_7c508d30",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_fb890302",
+      "createdAt": "2026-04-06T15:26:47.558Z"
+    },
+    {
+      "id": "usage_a3f229c3",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_23f02c5d",
+      "createdAt": "2026-04-06T14:43:55.968Z"
+    },
+    {
+      "id": "usage_484d9375",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_864ff4a8",
+      "createdAt": "2026-04-06T14:25:52.595Z"
+    },
+    {
+      "id": "usage_4acee2c7",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_6e98abcf",
+      "createdAt": "2026-04-06T14:25:50.274Z"
+    },
+    {
+      "id": "usage_89eaba80",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_b5ffb7dc",
+      "createdAt": "2026-04-06T14:25:50.063Z"
+    },
+    {
+      "id": "usage_32f383aa",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_1c02a117",
+      "createdAt": "2026-04-06T14:25:49.241Z"
+    },
+    {
+      "id": "usage_81c1ffcf",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_29f42639",
+      "createdAt": "2026-04-06T14:18:00.189Z"
+    },
+    {
+      "id": "usage_82980fa2",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_dad350cd",
+      "createdAt": "2026-04-06T14:17:49.945Z"
+    },
+    {
+      "id": "usage_d9fafb54",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_647ca47e",
+      "createdAt": "2026-04-06T14:17:49.696Z"
+    },
+    {
+      "id": "usage_34e79120",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_41a4bc4f",
+      "createdAt": "2026-04-06T14:17:49.237Z"
+    },
+    {
+      "id": "usage_3718af4a",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_44dde200",
+      "createdAt": "2026-04-06T14:17:48.607Z"
+    },
+    {
+      "id": "usage_f0310666",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
+      "endpoint": "asset_extraction",
+      "estimatedCost": 0.05,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "asset_extract",
+      "taskId": "task_49e40651",
+      "createdAt": "2026-04-06T14:17:40.048Z"
+    },
+    {
+      "id": "usage_fed4979f",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-9B",
+      "endpoint": "script_generation",
+      "inputTokens": 587,
+      "outputTokens": 480,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "script",
+      "taskId": "task_92140c5c",
+      "createdAt": "2026-04-06T14:08:18.576Z"
+    },
+    {
+      "id": "usage_28f2e600",
+      "provider": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-9B",
+      "endpoint": "script_generation",
+      "inputTokens": 587,
+      "outputTokens": 480,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_60bfa5e1",
+      "episodeId": "episode_179babf9",
+      "taskType": "script",
+      "taskId": "task_287db04e",
+      "createdAt": "2026-04-06T14:00:22.668Z"
+    },
+    {
+      "id": "usage_9e2bc8cb",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "script_generation",
+      "inputTokens": 587,
+      "outputTokens": 480,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_29b1f871",
+      "episodeId": "episode_c2ff06f1",
+      "taskType": "script",
+      "taskId": "task_538a3e5d",
+      "createdAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "usage_f0a9735c",
+      "provider": "mock",
+      "model": "google/gemini-2.5-flash",
+      "endpoint": "script_generation",
+      "inputTokens": 587,
+      "outputTokens": 480,
+      "estimatedCost": 0.2,
+      "currency": "USD",
+      "seriesId": "series_dd06596f",
+      "episodeId": "episode_99697595",
+      "taskType": "script",
+      "taskId": "task_25d0295d",
+      "createdAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "usage_1f47a276",
       "provider": "mock",
       "model": "google/gemini-2.5-flash",
       "endpoint": "shot_image_generation",
       "imageCount": 2,
       "estimatedCost": 0.4,
+      "currency": "USD",
       "seriesId": "series_neon_relic",
       "episodeId": "episode_01",
       "taskType": "asset_generate",
-      "taskId": "task_dd7b7278"
+      "taskId": "task_dd7b7278",
+      "createdAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "usage_8f627a4a",
@@ -631,7 +2114,7 @@
       "id": "usage_single_task",
       "type": "single_task_limit",
       "threshold": 5,
-      "currentValue": 0.4,
+      "currentValue": 0.2,
       "status": "normal",
       "notifyMethod": "block"
     },
@@ -639,7 +2122,7 @@
       "id": "usage_daily",
       "type": "daily_limit",
       "threshold": 50,
-      "currentValue": 1.2,
+      "currentValue": 4.45,
       "status": "normal",
       "notifyMethod": "block"
     },
@@ -647,12 +2130,61 @@
       "id": "usage_monthly",
       "type": "monthly_limit",
       "threshold": 500,
-      "currentValue": 1.2,
+      "currentValue": 7.549999999999997,
       "status": "normal",
       "notifyMethod": "block"
     }
   ],
-  "directorPlans": [],
+  "directorPlans": [
+    {
+      "id": "director_plan_4a91a3f0",
+      "episodeId": "episode_99697595",
+      "theme": "冒险者3 default theme",
+      "visualStyle": "赛博东方 · 赛博东方",
+      "narrativeStructure": "Audio First",
+      "sceneIntent": "Carry series-level directing intent into this episode",
+      "soundDirection": "Imported series baseline",
+      "transitionStrategy": "Use smooth transitions aligned with the series camera preference",
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "director_plan_e7289158",
+      "episodeId": "episode_c2ff06f1",
+      "theme": "冒险者4 default theme",
+      "visualStyle": "赛博东方 · 赛博东方",
+      "narrativeStructure": "Audio First",
+      "sceneIntent": "Carry series-level directing intent into this episode",
+      "soundDirection": "Imported series baseline",
+      "transitionStrategy": "Use smooth transitions aligned with the series camera preference",
+      "createdAt": "2026-04-06T12:48:32.229Z",
+      "updatedAt": "2026-04-06T12:48:32.229Z"
+    },
+    {
+      "id": "director_plan_0fe50e50",
+      "episodeId": "episode_6b693398",
+      "theme": "test2 default theme",
+      "visualStyle": "赛博东方 · 赛博东方",
+      "narrativeStructure": "Audio First",
+      "sceneIntent": "Carry series-level directing intent into this episode",
+      "soundDirection": "Imported series baseline",
+      "transitionStrategy": "Use smooth transitions aligned with the series camera preference",
+      "createdAt": "2026-04-06T13:09:52.433Z",
+      "updatedAt": "2026-04-06T13:09:52.433Z"
+    },
+    {
+      "id": "director_plan_ccfd107b",
+      "episodeId": "episode_179babf9",
+      "theme": "陷入虚拟现实的心理惊悚与战斗探索",
+      "visualStyle": "高对比度超现实主义，暗黑奇幻风格，强调冰冷石质纹理与诡异红光/蓝光特效的冲突",
+      "narrativeStructure": "环境压抑引入 - 突发战斗转折 - 揭示弱点反击 - 神秘指引升华",
+      "sceneIntent": "Carry series-level directing intent into this episode",
+      "soundDirection": "从诡异的低频寂静突变为金属撞击与急促鼓点，结尾转为空灵合成的电子音",
+      "transitionStrategy": "通过环境色调突变（红->黑->蓝->白）实现章节间的情绪转换",
+      "createdAt": "2026-04-06T13:56:44.945Z",
+      "updatedAt": "2026-04-07T04:56:32.317Z"
+    }
+  ],
   "shots": [
     {
       "id": "shot_01",
@@ -1043,6 +2575,590 @@
       ],
       "createdAt": "2026-04-03T12:10:00.000Z",
       "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "shot_1ad7b114",
+      "episodeId": "episode_179babf9",
+      "chapterId": "chapter_70505b69",
+      "index": 1,
+      "title": "猩红警示与消失的出口",
+      "description": "林澈站在迷雾沉沉的古城城门下，视线聚焦于石壁上无法抹去的猩红警示语，四周出口逐渐模糊直至消失。",
+      "scene": "古城城门",
+      "associatedAssetIds": [
+        "asset_b52f743e",
+        "asset_c26f6a4f"
+      ],
+      "associatedAssetNames": [
+        "林澈",
+        "古城城门"
+      ],
+      "duration": 25,
+      "shotSize": "中景",
+      "cameraMove": "缓慢推镜",
+      "action": "林澈环顾四周，后退试探，发现石壁上的红色文字闪烁着不祥的光芒，四周迷雾开始封锁退路。",
+      "emotion": "困惑、恐慌",
+      "sound": "沉重的风声，远处低频的电子蜂鸣声，心跳声放大。",
+      "composition": "低位仰拍，利用高耸的石壁压迫主角，红色警示语作为视觉重心置于画面中心。",
+      "lighting": "冷蓝环境光与石壁上诡异的暖红光形成强烈冷暖对比，强调孤立感。",
+      "cameraMotion": "镜头从人物面部缓慢后拉，展现其被困于巨大石壁之间的渺小。",
+      "prompt": "A confused Asian male character named Lin Che standing in front of ancient stone city gates shrouded in thick fog, close-up on mysterious crimson warning text glowing on the rough stone wall, scale Context no back button or door visible, eerie atmosphere, cinematic lighting, cold blue ambient light vs warm red warning glow, hyper-realistic, 8k resolution, obsidian texture",
+      "videoDesc": "镜头缓缓靠近石壁上的红色警示语，随后拉远，展示林澈在迷雾中不知所措的背影，身后道路被雾气吞噬。",
+      "dialogue": "",
+      "sfx": "沉重的风声，远处低频的电子蜂鸣声，心跳声放大。",
+      "durationSeconds": 25,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_c26f6a4f"
+      ],
+      "takes": [
+        {
+          "id": "take_img_9feca5af",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:03:52.714Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_9feca5af.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_8722a2ae",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:24:31.662Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_8722a2ae.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_b39bd97c",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:24:56.168Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_b39bd97c.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        },
+        {
+          "id": "take_img_5bf14287",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:55:19.278Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_5bf14287.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_371d1da8",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T07:03:58.019Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_371d1da8.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_acd92177",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T07:06:39.207Z",
+          "url": "/api/media?path=shots/shot_1ad7b114/img_acd92177.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        }
+      ],
+      "images": [
+        {
+          "id": "img_9feca5af",
+          "label": "AI生成 2026-04-07T06:03:52.714Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_9feca5af.jpg",
+          "createdAt": "2026-04-07T06:03:52.714Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_8722a2ae",
+          "label": "AI生成 2026-04-07T06:24:31.662Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_8722a2ae.jpg",
+          "createdAt": "2026-04-07T06:24:31.662Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_b39bd97c",
+          "label": "AI生成 2026-04-07T06:24:56.168Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_b39bd97c.jpg",
+          "createdAt": "2026-04-07T06:24:56.168Z",
+          "isSelected": true
+        },
+        {
+          "id": "img_5bf14287",
+          "label": "AI生成 2026-04-07T06:55:19.278Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_5bf14287.jpg",
+          "createdAt": "2026-04-07T06:55:19.278Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_371d1da8",
+          "label": "AI生成 2026-04-07T07:03:58.019Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_371d1da8.jpg",
+          "createdAt": "2026-04-07T07:03:58.019Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_acd92177",
+          "label": "AI生成 2026-04-07T07:06:39.207Z",
+          "imageUrl": "/api/media?path=shots/shot_1ad7b114/img_acd92177.jpg",
+          "createdAt": "2026-04-07T07:06:39.207Z",
+          "isSelected": false
+        }
+      ],
+      "state": "completed",
+      "track": "古城城门",
+      "trackId": "track_古城城门",
+      "revision": 29,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_b52f743e",
+          "assetName": "林澈",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_c26f6a4f",
+          "assetName": "古城城门",
+          "revision": 1,
+          "selectedImageId": null
+        }
+      ],
+      "assetRefStatus": "stale",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_1ad7b114",
+        "audioFile": null,
+        "duration": 25000,
+        "transcript": "",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "mm_f602b09d",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "凌晨两点，林澈进入“遗迹边境”全息游戏，站在迷雾笼罩的古城前。石壁刻有猩红警示语"
+        }
+      ],
+      "createdAt": "2026-04-07T04:56:32.321Z",
+      "updatedAt": "2026-04-07T07:08:03.735Z"
+    },
+    {
+      "id": "shot_404f2bd4",
+      "episodeId": "episode_179babf9",
+      "chapterId": "chapter_09898277",
+      "index": 2,
+      "title": "大地裂开与黑甲怪物降临",
+      "description": "林澈踏入广场方形地面，地面剧烈震动并裂开，一只身披厚重黑甲的怪物从中爬出，系统提示音突兀响起。",
+      "scene": "古城广场",
+      "associatedAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_2aac28fe"
+      ],
+      "associatedAssetNames": [
+        "林澈",
+        "守门者",
+        "古城广场"
+      ],
+      "duration": 35,
+      "shotSize": "全景",
+      "cameraMove": "剧烈晃动",
+      "action": "地面崩裂，一只重型的黑甲怪物（守门者）四肢着地从裂缝中挣扎爬出，地面震颤，系统文字悬空浮现。",
+      "emotion": "紧张、警惕",
+      "sound": "大地崩裂的轰鸣声，沉重的金属摩擦声，尖锐的系统警报音。",
+      "composition": "低角度广角镜头，强调地面裂缝的纵深感与怪物的庞大压迫力，主角位于画面边缘准备迎战。",
+      "lighting": "广场昏暗，只有裂缝中透出诡异白光，系统文字发出刺眼的界面白光。",
+      "cameraMotion": "模拟地震的手持摄影机剧烈晃动，随后急速下摇对准怪物爬出的地面裂缝。",
+      "prompt": "Wide angle low angle shot of an ancient city square ground cracking open violently, a towering armored monster named Gatekeeper emerging from the fissure, wearing heavy black plate armor, dust particles flying, empty game interface text floating in air saying 'Defeat the Gatekeeper', dramatic chiaroscuro lighting, dark atmosphere, cinematic composition, 8k resolution, unreal engine 5 render",
+      "videoDesc": "镜头跟随地面裂缝张开，黑甲怪物猛然爬出地面，尘土飞扬，林澈握紧剑柄后退。",
+      "dialogue": "系统：守门者出现，击败它可获得第一枚核心碎片。",
+      "sfx": "大地崩裂的轰鸣声，沉重的金属摩擦声，尖锐的系统警报音。",
+      "durationSeconds": 35,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_2aac28fe"
+      ],
+      "takes": [
+        {
+          "id": "take_img_ce2fc4e1",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:03:56.618Z",
+          "url": "/api/media?path=shots/shot_404f2bd4/img_ce2fc4e1.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        },
+        {
+          "id": "take_img_0d41ab85",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:24:35.866Z",
+          "url": "/api/media?path=shots/shot_404f2bd4/img_0d41ab85.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_9230e314",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T07:04:01.760Z",
+          "url": "/api/media?path=shots/shot_404f2bd4/img_9230e314.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        }
+      ],
+      "images": [
+        {
+          "id": "img_ce2fc4e1",
+          "label": "AI生成 2026-04-07T06:03:56.618Z",
+          "imageUrl": "/api/media?path=shots/shot_404f2bd4/img_ce2fc4e1.jpg",
+          "createdAt": "2026-04-07T06:03:56.618Z",
+          "isSelected": true
+        },
+        {
+          "id": "img_0d41ab85",
+          "label": "AI生成 2026-04-07T06:24:35.866Z",
+          "imageUrl": "/api/media?path=shots/shot_404f2bd4/img_0d41ab85.jpg",
+          "createdAt": "2026-04-07T06:24:35.866Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_9230e314",
+          "label": "AI生成 2026-04-07T07:04:01.760Z",
+          "imageUrl": "/api/media?path=shots/shot_404f2bd4/img_9230e314.jpg",
+          "createdAt": "2026-04-07T07:04:01.760Z",
+          "isSelected": false
+        }
+      ],
+      "state": "completed",
+      "track": "地下通道",
+      "trackId": "track_地下通道",
+      "revision": 4,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_b52f743e",
+          "assetName": "林澈",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_2023d69d",
+          "assetName": "守门者",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_2aac28fe",
+          "assetName": "古城广场",
+          "revision": 1,
+          "selectedImageId": null
+        }
+      ],
+      "assetRefStatus": "stale",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_404f2bd4",
+        "audioFile": null,
+        "duration": 35000,
+        "transcript": "守门者出现，击败它可获得第一枚核心碎片。",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "mm_ef79d435",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "林澈踏入广场，地面突然裂开，一只黑甲怪物从中爬出。系统提示立即响起，告知他击败获"
+        }
+      ],
+      "createdAt": "2026-04-07T04:56:32.321Z",
+      "updatedAt": "2026-04-07T07:04:01.760Z"
+    },
+    {
+      "id": "shot_f9be2f38",
+      "episodeId": "episode_179babf9",
+      "chapterId": "chapter_8f31f5fb",
+      "index": 3,
+      "title": "弱点穿透与碎片升起",
+      "description": "战斗中特写怪物胸口闪烁的蓝色晶核，林澈利用间隙跃起，将短剑狠狠刺入晶核，怪物崩溃，碎片光芒炸裂升起。",
+      "scene": "战斗空地",
+      "associatedAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_93fceca9"
+      ],
+      "associatedAssetNames": [
+        "林澈",
+        "守门者",
+        "核心碎片"
+      ],
+      "duration": 30,
+      "shotSize": "特写",
+      "cameraMove": "极速跟随",
+      "action": "林澈闪避一次重击，瞬间跃起，短剑精准刺入怪物胸口发光的蓝色晶核，怪物僵直倒下，地面升起一枚旋转发光的金色碎片。",
+      "emotion": "果断、胜利",
+      "sound": "清脆的金属穿刺声，能量爆炸的嘶嘶声，碎片落地的重音。",
+      "composition": "极致特写构图，聚焦短剑刺入晶核的瞬间，背景虚化，光线聚焦在蓝色与金色的能量交互上。",
+      "lighting": "动态打击光，蓝色弱光（怪物）瞬间被刺剑的金色强光取代，照亮林澈的胜利表情。",
+      "cameraMotion": "镜头从怪物面部快速拉远至林澈跃起动作，最后聚焦在升起的碎片上进行微距跟踪。",
+      "prompt": "Extreme close-up of a glowing blue crystal core embedded in a monster's chest, a steel sword piercing through it, sparks of blue and gold energy exploding, the Gatekeeper monster collapsing, a glowing golden core fragment rising from the ground, dynamic action shot, slow motion impact, volumetric lighting, dynamic angle, hyper-detailed textures, 8k resolution",
+      "videoDesc": "慢动作展示林澈将剑刺入怪物胸口蓝色晶核的瞬间，随后镜头跟随蓝色能量爆发并化作一枚金色碎片升起。",
+      "dialogue": "",
+      "sfx": "清脆的金属穿刺声，能量爆炸的嘶嘶声，碎片落地的重音。",
+      "durationSeconds": 30,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_93fceca9"
+      ],
+      "takes": [
+        {
+          "id": "take_img_99fd013a",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:04:00.458Z",
+          "url": "/api/media?path=shots/shot_f9be2f38/img_99fd013a.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        },
+        {
+          "id": "take_img_b39f000a",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:24:40.711Z",
+          "url": "/api/media?path=shots/shot_f9be2f38/img_b39f000a.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_2eb69d84",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T07:04:05.436Z",
+          "url": "/api/media?path=shots/shot_f9be2f38/img_2eb69d84.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        }
+      ],
+      "images": [
+        {
+          "id": "img_99fd013a",
+          "label": "AI生成 2026-04-07T06:04:00.458Z",
+          "imageUrl": "/api/media?path=shots/shot_f9be2f38/img_99fd013a.jpg",
+          "createdAt": "2026-04-07T06:04:00.458Z",
+          "isSelected": true
+        },
+        {
+          "id": "img_b39f000a",
+          "label": "AI生成 2026-04-07T06:24:40.711Z",
+          "imageUrl": "/api/media?path=shots/shot_f9be2f38/img_b39f000a.jpg",
+          "createdAt": "2026-04-07T06:24:40.711Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_2eb69d84",
+          "label": "AI生成 2026-04-07T07:04:05.436Z",
+          "imageUrl": "/api/media?path=shots/shot_f9be2f38/img_2eb69d84.jpg",
+          "createdAt": "2026-04-07T07:04:05.436Z",
+          "isSelected": false
+        }
+      ],
+      "state": "completed",
+      "track": "战斗空地",
+      "trackId": "track_战斗空地",
+      "revision": 4,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_b52f743e",
+          "assetName": "林澈",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_2023d69d",
+          "assetName": "守门者",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_93fceca9",
+          "assetName": "核心碎片",
+          "revision": 1,
+          "selectedImageId": null
+        }
+      ],
+      "assetRefStatus": "stale",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_f9be2f38",
+        "audioFile": null,
+        "duration": 30000,
+        "transcript": "",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "mm_eb3d958f",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "林澈利用怪物攻击间隙，发现其胸口蓝色晶核为弱点。连续三次闪避后，他跃起将短剑刺入"
+        }
+      ],
+      "createdAt": "2026-04-07T04:56:32.321Z",
+      "updatedAt": "2026-04-07T07:04:05.437Z"
+    },
+    {
+      "id": "shot_e46ad555",
+      "episodeId": "episode_179babf9",
+      "chapterId": "chapter_a83b282f",
+      "index": 4,
+      "title": "银衣流光与神秘指引",
+      "description": "林澈触碰升起的碎片，周围迷雾翻涌，银甲少女身影浮现并化作流光，留下光绘地图指向钟楼。",
+      "scene": "迷雾深处",
+      "associatedAssetIds": [
+        "asset_b52f743e",
+        "asset_5f6f8ae4",
+        "asset_93fceca9"
+      ],
+      "associatedAssetNames": [
+        "林澈",
+        "银甲少女",
+        "核心碎片"
+      ],
+      "duration": 40,
+      "shotSize": "全景",
+      "cameraMove": "环绕运镜",
+      "action": "林澈伸手触碰核心碎片，迷雾中一位身穿银色铠甲的少女显现，她挥手间化作一道流动的光带，在空中绘制出通往钟楼的路线图。",
+      "emotion": "充满希望、决绝",
+      "sound": "空灵的水晶铃声，迷雾消散的呼啸声，轻柔的合成人声。",
+      "composition": "主体居中，银甲少女占据画面黄金分割点，背景是翻腾的迷雾与隐约可见的高耸钟楼，光绘地图连接前景与远景。",
+      "lighting": "银色少女散发柔和的银白色光辉，照亮周围迷雾，背景钟楼隐没在蓝紫色暮光中。",
+      "cameraMotion": "镜头围绕林澈与少女做360度缓慢环绕，最后定格在光绘地图上。",
+      "prompt": "Medium full shot of an elegant female warrior in silver armor named Silver Armored Girl appearing amidst swirling thick fog, she transforms into streams of light that form a glowing map pointing to a distant tower, Lin Che watching in awe, ethereal atmosphere, bioluminescent silver light effects, magical particles, mystery and revelation, cinematic lighting, 8k resolution, dreamlike aesthetic",
+      "videoDesc": "林澈伸手触碰碎片，迷雾散去，银甲少女现身并化作流光在空中绘制出新的地图，指引方向。",
+      "dialogue": "银甲少女：别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。",
+      "sfx": "空灵的水晶铃声，迷雾消散的呼啸声，轻柔的合成人声。",
+      "durationSeconds": 40,
+      "status": "rendered",
+      "continuityStatus": "clear",
+      "continuityIssues": [],
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_5f6f8ae4",
+        "asset_93fceca9"
+      ],
+      "takes": [
+        {
+          "id": "take_img_08477ca6",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:04:05.651Z",
+          "url": "/api/media?path=shots/shot_e46ad555/img_08477ca6.jpg",
+          "durationSeconds": null,
+          "isSelected": true
+        },
+        {
+          "id": "take_img_cc2b317b",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T06:24:44.476Z",
+          "url": "/api/media?path=shots/shot_e46ad555/img_cc2b317b.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        },
+        {
+          "id": "take_img_d0857dea",
+          "kind": "image",
+          "label": "AI生成 2026-04-07T07:04:09.439Z",
+          "url": "/api/media?path=shots/shot_e46ad555/img_d0857dea.jpg",
+          "durationSeconds": null,
+          "isSelected": false
+        }
+      ],
+      "images": [
+        {
+          "id": "img_08477ca6",
+          "label": "AI生成 2026-04-07T06:04:05.651Z",
+          "imageUrl": "/api/media?path=shots/shot_e46ad555/img_08477ca6.jpg",
+          "createdAt": "2026-04-07T06:04:05.651Z",
+          "isSelected": true
+        },
+        {
+          "id": "img_cc2b317b",
+          "label": "AI生成 2026-04-07T06:24:44.476Z",
+          "imageUrl": "/api/media?path=shots/shot_e46ad555/img_cc2b317b.jpg",
+          "createdAt": "2026-04-07T06:24:44.476Z",
+          "isSelected": false
+        },
+        {
+          "id": "img_d0857dea",
+          "label": "AI生成 2026-04-07T07:04:09.439Z",
+          "imageUrl": "/api/media?path=shots/shot_e46ad555/img_d0857dea.jpg",
+          "createdAt": "2026-04-07T07:04:09.439Z",
+          "isSelected": false
+        }
+      ],
+      "state": "completed",
+      "track": "迷雾深处",
+      "trackId": "track_迷雾深处",
+      "revision": 4,
+      "assetSnapshots": [
+        {
+          "assetId": "asset_b52f743e",
+          "assetName": "林澈",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_5f6f8ae4",
+          "assetName": "银甲少女",
+          "revision": 1,
+          "selectedImageId": null
+        },
+        {
+          "assetId": "asset_93fceca9",
+          "assetName": "核心碎片",
+          "revision": 1,
+          "selectedImageId": null
+        }
+      ],
+      "assetRefStatus": "stale",
+      "brokenAssetRefs": [],
+      "appliedPresetId": null,
+      "dialogueTrack": {
+        "shotId": "shot_e46ad555",
+        "audioFile": null,
+        "duration": 40000,
+        "transcript": "别相信系统，它在骗你。集齐三枚碎片，你会唤醒真正的城主。",
+        "characterId": null,
+        "voiceId": null,
+        "lipSyncEnabled": true
+      },
+      "multimodalInputs": [
+        {
+          "id": "mm_76adb914",
+          "kind": "text",
+          "title": "章节文本",
+          "url": null,
+          "notes": "触碰碎片时迷雾翻涌，银甲少女现身警示林澈，称系统欺骗他并告知唤醒城主的条件。少女"
+        }
+      ],
+      "createdAt": "2026-04-07T04:56:32.321Z",
+      "updatedAt": "2026-04-07T07:04:09.439Z"
     }
   ],
   "storyboards": [
@@ -1099,6 +3215,65 @@
       ],
       "revision": 1,
       "updatedAt": "2026-04-06T00:00:00.000Z"
+    },
+    {
+      "id": "story_cf690c6d",
+      "episodeId": "episode_179babf9",
+      "shotId": "shot_1ad7b114",
+      "subtitle": "",
+      "notes": "Agent 生成的初始故事板卡片。",
+      "selectedTakeId": "take_img_b39bd97c",
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_c26f6a4f"
+      ],
+      "revision": 29,
+      "updatedAt": "2026-04-07T07:08:03.735Z"
+    },
+    {
+      "id": "story_02dc6c9a",
+      "episodeId": "episode_179babf9",
+      "shotId": "shot_404f2bd4",
+      "subtitle": "",
+      "notes": "Agent 生成的初始故事板卡片。",
+      "selectedTakeId": "take_img_ce2fc4e1",
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_2aac28fe"
+      ],
+      "revision": 4,
+      "updatedAt": "2026-04-07T07:04:01.760Z"
+    },
+    {
+      "id": "story_152dfe5e",
+      "episodeId": "episode_179babf9",
+      "shotId": "shot_f9be2f38",
+      "subtitle": "",
+      "notes": "Agent 生成的初始故事板卡片。",
+      "selectedTakeId": "take_img_99fd013a",
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_2023d69d",
+        "asset_93fceca9"
+      ],
+      "revision": 4,
+      "updatedAt": "2026-04-07T07:04:05.437Z"
+    },
+    {
+      "id": "story_e57b6a6f",
+      "episodeId": "episode_179babf9",
+      "shotId": "shot_e46ad555",
+      "subtitle": "",
+      "notes": "Agent 生成的初始故事板卡片。",
+      "selectedTakeId": "take_img_08477ca6",
+      "referenceAssetIds": [
+        "asset_b52f743e",
+        "asset_5f6f8ae4",
+        "asset_93fceca9"
+      ],
+      "revision": 4,
+      "updatedAt": "2026-04-07T07:04:09.439Z"
     }
   ],
   "finalCuts": [
@@ -1218,13 +3393,1253 @@
       "tracks": [],
       "revision": 1,
       "updatedAt": "2026-04-05T09:30:00.000Z"
+    },
+    {
+      "id": "final_95f7aaf0",
+      "episodeId": "episode_99697595",
+      "resolution": "1080p",
+      "fps": 24,
+      "exportStatus": "draft",
+      "notes": "",
+      "tracks": [
+        {
+          "id": "track_2486e9d2",
+          "type": "video",
+          "name": "Video",
+          "items": []
+        },
+        {
+          "id": "track_169450a3",
+          "type": "dialogue",
+          "name": "Dialogue",
+          "items": []
+        },
+        {
+          "id": "track_94c7c899",
+          "type": "audio",
+          "name": "Audio",
+          "items": []
+        }
+      ],
+      "revision": 1,
+      "updatedAt": "2026-04-06T12:03:22.023Z"
+    },
+    {
+      "id": "final_bfe8b671",
+      "episodeId": "episode_c2ff06f1",
+      "resolution": "1080p",
+      "fps": 24,
+      "exportStatus": "draft",
+      "notes": "",
+      "tracks": [
+        {
+          "id": "track_d0c4615c",
+          "type": "video",
+          "name": "Video",
+          "items": []
+        },
+        {
+          "id": "track_989c39c3",
+          "type": "dialogue",
+          "name": "Dialogue",
+          "items": []
+        },
+        {
+          "id": "track_c93570dd",
+          "type": "audio",
+          "name": "Audio",
+          "items": []
+        }
+      ],
+      "revision": 1,
+      "updatedAt": "2026-04-06T12:48:32.229Z"
+    },
+    {
+      "id": "final_fb0e21ec",
+      "episodeId": "episode_6b693398",
+      "resolution": "1080p",
+      "fps": 24,
+      "exportStatus": "draft",
+      "notes": "",
+      "tracks": [
+        {
+          "id": "track_31928443",
+          "type": "video",
+          "name": "Video",
+          "items": []
+        },
+        {
+          "id": "track_f579d49d",
+          "type": "dialogue",
+          "name": "Dialogue",
+          "items": []
+        },
+        {
+          "id": "track_692f8f75",
+          "type": "audio",
+          "name": "Audio",
+          "items": []
+        }
+      ],
+      "revision": 1,
+      "updatedAt": "2026-04-06T13:09:52.433Z"
+    },
+    {
+      "id": "final_7ffb9181",
+      "episodeId": "episode_179babf9",
+      "resolution": "1080p",
+      "fps": 24,
+      "exportStatus": "draft",
+      "notes": "",
+      "tracks": [
+        {
+          "id": "track_b315ccbb",
+          "type": "video",
+          "name": "Video",
+          "items": []
+        },
+        {
+          "id": "track_08e1294c",
+          "type": "dialogue",
+          "name": "Dialogue",
+          "items": []
+        },
+        {
+          "id": "track_fe1eec9b",
+          "type": "audio",
+          "name": "Audio",
+          "items": []
+        }
+      ],
+      "revision": 22,
+      "updatedAt": "2026-04-07T07:08:03.735Z"
     }
   ],
   "tasks": [
     {
+      "id": "task_fe640792",
+      "createdAt": "2026-04-07T07:08:03.735Z",
+      "updatedAt": "2026-04-07T07:08:03.735Z",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:56.168Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null
+    },
+    {
+      "id": "task_2d5ead8e",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:55:19.278Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:08:03.288Z",
+      "updatedAt": "2026-04-07T07:08:03.288Z"
+    },
+    {
+      "id": "task_2299dd93",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T07:06:39.207Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:08:02.598Z",
+      "updatedAt": "2026-04-07T07:08:02.598Z"
+    },
+    {
+      "id": "task_af128573",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T07:03:58.019Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:49.538Z",
+      "updatedAt": "2026-04-07T07:07:49.538Z"
+    },
+    {
+      "id": "task_82cd61f4",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:56.168Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:48.777Z",
+      "updatedAt": "2026-04-07T07:07:48.777Z"
+    },
+    {
+      "id": "task_58a3a943",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:31.662Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:42.722Z",
+      "updatedAt": "2026-04-07T07:07:42.722Z"
+    },
+    {
+      "id": "task_ce7e96f0",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:03:52.714Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:40.690Z",
+      "updatedAt": "2026-04-07T07:07:40.690Z"
+    },
+    {
+      "id": "task_d91d5af4",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:56.168Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:38.971Z",
+      "updatedAt": "2026-04-07T07:07:38.971Z"
+    },
+    {
+      "id": "task_f5b997d9",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T07:06:39.207Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:34.474Z",
+      "updatedAt": "2026-04-07T07:07:34.474Z"
+    },
+    {
+      "id": "task_9ac77e43",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T07:03:58.019Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:32.939Z",
+      "updatedAt": "2026-04-07T07:07:32.939Z"
+    },
+    {
+      "id": "task_7d9a8349",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:55:19.278Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:28.938Z",
+      "updatedAt": "2026-04-07T07:07:28.938Z"
+    },
+    {
+      "id": "task_87c3934e",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:56.168Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:26.310Z",
+      "updatedAt": "2026-04-07T07:07:26.310Z"
+    },
+    {
+      "id": "task_186201fa",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:55:19.278Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:23.760Z",
+      "updatedAt": "2026-04-07T07:07:23.760Z"
+    },
+    {
+      "id": "task_93a41421",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:31.662Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:22.660Z",
+      "updatedAt": "2026-04-07T07:07:22.660Z"
+    },
+    {
+      "id": "task_a53c060e",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:03:52.714Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:21.647Z",
+      "updatedAt": "2026-04-07T07:07:21.647Z"
+    },
+    {
+      "id": "task_a5b4abc0",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T06:24:56.168Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:20.838Z",
+      "updatedAt": "2026-04-07T07:07:20.838Z"
+    },
+    {
+      "id": "task_e1a5d233",
+      "kind": "storyboard",
+      "targetType": "shot",
+      "targetId": "shot_1ad7b114",
+      "title": "选定镜头 1 的主版本",
+      "description": "已选用 AI生成 2026-04-07T07:06:39.207Z 进入下游故事板。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "take selected"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T07:07:19.918Z",
+      "updatedAt": "2026-04-07T07:07:19.918Z"
+    },
+    {
+      "id": "task_0b0baab5",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 1 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 11,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T07:06:39.207Z",
+      "updatedAt": "2026-04-07T07:06:39.207Z"
+    },
+    {
+      "id": "task_eb7a5725",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 4 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "shot rendered: 大地裂开与黑甲怪物降临",
+        "shot rendered: 弱点穿透与碎片升起",
+        "shot rendered: 银衣流光与神秘指引"
+      ],
+      "batch": {
+        "total": 4,
+        "processed": 4,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 10,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_404f2bd4",
+            "snapshotRevision": 3,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_f9be2f38",
+            "snapshotRevision": 3,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_e46ad555",
+            "snapshotRevision": 3,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T07:04:09.440Z",
+      "updatedAt": "2026-04-07T07:04:09.440Z"
+    },
+    {
+      "id": "task_29e8026e",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 1 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "retry executed: rendered 4 shot images"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 9,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:55:19.280Z",
+      "updatedAt": "2026-04-07T07:04:09.441Z"
+    },
+    {
+      "id": "task_2832dd50",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 0 个分镜图片，1 个失败",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}",
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 8,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:40:54.985Z",
+      "updatedAt": "2026-04-07T06:40:54.985Z"
+    },
+    {
+      "id": "task_3be7ce10",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 0 个分镜图片，1 个失败",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}",
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 7,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:37:06.787Z",
+      "updatedAt": "2026-04-07T06:37:06.787Z"
+    },
+    {
+      "id": "task_4a6345a9",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 0 个分镜图片，1 个失败",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}",
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 6,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:36:05.229Z",
+      "updatedAt": "2026-04-07T06:36:05.229Z"
+    },
+    {
+      "id": "task_50463de7",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 0 个分镜图片，1 个失败",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}",
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 5,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:31:17.412Z",
+      "updatedAt": "2026-04-07T06:31:17.412Z"
+    },
+    {
+      "id": "task_d7b6f8a5",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 1 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 4,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:24:56.168Z",
+      "updatedAt": "2026-04-07T06:24:56.168Z"
+    },
+    {
+      "id": "task_cb505b61",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 4 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "shot rendered: 大地裂开与黑甲怪物降临",
+        "shot rendered: 弱点穿透与碎片升起",
+        "shot rendered: 银衣流光与神秘指引"
+      ],
+      "batch": {
+        "total": 4,
+        "processed": 4,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 3,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_404f2bd4",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_f9be2f38",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_e46ad555",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:24:44.477Z",
+      "updatedAt": "2026-04-07T06:24:44.477Z"
+    },
+    {
+      "id": "task_d335b0c4",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 0 个分镜图片，1 个失败",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "猩红警示与消失的出口: Image generation failed (400): {\"code\":20012,\"message\":\"Model does not exist. Please check it carefully.\",\"data\":null}",
+        "retry executed: rendered 4 shot images"
+      ],
+      "batch": {
+        "total": 1,
+        "processed": 1,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 2,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:15:52.776Z",
+      "updatedAt": "2026-04-07T06:24:44.477Z"
+    },
+    {
+      "id": "task_3a387f32",
+      "kind": "storyboard",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成分镜图",
+      "description": "已生成 4 个分镜图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "shot rendered: 猩红警示与消失的出口",
+        "shot rendered: 大地裂开与黑甲怪物降临",
+        "shot rendered: 弱点穿透与碎片升起",
+        "shot rendered: 银衣流光与神秘指引"
+      ],
+      "batch": {
+        "total": 4,
+        "processed": 4,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "shot_1ad7b114",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_404f2bd4",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_f9be2f38",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "shot_e46ad555",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T06:04:05.652Z",
+      "updatedAt": "2026-04-07T06:04:05.652Z"
+    },
+    {
+      "id": "task_50218ab8",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 批量生成资产图",
+      "description": "已生成 6 个主体图片",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "asset render: 林澈",
+        "asset render: 守门者",
+        "asset render: 银甲少女",
+        "asset render: 古城城门",
+        "asset render: 古城广场",
+        "asset render: 核心碎片"
+      ],
+      "batch": {
+        "total": 6,
+        "processed": 6,
+        "skipped": 0,
+        "items": [
+          {
+            "targetId": "asset_b52f743e",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "asset_2023d69d",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "asset_5f6f8ae4",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "asset_c26f6a4f",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "asset_2aac28fe",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          },
+          {
+            "targetId": "asset_93fceca9",
+            "snapshotRevision": 1,
+            "status": "completed",
+            "skipReason": null
+          }
+        ]
+      },
+      "createdAt": "2026-04-07T05:38:12.604Z",
+      "updatedAt": "2026-04-07T05:38:12.604Z"
+    },
+    {
+      "id": "task_947d75f6",
+      "kind": "agent",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成分镜草案",
+      "description": "基于章节文本创建了 4 条结构化镜头。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "generated shot_1ad7b114",
+        "generated shot_404f2bd4",
+        "generated shot_f9be2f38",
+        "generated shot_e46ad555"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T04:56:32.323Z",
+      "updatedAt": "2026-04-07T04:56:32.323Z"
+    },
+    {
+      "id": "task_1d9974d3",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 提取主体",
+      "description": "AssetAgent 已基于结构化返回提取 6 个主体。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "asset extraction completed",
+        "assets: 6",
+        "analysis mode: ai"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-07T04:31:58.033Z",
+      "updatedAt": "2026-04-07T04:31:58.033Z"
+    },
+    {
+      "id": "task_216453da",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "ScriptAgent 基于完整原文分析生成 4 个章节。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": null,
+      "logs": [
+        "source document parsed",
+        "chapters: 4",
+        "analysis mode: ai"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T17:33:49.680Z",
+      "updatedAt": "2026-04-06T17:33:49.680Z"
+    },
+    {
+      "id": "task_0ab4e614",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T17:24:10.142Z",
+      "updatedAt": "2026-04-06T17:24:10.142Z"
+    },
+    {
+      "id": "task_757ad9d0",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T17:23:55.645Z",
+      "updatedAt": "2026-04-06T17:23:55.645Z"
+    },
+    {
+      "id": "task_0c26e998",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T16:01:09.308Z",
+      "updatedAt": "2026-04-06T16:01:09.308Z"
+    },
+    {
+      "id": "task_abb3d416",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T15:47:53.980Z",
+      "updatedAt": "2026-04-06T15:47:53.980Z"
+    },
+    {
+      "id": "task_6db7d49e",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_179babf9",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_60bfa5e1/episodes/episode_179babf9",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T15:47:37.316Z",
+      "updatedAt": "2026-04-06T15:47:37.316Z"
+    },
+    {
+      "id": "task_f8fce7a6",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_99697595",
+      "title": "为 冒险者3 提取主体",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_dd06596f/episodes/episode_99697595",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "asset extraction failed",
+        "reason: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T15:36:48.412Z",
+      "updatedAt": "2026-04-06T15:36:48.412Z"
+    },
+    {
+      "id": "task_1e5385e2",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_99697595",
+      "title": "为 冒险者3 提取主体",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_dd06596f/episodes/episode_99697595",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "asset extraction failed",
+        "reason: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T15:35:49.012Z",
+      "updatedAt": "2026-04-06T15:35:49.012Z"
+    },
+    {
+      "id": "task_0285a323",
+      "kind": "asset",
+      "targetType": "episode",
+      "targetId": "episode_99697595",
+      "title": "为 冒险者3 提取主体",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_dd06596f/episodes/episode_99697595",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "asset extraction failed",
+        "reason: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T15:35:34.377Z",
+      "updatedAt": "2026-04-06T15:35:34.377Z"
+    },
+    {
+      "id": "task_8ed4c0ca",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_6b693398",
+      "title": "为 游戏冒险小说_迷雾之城 生成剧本章节",
+      "description": "剧本拆解失败：Bad Request",
+      "status": "failed",
+      "retryable": true,
+      "link": "/series/series_f6ae3605/episodes/episode_6b693398",
+      "error": "剧本拆解失败：Bad Request",
+      "logs": [
+        "source document parsed",
+        "analysis failed: Bad Request"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T14:31:14.259Z",
+      "updatedAt": "2026-04-06T14:31:14.259Z"
+    },
+    {
+      "id": "task_70920bf8",
+      "kind": "settings",
+      "targetType": "series",
+      "targetId": "series_60bfa5e1",
+      "title": "导入创建 游戏冒险小说_迷雾之城",
+      "description": "文本导入已生成系列、首集原文骨架，并自动完成剧本拆解。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_60bfa5e1",
+      "error": null,
+      "logs": [
+        "series imported",
+        "episode created: episode_179babf9",
+        "script auto-generated"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T14:00:22.668Z",
+      "updatedAt": "2026-04-06T14:00:22.668Z"
+    },
+    {
+      "id": "task_9c57dfe5",
+      "kind": "settings",
+      "targetType": "series",
+      "targetId": "series_f6ae3605",
+      "title": "导入创建 test2",
+      "description": "文本导入已生成系列、首集原文骨架，并自动完成剧本拆解。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_f6ae3605",
+      "error": null,
+      "logs": [
+        "series imported",
+        "episode created: episode_6b693398",
+        "script auto-generated"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T13:09:52.434Z",
+      "updatedAt": "2026-04-06T13:09:52.434Z"
+    },
+    {
+      "id": "task_8f152a49",
+      "kind": "settings",
+      "targetType": "series",
+      "targetId": "series_29b1f871",
+      "title": "导入创建 冒险者4",
+      "description": "文本导入已生成系列、首集原文骨架，并自动完成剧本拆解。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_29b1f871",
+      "error": null,
+      "logs": [
+        "series imported",
+        "episode created: episode_c2ff06f1",
+        "script auto-generated"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "task_538a3e5d",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_c2ff06f1",
+      "title": "为 冒险者4 生成剧本章节",
+      "description": "ScriptAgent 基于完整原文分析生成 4 个章节。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_29b1f871/episodes/episode_c2ff06f1",
+      "error": null,
+      "logs": [
+        "source document parsed",
+        "chapters: 4",
+        "analysis mode: fallback (no_real_credentials)"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "task_7ffb0f56",
+      "kind": "settings",
+      "targetType": "series",
+      "targetId": "series_dd06596f",
+      "title": "导入创建 冒险者3",
+      "description": "文本导入已生成系列、首集原文骨架，并自动完成剧本拆解。",
+      "status": "completed",
+      "retryable": false,
+      "link": "/series/series_dd06596f",
+      "error": null,
+      "logs": [
+        "series imported",
+        "episode created: episode_99697595",
+        "script auto-generated"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
+      "id": "task_25d0295d",
+      "kind": "script",
+      "targetType": "episode",
+      "targetId": "episode_99697595",
+      "title": "为 冒险者3 生成剧本章节",
+      "description": "ScriptAgent 根据原文生成 4 个章节。",
+      "status": "completed",
+      "retryable": true,
+      "link": "/series/series_dd06596f/episodes/episode_99697595",
+      "error": null,
+      "logs": [
+        "source document parsed",
+        "chapters: 4"
+      ],
+      "batch": null,
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
+    {
       "id": "task_dd7b7278",
-      "createdAt": "2026-04-06T09:32:24.313Z",
-      "updatedAt": "2026-04-06T09:32:24.313Z",
       "kind": "storyboard",
       "targetType": "episode",
       "targetId": "episode_01",
@@ -1256,7 +4671,9 @@
             "skipReason": null
           }
         ]
-      }
+      },
+      "createdAt": "2026-04-06T09:32:24.313Z",
+      "updatedAt": "2026-04-06T09:32:24.313Z"
     },
     {
       "id": "task_8f31be51",
@@ -1435,11 +4852,22 @@
   "settings": {
     "locale": "zh-CN",
     "ai": {
-      "mode": "mock",
-      "model": "google/gemini-2.5-flash",
+      "mode": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-72B",
       "systemPrompt": "你是 Mercruiser Studio 的生产协调 Agent，帮助用户推进系列治理与单集生产。",
       "skillPrompt": "优先使用结构化工具读写本地工作区，避免输出空泛建议。",
       "memoryEnabled": true
+    },
+    "providers": {
+      "siliconflow": {
+        "apiKey": ""
+      },
+      "google": {
+        "apiKey": ""
+      },
+      "gateway": {
+        "apiKey": ""
+      }
     },
     "workspace": {
       "aspectRatio": "16:9",
@@ -1491,6 +4919,578 @@
     }
   ],
   "workflowRuns": [
+    {
+      "id": "workflow_396b1863",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_0b0baab5",
+      "createdAt": "2026-04-07T07:06:39.208Z",
+      "updatedAt": "2026-04-07T07:06:39.208Z"
+    },
+    {
+      "id": "workflow_7ae428c3",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "recovery",
+      "status": "completed",
+      "summary": "恢复 Agent 重新执行了分镜图生成",
+      "taskId": "task_29e8026e",
+      "createdAt": "2026-04-07T07:04:09.441Z",
+      "updatedAt": "2026-04-07T07:04:09.441Z"
+    },
+    {
+      "id": "workflow_68584653",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 4 条分镜图",
+      "taskId": "task_eb7a5725",
+      "createdAt": "2026-04-07T07:04:09.440Z",
+      "updatedAt": "2026-04-07T07:04:09.440Z"
+    },
+    {
+      "id": "workflow_0f4482ed",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_29e8026e",
+      "createdAt": "2026-04-07T06:55:19.281Z",
+      "updatedAt": "2026-04-07T06:55:19.281Z"
+    },
+    {
+      "id": "workflow_58fdf48d",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_2832dd50",
+      "createdAt": "2026-04-07T06:40:54.985Z",
+      "updatedAt": "2026-04-07T06:40:54.985Z"
+    },
+    {
+      "id": "workflow_b189df9c",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_3be7ce10",
+      "createdAt": "2026-04-07T06:37:06.787Z",
+      "updatedAt": "2026-04-07T06:37:06.787Z"
+    },
+    {
+      "id": "workflow_18581484",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_4a6345a9",
+      "createdAt": "2026-04-07T06:36:05.229Z",
+      "updatedAt": "2026-04-07T06:36:05.229Z"
+    },
+    {
+      "id": "workflow_0ba20651",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_50463de7",
+      "createdAt": "2026-04-07T06:31:17.412Z",
+      "updatedAt": "2026-04-07T06:31:17.412Z"
+    },
+    {
+      "id": "workflow_13e00745",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_d7b6f8a5",
+      "createdAt": "2026-04-07T06:24:56.169Z",
+      "updatedAt": "2026-04-07T06:24:56.169Z"
+    },
+    {
+      "id": "workflow_9bed6178",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "recovery",
+      "status": "completed",
+      "summary": "恢复 Agent 重新执行了分镜图生成",
+      "taskId": "task_d335b0c4",
+      "createdAt": "2026-04-07T06:24:44.477Z",
+      "updatedAt": "2026-04-07T06:24:44.477Z"
+    },
+    {
+      "id": "workflow_c8083d84",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 4 条分镜图",
+      "taskId": "task_cb505b61",
+      "createdAt": "2026-04-07T06:24:44.477Z",
+      "updatedAt": "2026-04-07T06:24:44.477Z"
+    },
+    {
+      "id": "workflow_47fc3395",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 1 条分镜图",
+      "taskId": "task_d335b0c4",
+      "createdAt": "2026-04-07T06:15:52.776Z",
+      "updatedAt": "2026-04-07T06:15:52.776Z"
+    },
+    {
+      "id": "workflow_d7bb83cf",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_rendering",
+      "agent": "production",
+      "status": "completed",
+      "summary": "完成 4 条分镜图",
+      "taskId": "task_3a387f32",
+      "createdAt": "2026-04-07T06:04:05.652Z",
+      "updatedAt": "2026-04-07T06:04:05.652Z"
+    },
+    {
+      "id": "workflow_b76a0300",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_rendering",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "已生成 6 个主体的图片",
+      "taskId": "task_50218ab8",
+      "createdAt": "2026-04-07T05:38:12.604Z",
+      "updatedAt": "2026-04-07T05:38:12.604Z"
+    },
+    {
+      "id": "workflow_320e0648",
+      "episodeId": "episode_179babf9",
+      "stage": "shot_generation",
+      "agent": "production",
+      "status": "completed",
+      "summary": "生成 4 条分镜",
+      "taskId": "task_947d75f6",
+      "createdAt": "2026-04-07T04:56:32.323Z",
+      "updatedAt": "2026-04-07T04:56:32.323Z"
+    },
+    {
+      "id": "workflow_2b4adf2d",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 6 个",
+      "taskId": "task_1d9974d3",
+      "createdAt": "2026-04-07T04:31:58.033Z",
+      "updatedAt": "2026-04-07T04:31:58.033Z"
+    },
+    {
+      "id": "workflow_c233ff7e",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "completed",
+      "summary": "基于完整原文生成 4 个章节",
+      "taskId": "task_216453da",
+      "createdAt": "2026-04-06T17:33:49.680Z",
+      "updatedAt": "2026-04-06T17:33:49.680Z"
+    },
+    {
+      "id": "workflow_007a7473",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "taskId": "task_0ab4e614",
+      "createdAt": "2026-04-06T17:24:10.142Z",
+      "updatedAt": "2026-04-06T17:24:10.142Z"
+    },
+    {
+      "id": "workflow_3a671583",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Failed after 3 attempts. Last error: Cannot connect to API: getaddrinfo ENOTFOUND api.siliconflow.cn",
+      "taskId": "task_757ad9d0",
+      "createdAt": "2026-04-06T17:23:55.645Z",
+      "updatedAt": "2026-04-06T17:23:55.645Z"
+    },
+    {
+      "id": "workflow_df1e50c5",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_0c26e998",
+      "createdAt": "2026-04-06T16:01:09.308Z",
+      "updatedAt": "2026-04-06T16:01:09.308Z"
+    },
+    {
+      "id": "workflow_e48db0e0",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_abb3d416",
+      "createdAt": "2026-04-06T15:47:53.980Z",
+      "updatedAt": "2026-04-06T15:47:53.980Z"
+    },
+    {
+      "id": "workflow_71bc0f43",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_6db7d49e",
+      "createdAt": "2026-04-06T15:47:37.316Z",
+      "updatedAt": "2026-04-06T15:47:37.316Z"
+    },
+    {
+      "id": "workflow_df82c51f",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 2 个",
+      "taskId": "task_7c2e6b67",
+      "createdAt": "2026-04-06T15:44:31.456Z",
+      "updatedAt": "2026-04-06T15:44:31.456Z"
+    },
+    {
+      "id": "workflow_1bf7818f",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 2 个",
+      "taskId": "task_c943b2d1",
+      "createdAt": "2026-04-06T15:44:21.487Z",
+      "updatedAt": "2026-04-06T15:44:21.487Z"
+    },
+    {
+      "id": "workflow_7810b38a",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 2 个",
+      "taskId": "task_533bfe9b",
+      "createdAt": "2026-04-06T15:44:20.624Z",
+      "updatedAt": "2026-04-06T15:44:20.624Z"
+    },
+    {
+      "id": "workflow_3faac8a0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 2 个",
+      "taskId": "task_10885737",
+      "createdAt": "2026-04-06T15:40:41.682Z",
+      "updatedAt": "2026-04-06T15:40:41.682Z"
+    },
+    {
+      "id": "workflow_8647f6a0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成，共 2 个",
+      "taskId": "task_1f0c539c",
+      "createdAt": "2026-04-06T15:40:36.658Z",
+      "updatedAt": "2026-04-06T15:40:36.658Z"
+    },
+    {
+      "id": "workflow_5ecbb8dd",
+      "episodeId": "episode_99697595",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_f8fce7a6",
+      "createdAt": "2026-04-06T15:36:48.412Z",
+      "updatedAt": "2026-04-06T15:36:48.412Z"
+    },
+    {
+      "id": "workflow_25a49cbe",
+      "episodeId": "episode_99697595",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_1e5385e2",
+      "createdAt": "2026-04-06T15:35:49.012Z",
+      "updatedAt": "2026-04-06T15:35:49.012Z"
+    },
+    {
+      "id": "workflow_7bc819de",
+      "episodeId": "episode_99697595",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_0285a323",
+      "createdAt": "2026-04-06T15:35:34.377Z",
+      "updatedAt": "2026-04-06T15:35:34.377Z"
+    },
+    {
+      "id": "workflow_87b688e0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_964bb669",
+      "createdAt": "2026-04-06T15:26:51.332Z",
+      "updatedAt": "2026-04-06T15:26:51.332Z"
+    },
+    {
+      "id": "workflow_b53e839b",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_b62152da",
+      "createdAt": "2026-04-06T15:26:50.732Z",
+      "updatedAt": "2026-04-06T15:26:50.732Z"
+    },
+    {
+      "id": "workflow_b9801b5b",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_2b1b9486",
+      "createdAt": "2026-04-06T15:26:50.515Z",
+      "updatedAt": "2026-04-06T15:26:50.515Z"
+    },
+    {
+      "id": "workflow_59b9dd83",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_d11f90b3",
+      "createdAt": "2026-04-06T15:26:50.264Z",
+      "updatedAt": "2026-04-06T15:26:50.264Z"
+    },
+    {
+      "id": "workflow_f2cda5d0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_f90ede43",
+      "createdAt": "2026-04-06T15:26:49.686Z",
+      "updatedAt": "2026-04-06T15:26:49.686Z"
+    },
+    {
+      "id": "workflow_d3ddcccd",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_fb890302",
+      "createdAt": "2026-04-06T15:26:47.558Z",
+      "updatedAt": "2026-04-06T15:26:47.558Z"
+    },
+    {
+      "id": "workflow_934bfa88",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_23f02c5d",
+      "createdAt": "2026-04-06T14:43:55.968Z",
+      "updatedAt": "2026-04-06T14:43:55.968Z"
+    },
+    {
+      "id": "workflow_198d8cc9",
+      "episodeId": "episode_6b693398",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "failed",
+      "summary": "剧本拆解失败：Bad Request",
+      "taskId": "task_8ed4c0ca",
+      "createdAt": "2026-04-06T14:31:14.259Z",
+      "updatedAt": "2026-04-06T14:31:14.259Z"
+    },
+    {
+      "id": "workflow_25f37fd0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_864ff4a8",
+      "createdAt": "2026-04-06T14:25:52.595Z",
+      "updatedAt": "2026-04-06T14:25:52.595Z"
+    },
+    {
+      "id": "workflow_2e34552d",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_6e98abcf",
+      "createdAt": "2026-04-06T14:25:50.274Z",
+      "updatedAt": "2026-04-06T14:25:50.274Z"
+    },
+    {
+      "id": "workflow_481731df",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_b5ffb7dc",
+      "createdAt": "2026-04-06T14:25:50.063Z",
+      "updatedAt": "2026-04-06T14:25:50.063Z"
+    },
+    {
+      "id": "workflow_0a050ad3",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_1c02a117",
+      "createdAt": "2026-04-06T14:25:49.241Z",
+      "updatedAt": "2026-04-06T14:25:49.241Z"
+    },
+    {
+      "id": "workflow_83a35dab",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_29f42639",
+      "createdAt": "2026-04-06T14:18:00.189Z",
+      "updatedAt": "2026-04-06T14:18:00.189Z"
+    },
+    {
+      "id": "workflow_86a5eaf7",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_dad350cd",
+      "createdAt": "2026-04-06T14:17:49.945Z",
+      "updatedAt": "2026-04-06T14:17:49.945Z"
+    },
+    {
+      "id": "workflow_a9d5a68e",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_647ca47e",
+      "createdAt": "2026-04-06T14:17:49.696Z",
+      "updatedAt": "2026-04-06T14:17:49.696Z"
+    },
+    {
+      "id": "workflow_0cd2cd7c",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_41a4bc4f",
+      "createdAt": "2026-04-06T14:17:49.237Z",
+      "updatedAt": "2026-04-06T14:17:49.237Z"
+    },
+    {
+      "id": "workflow_19b1bef0",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_44dde200",
+      "createdAt": "2026-04-06T14:17:48.607Z",
+      "updatedAt": "2026-04-06T14:17:48.607Z"
+    },
+    {
+      "id": "workflow_44fb4b97",
+      "episodeId": "episode_179babf9",
+      "stage": "asset_extraction",
+      "agent": "asset",
+      "status": "completed",
+      "summary": "主体抽取完成",
+      "taskId": "task_49e40651",
+      "createdAt": "2026-04-06T14:17:40.048Z",
+      "updatedAt": "2026-04-06T14:17:40.048Z"
+    },
+    {
+      "id": "workflow_7c267a0f",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "completed",
+      "summary": "基于完整原文生成 4 个章节",
+      "taskId": "task_92140c5c",
+      "createdAt": "2026-04-06T14:08:18.576Z",
+      "updatedAt": "2026-04-06T14:08:18.576Z"
+    },
+    {
+      "id": "workflow_45f2b8a7",
+      "episodeId": "episode_179babf9",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "completed",
+      "summary": "基于完整原文生成 4 个章节",
+      "taskId": "task_287db04e",
+      "createdAt": "2026-04-06T14:00:22.668Z",
+      "updatedAt": "2026-04-06T14:00:22.668Z"
+    },
+    {
+      "id": "workflow_67e958d3",
+      "episodeId": "episode_c2ff06f1",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "completed",
+      "summary": "基于完整原文生成 4 个章节",
+      "taskId": "task_538a3e5d",
+      "createdAt": "2026-04-06T12:48:32.230Z",
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "id": "workflow_e6f0eae7",
+      "episodeId": "episode_99697595",
+      "stage": "script_generation",
+      "agent": "script",
+      "status": "completed",
+      "summary": "生成 4 个章节",
+      "taskId": "task_25d0295d",
+      "createdAt": "2026-04-06T12:03:22.024Z",
+      "updatedAt": "2026-04-06T12:03:22.024Z"
+    },
     {
       "id": "workflow_f2f64b2f",
       "episodeId": "episode_01",
@@ -1690,6 +5690,246 @@
         "需要先提取本集主体"
       ],
       "updatedAt": "2026-04-06T09:32:24.313Z"
+    },
+    {
+      "episodeId": "episode_99697595",
+      "currentStage": "asset_extraction",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": true,
+          "label": "从原文生成剧本",
+          "reason": null
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": true,
+          "label": "提取本集主体",
+          "reason": null
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": false,
+          "label": "批量生成资产图片",
+          "reason": "还没有可生成的主体"
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": false,
+          "label": "生成分镜表",
+          "reason": "所有资产必须完成并选定主版本"
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": false,
+          "label": "生成分镜图片",
+          "reason": "分镜表尚未生成"
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": false,
+          "label": "进入故事板",
+          "reason": "分镜图片尚未收敛"
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": false,
+          "label": "进入成片",
+          "reason": "需要先完成故事板主版本选择"
+        },
+        {
+          "kind": "export_episode",
+          "enabled": false,
+          "label": "导出成片",
+          "reason": "成片工位尚未装配完成"
+        }
+      ],
+      "blockedReasons": [
+        "主体已更新，必须先重新确认分镜引用与主版本"
+      ],
+      "requiredInputs": [
+        "需要先提取本集主体"
+      ],
+      "updatedAt": "2026-04-06T15:36:48.412Z"
+    },
+    {
+      "episodeId": "episode_c2ff06f1",
+      "currentStage": "asset_extraction",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": true,
+          "label": "从原文生成剧本",
+          "reason": null
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": true,
+          "label": "提取本集主体",
+          "reason": null
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": false,
+          "label": "批量生成资产图片",
+          "reason": "还没有可生成的主体"
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": false,
+          "label": "生成分镜表",
+          "reason": "所有资产必须完成并选定主版本"
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": false,
+          "label": "生成分镜图片",
+          "reason": "分镜表尚未生成"
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": false,
+          "label": "进入故事板",
+          "reason": "分镜图片尚未收敛"
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": false,
+          "label": "进入成片",
+          "reason": "需要先完成故事板主版本选择"
+        },
+        {
+          "kind": "export_episode",
+          "enabled": false,
+          "label": "导出成片",
+          "reason": "成片工位尚未装配完成"
+        }
+      ],
+      "blockedReasons": [],
+      "requiredInputs": [
+        "需要先提取本集主体"
+      ],
+      "updatedAt": "2026-04-06T12:48:32.230Z"
+    },
+    {
+      "episodeId": "episode_6b693398",
+      "currentStage": "script_generation",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": true,
+          "label": "从原文生成剧本",
+          "reason": null
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": false,
+          "label": "提取本集主体",
+          "reason": "剧本尚未完成"
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": false,
+          "label": "批量生成资产图片",
+          "reason": "还没有可生成的主体"
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": false,
+          "label": "生成分镜表",
+          "reason": "所有资产必须完成并选定主版本"
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": false,
+          "label": "生成分镜图片",
+          "reason": "分镜表尚未生成"
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": false,
+          "label": "进入故事板",
+          "reason": "分镜图片尚未收敛"
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": false,
+          "label": "进入成片",
+          "reason": "需要先完成故事板主版本选择"
+        },
+        {
+          "kind": "export_episode",
+          "enabled": false,
+          "label": "导出成片",
+          "reason": "成片工位尚未装配完成"
+        }
+      ],
+      "blockedReasons": [
+        "剧本已修改，必须先重新确认下游主体与分镜"
+      ],
+      "requiredInputs": [
+        "需要先生成章节剧本"
+      ],
+      "updatedAt": "2026-04-06T14:31:14.259Z"
+    },
+    {
+      "episodeId": "episode_179babf9",
+      "currentStage": "storyboard",
+      "availableActions": [
+        {
+          "kind": "generate_script",
+          "enabled": true,
+          "label": "从原文生成剧本",
+          "reason": null
+        },
+        {
+          "kind": "extract_assets",
+          "enabled": true,
+          "label": "提取本集主体",
+          "reason": null
+        },
+        {
+          "kind": "generate_asset_images",
+          "enabled": true,
+          "label": "批量生成资产图片",
+          "reason": null
+        },
+        {
+          "kind": "generate_shots",
+          "enabled": true,
+          "label": "生成分镜表",
+          "reason": null
+        },
+        {
+          "kind": "generate_shot_images",
+          "enabled": true,
+          "label": "生成分镜图片",
+          "reason": null
+        },
+        {
+          "kind": "open_storyboard",
+          "enabled": true,
+          "label": "进入故事板",
+          "reason": null
+        },
+        {
+          "kind": "open_final_cut",
+          "enabled": true,
+          "label": "进入成片",
+          "reason": null
+        },
+        {
+          "kind": "export_episode",
+          "enabled": false,
+          "label": "导出成片",
+          "reason": "成片工位尚未装配完成"
+        }
+      ],
+      "blockedReasons": [
+        "存在资产引用过期，建议重新生成相关分镜图"
+      ],
+      "requiredInputs": [],
+      "updatedAt": "2026-04-07T07:08:03.735Z"
     }
   ]
 }

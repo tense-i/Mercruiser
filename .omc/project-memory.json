@@ -1,0 +1,249 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775491322356,
+  "projectRoot": "/Users/zh/project/mercruiser-studio",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.2",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.0",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.0",
+        "category": "frontend"
+      },
+      {
+        "name": "vitest",
+        "version": "3.2.4",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "typecheck": "tsc --noEmit",
+      "lint": "tsc --noEmit",
+      "test": "vitest run",
+      "test:integration:siliconflow": "node tests/integration/siliconflow-smoke.mjs"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "docs",
+      "lib",
+      "public",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "Toonflow-app": {
+      "path": "Toonflow-app",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1775491322338,
+      "keyFiles": [
+        "Dockerfile",
+        "LICENSE",
+        "NOTICES.txt",
+        "README.md",
+        "electron-builder.yml"
+      ]
+    },
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 3,
+      "lastAccessed": 1775491322338,
+      "keyFiles": [
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1775491322343,
+      "keyFiles": []
+    },
+    "data": {
+      "path": "data",
+      "purpose": "Data files",
+      "fileCount": 1,
+      "lastAccessed": 1775491322343,
+      "keyFiles": [
+        "studio.json"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1775491322343,
+      "keyFiles": []
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 2,
+      "lastAccessed": 1775491322343,
+      "keyFiles": [
+        "source-file.ts",
+        "utils.ts"
+      ]
+    },
+    "memory": {
+      "path": "memory",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1775491322344,
+      "keyFiles": [
+        "EXPERIENCE.md",
+        "FACTS.md",
+        "MEMORY.md",
+        "feedback_prd_first_product_quality_bar.md"
+      ]
+    },
+    "mercruiser-studio-web": {
+      "path": "mercruiser-studio-web",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1775491322344,
+      "keyFiles": [
+        "README.md",
+        "index.html",
+        "mercruiser-studio.zip",
+        "metadata.json",
+        "package-lock.json"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 0,
+      "lastAccessed": 1775491322344,
+      "keyFiles": []
+    },
+    "rules": {
+      "path": "rules",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775491322344,
+      "keyFiles": [
+        "00_core.md",
+        "10_release.md"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1775491322345,
+      "keyFiles": []
+    },
+    "types": {
+      "path": "types",
+      "purpose": "Type definitions",
+      "fileCount": 1,
+      "lastAccessed": 1775491322345,
+      "keyFiles": [
+        "ai-sdk-openai.d.ts"
+      ]
+    },
+    "Toonflow-app/data": {
+      "path": "Toonflow-app/data",
+      "purpose": "Data files",
+      "fileCount": 2,
+      "lastAccessed": 1775491322346,
+      "keyFiles": [
+        "db2.sqlite",
+        "update.json"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1775491322346,
+      "keyFiles": []
+    },
+    "mercruiser-studio-web/src": {
+      "path": "mercruiser-studio-web/src",
+      "purpose": "Source code",
+      "fileCount": 3,
+      "lastAccessed": 1775491322347,
+      "keyFiles": [
+        "App.tsx",
+        "index.css",
+        "main.tsx"
+      ]
+    },
+    "tests/api": {
+      "path": "tests/api",
+      "purpose": "API routes",
+      "fileCount": 1,
+      "lastAccessed": 1775491322348,
+      "keyFiles": [
+        "studio-route.test.ts"
+      ]
+    },
+    "tests/fixtures": {
+      "path": "tests/fixtures",
+      "purpose": "Test fixtures",
+      "fileCount": 1,
+      "lastAccessed": 1775491322348,
+      "keyFiles": [
+        "studio-seed.json"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

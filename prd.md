@@ -14,7 +14,11 @@
 
 ## 0. 竞品
 - https://zhenxuai.com/
-- 
+  - 参考以工作流结合无限画布实现
+
+- https://github.com/KwokKwok/Silo
+  - 考虑做一个插件可以实现从我们应用之间调用各个web的api生成图片或者视频
+  
 ## 1. 文档目的
 
 本 PRD 用于定义 Mercruiser 下一阶段的核心业务模型、生产工作流和产品范围。
