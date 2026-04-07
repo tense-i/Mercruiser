@@ -1,5 +1,9 @@
 import { mutateWorkspaceAtomically, readWorkspace } from '@/lib/server/repository/file-store';
-import { analyzeSourceTextToChapters } from '@/lib/ai/script-analysis';
+import { readConfig, getEffectiveApiKey } from '@/lib/server/config-store';
+import { analyzeChaptersToAssets, analyzeSourceTextToChapters, generateShotsFromScript, ScriptAnalysisError } from '@/lib/ai/script-analysis';
+import { generateImageFromPrompt, getSiliconflowApiKey, downloadImageToBuffer, buildShotImagePrompt } from '@/lib/ai/image-generation';
+import { localAssetImagePath, assetImageApiUrl, localShotImagePath, shotImageApiUrl, saveImageBuffer, readLocalImageAsBase64 } from '@/lib/server/media-store';
+import { getCurrentAiProviderLabel, getCurrentAiSettings, normalizeAiSettings, hasRealCredentials } from '@/lib/ai/provider';
 import { buildDashboardView, buildEpisodeWorkspaceView, buildSeriesView } from '@/lib/view-models/studio';
 import { StudioCommandSchema, type StudioCommand } from '@/lib/domain/commands';
 import type {
@@ -39,6 +43,15 @@ export class StudioCommandConflictError extends Error {
   ) {
     super(`${entityType}:${entityId} revision conflict (expected ${String(expectedRevision)}, got ${String(actualRevision)})`);
     this.name = 'StudioCommandConflictError';
+  }
+}
+
+export class StudioPersistedCommandError extends Error {
+  persistWorkspace = true as const;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'StudioPersistedCommandError';
   }
 }
 
@@ -337,6 +350,107 @@ function syncShotImageTakes(shot: Shot) {
 function syncEpisodeReferenceState(workspace: StudioWorkspace, episodeId: string) {
   const shots = workspace.shots.filter((item) => item.episodeId === episodeId);
   shots.forEach((shot) => recomputeShotAssetState(workspace, shot));
+}
+
+function markEpisodeDownstreamDirty(
+  workspace: StudioWorkspace,
+  episodeId: string,
+  from: 'script' | 'subjects' | 'shots' | 'storyboard',
+) {
+  const episode = workspace.episodes.find((item) => item.id === episodeId);
+  if (!episode) {
+    return;
+  }
+
+  const shots = workspace.shots.filter((item) => item.episodeId === episodeId);
+  const storyboards = workspace.storyboards.filter((item) => item.episodeId === episodeId);
+  const finalCut = workspace.finalCuts.find((item) => item.id === episode.finalCutId);
+
+  if (from === 'script') {
+    if (episode.assetIds.length) {
+      episode.stationStates.subjects = 'editing';
+    }
+    if (episode.shotIds.length) {
+      episode.stationStates.shots = 'blocked';
+    }
+    if (episode.storyboardIds.length) {
+      episode.stationStates.storyboard = 'blocked';
+    }
+    if (finalCut?.tracks.some((track) => track.items.length > 0)) {
+      episode.stationStates['final-cut'] = 'blocked';
+    }
+
+    shots.forEach((shot) => {
+      shot.assetRefStatus = 'stale';
+      touchRevision(shot);
+    });
+    storyboards.forEach((storyboard) => {
+      storyboard.selectedTakeId = null;
+      touchRevision(storyboard);
+    });
+    if (finalCut) {
+      finalCut.tracks = finalCut.tracks.map((track) => ({ ...track, items: [] }));
+      touchRevision(finalCut);
+    }
+    return;
+  }
+
+  if (from === 'subjects') {
+    if (episode.shotIds.length) {
+      episode.stationStates.shots = 'editing';
+    }
+    if (episode.storyboardIds.length) {
+      episode.stationStates.storyboard = 'blocked';
+    }
+    if (finalCut?.tracks.some((track) => track.items.length > 0)) {
+      episode.stationStates['final-cut'] = 'blocked';
+    }
+
+    shots.forEach((shot) => {
+      shot.assetRefStatus = shot.assetRefStatus === 'broken' ? 'broken' : 'stale';
+      touchRevision(shot);
+    });
+    storyboards.forEach((storyboard) => {
+      storyboard.selectedTakeId = null;
+      touchRevision(storyboard);
+    });
+    if (finalCut) {
+      finalCut.tracks = finalCut.tracks.map((track) => ({ ...track, items: [] }));
+      touchRevision(finalCut);
+    }
+    return;
+  }
+
+  if (from === 'shots') {
+    if (episode.storyboardIds.length) {
+      episode.stationStates.storyboard = 'editing';
+    }
+    if (finalCut?.tracks.some((track) => track.items.length > 0)) {
+      episode.stationStates['final-cut'] = 'blocked';
+    }
+
+    storyboards.forEach((storyboard) => {
+      if (shots.some((shot) => shot.id === storyboard.shotId)) {
+        storyboard.selectedTakeId = null;
+        touchRevision(storyboard);
+      }
+    });
+    if (finalCut) {
+      finalCut.tracks = finalCut.tracks.map((track) => ({ ...track, items: [] }));
+      touchRevision(finalCut);
+    }
+    return;
+  }
+
+  if (from === 'storyboard') {
+    if (finalCut?.tracks.some((track) => track.items.length > 0)) {
+      episode.stationStates['final-cut'] = 'editing';
+    }
+    if (finalCut) {
+      finalCut.tracks = finalCut.tracks.map((track) => ({ ...track, items: [] }));
+      touchRevision(finalCut);
+    }
+  }
 }
 
 function syncEpisode(workspace: StudioWorkspace, episodeId: string) {
@@ -863,6 +977,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       const episode = workspace.episodes.find((item) => item.id === chapter.episodeId);
       if (episode) {
         episode.stationStates.script = 'editing';
+        markEpisodeDownstreamDirty(workspace, episode.id, 'script');
         syncEpisode(workspace, episode.id);
       }
 
@@ -904,13 +1019,50 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       }
 
       const series = workspace.series.find((item) => item.id === episode.seriesId);
-      const analysis = await analyzeSourceTextToChapters({
-        workspace,
-        seriesName: series?.name ?? episode.seriesId,
-        episodeTitle: episode.title,
-        sourceTitle: source.title,
-        sourceContent: source.content,
-      });
+      const _scriptConfig = await readConfig();
+      const _scriptProvider = _scriptConfig.providers.find((p) => p.id === (command.aiMode ?? workspace.settings.ai.mode) && p.enabled);
+      const _scriptConfigKey = _scriptProvider ? getEffectiveApiKey(_scriptProvider) : undefined;
+      const scriptAiOverride = (command.aiMode || command.aiModel || command.aiApiKey || _scriptConfigKey)
+        ? { mode: command.aiMode, model: command.aiModel, apiKey: command.aiApiKey ?? _scriptConfigKey }
+        : undefined;
+      let analysis;
+      try {
+        analysis = await analyzeSourceTextToChapters({
+          workspace,
+          seriesName: series?.name ?? episode.seriesId,
+          episodeTitle: episode.title,
+          sourceTitle: source.title,
+          sourceContent: source.content,
+          aiOverride: scriptAiOverride,
+        });
+      } catch (error) {
+        const message = error instanceof ScriptAnalysisError ? error.message : error instanceof Error ? error.message : '剧本拆解失败';
+        const reason = error instanceof ScriptAnalysisError ? error.reason : 'analysis_failed';
+        episode.stationStates.script = 'editing';
+        syncEpisode(workspace, episode.id);
+        const failedTask = createTask(workspace, {
+          kind: 'script',
+          targetType: 'episode',
+          targetId: episode.id,
+          title: `为 ${episode.title} 生成剧本章节`,
+          description: message,
+          status: 'failed',
+          retryable: true,
+          link: `/series/${episode.seriesId}/episodes/${episode.id}`,
+          error: message,
+          logs: ['source document parsed', `analysis failed: ${reason}`],
+          batch: null,
+        });
+        upsertWorkflowRun(workspace, {
+          episodeId: episode.id,
+          stage: 'script_generation',
+          agent: 'script',
+          status: 'failed',
+          summary: message,
+          taskId: failedTask.id,
+        });
+        throw new StudioPersistedCommandError(message);
+      }
 
       const createdChapterIds: string[] = [];
       analysis.chapters.forEach((part, index) => {
@@ -934,6 +1086,10 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       episode.chapterIds = createdChapterIds;
       episode.stationStates.script = 'completed';
       syncEpisode(workspace, episode.id);
+      const aiConfig = getCurrentAiSettings({
+        settingsMode: workspace.settings.ai.mode,
+        settingsModel: workspace.settings.ai.model,
+      });
       const task = createTask(workspace, {
         kind: 'script',
         targetType: 'episode',
@@ -944,7 +1100,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: ['source document parsed', `chapters: ${episode.chapterIds.length}`, `analysis mode: ${analysis.mode}${analysis.reason ? ` (${analysis.reason})` : ''}`],
+        logs: ['source document parsed', `chapters: ${episode.chapterIds.length}`, `analysis mode: ${analysis.mode}`],
         batch: null,
       });
       upsertWorkflowRun(workspace, {
@@ -956,8 +1112,8 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         taskId: task.id,
       });
       recordApiUsage(workspace, {
-        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
-        model: workspace.settings.ai.model,
+        provider: getCurrentAiProviderLabel({ settingsMode: workspace.settings.ai.mode }),
+        model: aiConfig.model,
         endpoint: 'script_generation',
         inputTokens: source.content.length,
         outputTokens: episode.chapterIds.length * 120,
@@ -1019,27 +1175,68 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
     case 'extractAssetsFromScript': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
       if (!episode) throw new Error(`Episode ${command.episodeId} not found`);
-      const chapters = workspace.chapters.filter((chapter) => chapter.episodeId === episode.id);
+      const chapters = workspace.chapters.filter((chapter) => chapter.episodeId === episode.id).sort((left, right) => left.index - right.index);
       if (!chapters.length) throw new Error('Script must be generated before asset extraction');
 
       if (!workspace.assets.some((asset) => asset.episodeId === episode.id && !asset.isShared)) {
-        const extracted = [
-          {
-            name: '地下摊主',
-            type: 'character',
-            description: '交易场景中的关键角色，面部褶皱明显，眼神精明而克制。',
-            prompt: 'A shrewd underground market trader, cinematic portrait, layered neon light, detailed costume.',
-          },
-          {
-            name: '地下摊位',
-            type: 'scene',
-            description: '被旧显示器和铁皮包围的狭窄摊位，暖色台灯与外部冷色霓虹形成反差。',
-            prompt: 'A cramped underground stall, layered props, warm desk lamp against blue neon haze.',
-          },
-        ] as const;
+        let analysis;
+        try {
+          const series = workspace.series.find((item) => item.id === episode.seriesId);
+          const _extractConfig = await readConfig();
+          const _extractProvider = _extractConfig.providers.find((p) => p.id === (command.aiMode ?? workspace.settings.ai.mode) && p.enabled);
+          const _extractConfigKey = _extractProvider ? getEffectiveApiKey(_extractProvider) : undefined;
+          const extractAiOverride = (command.aiMode || command.aiModel || command.aiApiKey || _extractConfigKey)
+            ? { mode: command.aiMode, model: command.aiModel, apiKey: command.aiApiKey ?? _extractConfigKey }
+            : undefined;
+          analysis = await analyzeChaptersToAssets({
+            workspace,
+            seriesName: series?.name ?? episode.seriesId,
+            episodeTitle: episode.title,
+            chapters: chapters.map((chapter) => ({
+              id: chapter.id,
+              index: chapter.index,
+              title: chapter.title,
+              content: chapter.content,
+              scene: chapter.scene,
+              dialogues: chapter.dialogues,
+            })),
+            aiOverride: extractAiOverride,
+          });
+        } catch (error) {
+          const message = error instanceof ScriptAnalysisError ? error.message : error instanceof Error ? error.message : '主体提取失败';
+          const reason = error instanceof ScriptAnalysisError ? error.reason : 'asset_extraction_failed';
+          episode.stationStates.subjects = 'editing';
+          syncEpisode(workspace, episode.id);
+          const failedTask = createTask(workspace, {
+            kind: 'asset',
+            targetType: 'episode',
+            targetId: episode.id,
+            title: `为 ${episode.title} 提取主体`,
+            description: message,
+            status: 'failed',
+            retryable: true,
+            link: `/series/${episode.seriesId}/episodes/${episode.id}`,
+            error: message,
+            logs: ['asset extraction failed', `reason: ${reason}`],
+            batch: null,
+          });
+          upsertWorkflowRun(workspace, {
+            episodeId: episode.id,
+            stage: 'asset_extraction',
+            agent: 'asset',
+            status: 'failed',
+            summary: message,
+            taskId: failedTask.id,
+          });
+          throw new StudioPersistedCommandError(message);
+        }
 
-        extracted.forEach((item) => {
+        analysis.assets.forEach((item) => {
           const assetId = id('asset');
+          const chapterIds = item.chapterIndexes
+            .map((chapterIndex) => chapters.find((chapter) => chapter.index === chapterIndex)?.id)
+            .filter((chapterId): chapterId is string => Boolean(chapterId));
+
           workspace.assets.push({
             id: assetId,
             seriesId: episode.seriesId,
@@ -1048,7 +1245,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
             type: item.type,
             description: item.description,
             prompt: item.prompt,
-            chapterIds: chapters.map((chapter) => chapter.id),
+            chapterIds,
             tags: ['agent-extracted'],
             isShared: false,
             isFaceLocked: item.type === 'character',
@@ -1074,17 +1271,18 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
 
       episode.stationStates.subjects = 'ready';
       syncEpisode(workspace, episode.id);
+      const localAssetCount = workspace.assets.filter((asset) => asset.episodeId === episode.id && !asset.isShared).length;
       const task = createTask(workspace, {
         kind: 'asset',
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 提取主体`,
-        description: 'AssetAgent 已根据章节抽取角色、场景和道具主体。',
+        description: `AssetAgent 已基于结构化返回提取 ${localAssetCount} 个主体。`,
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
         error: null,
-        logs: ['asset extraction completed'],
+        logs: ['asset extraction completed', `assets: ${localAssetCount}`, 'analysis mode: ai'],
         batch: null,
       });
       upsertWorkflowRun(workspace, {
@@ -1092,12 +1290,15 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         stage: 'asset_extraction',
         agent: 'asset',
         status: 'completed',
-        summary: '主体抽取完成',
+        summary: `主体抽取完成，共 ${localAssetCount} 个`,
         taskId: task.id,
       });
       recordApiUsage(workspace, {
-        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
-        model: workspace.settings.ai.model,
+        provider: getCurrentAiProviderLabel({ settingsMode: workspace.settings.ai.mode }),
+        model: getCurrentAiSettings({
+          settingsMode: workspace.settings.ai.mode,
+          settingsModel: workspace.settings.ai.model,
+        }).model,
         endpoint: 'asset_extraction',
         estimatedCost: workspace.settings.usage.defaultTextCost,
         seriesId: episode.seriesId,
@@ -1105,33 +1306,90 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         taskType: 'asset_extract',
         taskId: task.id,
       });
-      return { ok: true, assetCount: episode.assetIds.length };
+      return { ok: true, assetCount: localAssetCount };
     }
     case 'generateAssetImages': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
       if (!episode) throw new Error(`Episode ${command.episodeId} not found`);
-      const ownAssets = workspace.assets.filter((asset) => asset.episodeId === episode.id);
+      const allEpisodeAssets = workspace.assets.filter((asset) => asset.episodeId === episode.id);
+      const ownAssets = command.assetIds?.length
+        ? allEpisodeAssets.filter((asset) => command.assetIds!.includes(asset.id))
+        : allEpisodeAssets;
       const { selectedAssets, batchItems, skippedAssetIds } = resolveAssetBatch(ownAssets, command.assetSnapshots);
 
-      selectedAssets.forEach((asset) => {
-        if (!asset.images.length) {
-          const imageId = id('asset_image');
-          asset.images = [
-            {
-              id: imageId,
-              label: '主版本',
-              imageUrl: `/generated/${asset.id}-${imageId}.jpg`,
-              createdAt: nowIso(),
-              isSelected: true,
-            },
-          ];
-        }
-        asset.versions = asset.images;
-        asset.state = 'completed';
-        touchRevision(asset);
-      });
+      const apiKey = getSiliconflowApiKey();
+      const useRealImageGen = hasRealCredentials() && Boolean(apiKey);
+      const countPerAsset = command.countPerAsset ?? 1;
+      const skipExisting = command.skipExisting ?? false;
+      let renderedCount = 0;
+      const imageErrors: string[] = [];
 
-      episode.stationStates.subjects = 'completed';
+      if (useRealImageGen) {
+        const assetsToRender = skipExisting
+          ? selectedAssets.filter((asset) => !asset.images.some((img) => img.isSelected))
+          : selectedAssets;
+
+        for (let assetIdx = 0; assetIdx < assetsToRender.length; assetIdx++) {
+          const asset = assetsToRender[assetIdx]!;
+          if (!asset.prompt) continue;
+          if (assetIdx > 0) await new Promise((r) => setTimeout(r, 800));
+          try {
+            const imagePromises = Array.from({ length: countPerAsset }, () =>
+              generateImageFromPrompt({ prompt: asset.prompt, apiKey: apiKey!, model: command.imageModel }),
+            );
+            const results = await Promise.allSettled(imagePromises);
+            const successes = results.filter(
+              (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof generateImageFromPrompt>>> =>
+                r.status === 'fulfilled',
+            );
+            if (successes.length > 0) {
+              const alreadyHasSelected = asset.images.some((img) => img.isSelected);
+              const newImages = await Promise.all(
+                successes.map(async (r, i) => {
+                  const imgId = id('img');
+                  let imageUrl = r.value.url;
+                  try {
+                    const buf = await downloadImageToBuffer(r.value.url);
+                    await saveImageBuffer(localAssetImagePath(asset.id, imgId), buf);
+                    imageUrl = assetImageApiUrl(asset.id, imgId);
+                  } catch {
+                  }
+                  const selectNew = !skipExisting || !alreadyHasSelected;
+                  return {
+                    id: imgId,
+                    label: `AI生成 ${nowIso()}`,
+                    imageUrl,
+                    createdAt: nowIso(),
+                    isSelected: i === 0 && selectNew,
+                  };
+                }),
+              );
+              asset.images = [...asset.images, ...newImages];
+              asset.versions = asset.images;
+              asset.state = 'completed';
+              touchRevision(asset);
+              renderedCount++;
+            } else {
+              const firstError = results.find((r) => r.status === 'rejected') as PromiseRejectedResult | undefined;
+              imageErrors.push(`${asset.name}: ${firstError?.reason instanceof Error ? firstError.reason.message : 'generation failed'}`);
+            }
+          } catch (error) {
+            imageErrors.push(`${asset.name}: ${error instanceof Error ? error.message : 'generation failed'}`);
+          }
+        }
+      } else {
+        selectedAssets.forEach((asset) => {
+          asset.images = asset.images.length ? asset.images : asset.versions;
+          asset.versions = asset.images;
+          if (!asset.images.some((image) => image.isSelected)) {
+            asset.state = 'ready';
+          }
+          touchRevision(asset);
+        });
+      }
+
+
+      episode.stationStates.subjects = 'ready';
       syncEpisode(workspace, episode.id);
       const batch = buildBatchSummary(batchItems);
       const task = createTask(workspace, {
@@ -1139,14 +1397,17 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 批量生成资产图`,
-        description: `共完成 ${selectedAssets.length} 个主体的主版本图片。`,
+        description: apiKey
+          ? `已生成 ${renderedCount} 个主体图片${imageErrors.length ? `，${imageErrors.length} 个失败` : ''}`
+          : '当前仓储未接入真实主体出图，未生成主版本图片。',
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
-        error: null,
+        error: imageErrors.length > 0 ? imageErrors.join('; ') : null,
         logs: [
-          ...selectedAssets.map((asset) => `asset rendered: ${asset.name}`),
+          ...selectedAssets.map((asset) => `asset render: ${asset.name}`),
           ...skippedAssetIds.map((assetId) => `asset skipped by snapshot conflict: ${assetId}`),
+          ...imageErrors,
         ],
         batch,
       });
@@ -1155,21 +1416,10 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         stage: 'asset_rendering',
         agent: 'asset',
         status: 'completed',
-        summary: `完成 ${selectedAssets.length} 个资产主版本`,
+        summary: apiKey ? `已生成 ${renderedCount} 个主体的图片` : `已处理 ${selectedAssets.length} 个主体，但未接入真实出图`,
         taskId: task.id,
       });
-      recordApiUsage(workspace, {
-        provider: workspace.settings.ai.mode === 'mock' ? 'mock' : 'siliconflow',
-        model: workspace.settings.ai.model,
-        endpoint: 'asset_generation',
-        imageCount: selectedAssets.length,
-        estimatedCost: selectedAssets.length * workspace.settings.usage.defaultImageCost,
-        seriesId: episode.seriesId,
-        episodeId: episode.id,
-        taskType: 'asset_generate',
-        taskId: task.id,
-      });
-      return { ok: true, renderedCount: selectedAssets.length, skippedCount: skippedAssetIds.length, skippedAssetIds, batch };
+      return { ok: true, renderedCount, skippedCount: skippedAssetIds.length, skippedAssetIds, imageErrors, batch };
     }
     case 'updateAsset': {
       const asset = workspace.assets.find((item) => item.id === command.assetId);
@@ -1201,8 +1451,12 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       }
 
       if (asset.isShared || !asset.episodeId) {
+        workspace.episodes
+          .filter((episode) => episode.seriesId === asset.seriesId)
+          .forEach((episode) => markEpisodeDownstreamDirty(workspace, episode.id, 'subjects'));
         syncSeriesEpisodes(workspace, asset.seriesId);
       } else if (asset.episodeId) {
+        markEpisodeDownstreamDirty(workspace, asset.episodeId, 'subjects');
         syncEpisode(workspace, asset.episodeId);
       }
 
@@ -1246,8 +1500,12 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       }
 
       if (asset.isShared || !asset.episodeId) {
+        workspace.episodes
+          .filter((episode) => episode.seriesId === asset.seriesId)
+          .forEach((episode) => markEpisodeDownstreamDirty(workspace, episode.id, 'subjects'));
         syncSeriesEpisodes(workspace, asset.seriesId);
       } else if (asset.episodeId) {
+        markEpisodeDownstreamDirty(workspace, asset.episodeId, 'subjects');
         syncEpisode(workspace, asset.episodeId);
       }
       return { ok: true, asset };
@@ -1412,6 +1670,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       shot.dialogue = command.dialogue;
       shot.durationSeconds = command.durationSeconds;
       touchRevision(shot);
+      markEpisodeDownstreamDirty(workspace, shot.episodeId, 'shots');
       syncEpisode(workspace, shot.episodeId);
       createTask(workspace, {
         kind: 'shot',
@@ -1458,6 +1717,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         storyboard.selectedTakeId = command.takeId;
         touchRevision(storyboard);
       }
+      markEpisodeDownstreamDirty(workspace, shot.episodeId, 'storyboard');
       syncEpisode(workspace, shot.episodeId);
       createTask(workspace, {
         kind: 'storyboard',
@@ -1505,6 +1765,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       shot.appliedPresetId = preset.id;
       shot.prompt = applyPresetText(shot.prompt, preset);
       touchRevision(shot);
+      markEpisodeDownstreamDirty(workspace, shot.episodeId, 'shots');
       syncEpisode(workspace, shot.episodeId);
       return { ok: true, shot, preset };
     }
@@ -1522,6 +1783,10 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       item.label = command.label;
       item.locked = command.locked;
       touchRevision(finalCut);
+      const episode = workspace.episodes.find((entry) => entry.id === finalCut.episodeId);
+      if (episode) {
+        episode.stationStates['final-cut'] = 'editing';
+      }
       syncEpisode(workspace, finalCut.episodeId);
       createTask(workspace, {
         kind: 'final_cut',
@@ -1539,10 +1804,30 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       return { ok: true, finalCut };
     }
     case 'updateSettings': {
+      const mergedProviders = command.settings.providers
+        ? {
+            siliconflow: {
+              ...workspace.settings.providers.siliconflow,
+              ...(command.settings.providers.siliconflow ?? {}),
+              apiKey: command.settings.providers.siliconflow?.apiKey ?? workspace.settings.providers.siliconflow.apiKey,
+            },
+            google: {
+              ...workspace.settings.providers.google,
+              ...(command.settings.providers.google ?? {}),
+              apiKey: command.settings.providers.google?.apiKey ?? workspace.settings.providers.google.apiKey,
+            },
+            gateway: {
+              ...workspace.settings.providers.gateway,
+              ...(command.settings.providers.gateway ?? {}),
+              apiKey: command.settings.providers.gateway?.apiKey ?? workspace.settings.providers.gateway.apiKey,
+            },
+          }
+        : workspace.settings.providers;
       workspace.settings = {
         ...workspace.settings,
         ...command.settings,
-        ai: { ...workspace.settings.ai, ...command.settings.ai },
+        ai: normalizeAiSettings({ ...workspace.settings.ai, ...command.settings.ai }),
+        providers: mergedProviders,
         workspace: { ...workspace.settings.workspace, ...command.settings.workspace },
         governance: { ...workspace.settings.governance, ...command.settings.governance },
         usage: { ...workspace.settings.usage, ...command.settings.usage },
@@ -1569,65 +1854,109 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
         throw new Error(`Episode ${command.episodeId} not found`);
       }
       const episodeAssets = workspace.assets.filter((asset) => episode.assetIds.includes(asset.id));
-      const assetsReady = episodeAssets.length > 0 && episodeAssets.every((asset) => {
-        const images = asset.images.length ? asset.images : asset.versions;
-        return asset.state === 'completed' && images.some((image) => image.isSelected);
-      });
-      if (!assetsReady) {
-        throw new Error('All assets must be completed with selected versions before shot generation');
+      if (episodeAssets.length === 0) {
+        throw new Error('No assets found for this episode. Please extract assets from the script first.');
       }
 
       const { selectedAssets, skippedAssetIds } = resolveAssetBatch(episodeAssets, command.assetSnapshots);
       const chapters = workspace.chapters.filter((chapter) => chapter.episodeId === episode.id).sort((left, right) => left.index - right.index);
+
+      const series = workspace.series.find((item) => item.id === episode.seriesId);
+      const _shotsConfig = await readConfig();
+      const _shotsProvider = _shotsConfig.providers.find((p) => p.id === (command.aiMode ?? workspace.settings.ai.mode) && p.enabled);
+      const _shotsConfigKey = _shotsProvider ? getEffectiveApiKey(_shotsProvider) : undefined;
+      const shotsAiOverride = (command.aiMode || command.aiModel || command.aiApiKey || _shotsConfigKey)
+        ? { mode: command.aiMode, model: command.aiModel, apiKey: command.aiApiKey ?? _shotsConfigKey }
+        : undefined;
+      const aiResult = await generateShotsFromScript({
+        workspace,
+        seriesName: series?.name ?? episode.seriesId,
+        episodeTitle: episode.title,
+        chapters: chapters.map((chapter) => ({
+          id: chapter.id,
+          index: chapter.index,
+          title: chapter.title,
+          content: chapter.content,
+          scene: chapter.scene,
+          dialogues: chapter.dialogues,
+          estimatedDurationSeconds: chapter.estimatedDurationSeconds,
+        })),
+        assets: selectedAssets.map((asset) => ({
+          id: asset.id,
+          name: asset.name,
+          type: asset.type,
+          description: asset.description,
+          prompt: asset.prompt,
+        })),
+        aiOverride: shotsAiOverride,
+      });
+
+      const assetByName = new Map(selectedAssets.map((asset) => [asset.name, asset]));
+
       let directorPlanId = episode.directorPlanId;
       if (!directorPlanId) {
         directorPlanId = id('director_plan');
         workspace.directorPlans.push({
           id: directorPlanId,
           episodeId: episode.id,
-          theme: '在压迫环境中维持主动性',
-          visualStyle: '冷暖交错的赛博东方画面，强调空间压缩与人物轮廓光',
-          narrativeStructure: '前段追逐建立压迫，中段交易制造选择，尾段留下钩子',
+          theme: aiResult.directorPlan.theme,
+          visualStyle: aiResult.directorPlan.visualStyle,
+          narrativeStructure: aiResult.directorPlan.narrativeStructure,
           sceneIntent: '每场戏都明确角色处境变化与镜头意图',
-          soundDirection: '雨声、电流声、广播噪声形成持续底噪',
-          transitionStrategy: '以空间遮挡和光影跳变作为转场主轴',
+          soundDirection: aiResult.directorPlan.soundDirection,
+          transitionStrategy: aiResult.directorPlan.transitionStrategy,
           createdAt: nowIso(),
           updatedAt: nowIso(),
         });
         episode.directorPlanId = directorPlanId;
-      }
-      const generated: Shot[] = chapters.flatMap((chapter) => {
-        const nextIndex = workspace.shots.filter((shot) => shot.episodeId === episode.id).length + 1;
-        const existingShot = workspace.shots.find((shot) => shot.chapterId === chapter.id);
-        if (existingShot) {
-          return [];
+      } else {
+        const existing = workspace.directorPlans.find((p) => p.id === directorPlanId);
+        if (existing) {
+          existing.theme = aiResult.directorPlan.theme;
+          existing.visualStyle = aiResult.directorPlan.visualStyle;
+          existing.narrativeStructure = aiResult.directorPlan.narrativeStructure;
+          existing.soundDirection = aiResult.directorPlan.soundDirection;
+          existing.transitionStrategy = aiResult.directorPlan.transitionStrategy;
+          existing.updatedAt = nowIso();
         }
+      }
+
+      const existingShotCount = workspace.shots.filter((shot) => shot.episodeId === episode.id).length;
+      const generated: Shot[] = aiResult.shots.flatMap((blueprint, idx) => {
+        const chapter = chapters.find((ch) => ch.id === blueprint.chapterId);
+        if (!chapter) return [];
+        if (workspace.shots.find((shot) => shot.chapterId === chapter.id)) return [];
+
         const baseId = id('shot');
-        const assetIds = selectedAssets.slice(0, 2).map((asset) => asset.id);
+        const refAssetIds = blueprint.referenceAssetNames
+          .map((name) => assetByName.get(name)?.id)
+          .filter((assetId): assetId is string => Boolean(assetId));
+        const assetIds = refAssetIds.length ? refAssetIds : selectedAssets.slice(0, 2).map((asset) => asset.id);
+
         const shot: Shot = {
           id: baseId,
           episodeId: episode.id,
           chapterId: chapter.id,
-          index: nextIndex,
-          title: `${chapter.title} 开场`,
-          description: chapter.content.slice(0, 90),
-          scene: chapter.scene,
+          index: existingShotCount + idx + 1,
+          title: blueprint.title,
+          description: blueprint.description,
+          scene: blueprint.scene,
           associatedAssetIds: assetIds,
-          associatedAssetNames: selectedAssets.slice(0, 2).map((asset) => asset.name),
-          duration: Math.min(8, Math.max(3, Math.round(chapter.estimatedDurationSeconds / 8))),
-          shotSize: '中景',
-          cameraMove: '缓推',
-          action: '角色推进当前场面动作',
-          emotion: '警觉',
-          sound: '环境底噪与关键动作音',
-          composition: '中景',
-          lighting: '叙事主光 + 辅助轮廓光',
-          cameraMotion: '缓推',
-          prompt: `根据章节《${chapter.title}》生成高一致性叙事镜头，突出关键动作与场景层次。`,
-          videoDesc: `${chapter.scene}，中景，角色动作围绕章节核心冲突展开。`,
-          dialogue: chapter.dialogues.map((line) => `${line.speaker}: ${line.content}`).join('\n'),
-          sfx: '环境音待补充',
-          durationSeconds: chapter.estimatedDurationSeconds,
+          associatedAssetNames: assetIds.map((assetId) => workspace.assets.find((a) => a.id === assetId)?.name ?? ''),
+          duration: blueprint.durationSeconds,
+          shotSize: blueprint.shotSize,
+          cameraMove: blueprint.cameraMove,
+          action: blueprint.action,
+          emotion: blueprint.emotion,
+          sound: blueprint.sfx || '环境底噪',
+          composition: blueprint.composition,
+          lighting: blueprint.lighting,
+          cameraMotion: blueprint.cameraMotion,
+          prompt: blueprint.prompt,
+          videoDesc: blueprint.videoDesc,
+          dialogue: blueprint.dialogue,
+          sfx: blueprint.sfx,
+          durationSeconds: blueprint.durationSeconds,
           status: 'ready',
           continuityStatus: 'clear',
           continuityIssues: [],
@@ -1635,8 +1964,8 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
           takes: [],
           images: [],
           state: 'ready',
-          track: 'default',
-          trackId: 'track_default',
+          track: blueprint.track,
+          trackId: `track_${blueprint.track.replace(/\s+/g, '_')}`,
           revision: 1,
           assetSnapshots: buildAssetSnapshots(workspace, assetIds),
           assetRefStatus: 'valid',
@@ -1645,7 +1974,7 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
           dialogueTrack: {
             shotId: baseId,
             audioFile: null,
-            duration: chapter.estimatedDurationSeconds * 1000,
+            duration: blueprint.durationSeconds * 1000,
             transcript: chapter.dialogues.map((line) => line.content).join(' '),
             characterId: null,
             voiceId: null,
@@ -1717,65 +2046,135 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
     case 'generateShotImages': {
       const episode = workspace.episodes.find((item) => item.id === command.episodeId);
       if (!episode) throw new Error(`Episode ${command.episodeId} not found`);
-      const shots = workspace.shots.filter((shot) => shot.episodeId === episode.id);
-      if (!shots.length) throw new Error('Shot list must exist before rendering shot images');
+      const allEpisodeShots = workspace.shots.filter((shot) => shot.episodeId === episode.id);
+      if (!allEpisodeShots.length) throw new Error('Shot list must exist before rendering shot images');
+      const shots = command.shotIds?.length
+        ? allEpisodeShots.filter((shot) => command.shotIds!.includes(shot.id))
+        : allEpisodeShots;
 
       const { selectedShots, batchItems, skippedShotIds } = resolveShotBatch(shots, command.shotSnapshots);
 
-      selectedShots.forEach((shot) => {
+      const apiKey = getSiliconflowApiKey();
+      const useRealImageGen = hasRealCredentials() && Boolean(apiKey);
+      const countPerShot = command.countPerShot ?? 1;
+      const skipExisting = command.skipExisting ?? false;
+      let renderedCount = 0;
+      const imageErrors: string[] = [];
+
+      const shotsToRender = skipExisting
+        ? selectedShots.filter((shot) => !shot.images.some((img) => img.isSelected))
+        : selectedShots;
+
+      for (let shotIdx = 0; shotIdx < shotsToRender.length; shotIdx++) {
+        const shot = shotsToRender[shotIdx]!;
         recomputeShotAssetState(workspace, shot);
+
         if (shot.assetRefStatus === 'broken') {
           const item = batchItems.find((batchItem: TaskBatchItem) => batchItem.targetId === shot.id);
-          if (item) {
-            item.status = 'skipped';
-            item.skipReason = 'broken asset reference';
-          }
+          if (item) { item.status = 'skipped'; item.skipReason = 'broken asset reference'; }
           skippedShotIds.push(shot.id);
-          return;
+          continue;
         }
 
-        if (!shot.images.length) {
+        if (useRealImageGen && shot.prompt) {
+          if (shotIdx > 0) await new Promise((r) => setTimeout(r, 800));
+          try {
+            const refAssets = workspace.assets.filter((a) => shot.referenceAssetIds.includes(a.id));
+            const refImageBase64s = (
+              await Promise.all(
+                refAssets.map(async (a) => {
+                  const selectedUrl = a.images.find((img) => img.isSelected)?.imageUrl;
+                  if (!selectedUrl || selectedUrl.startsWith('/generated/')) return null;
+                  if (selectedUrl.startsWith('/api/media')) return readLocalImageAsBase64(selectedUrl);
+                  try {
+                    const buf = await Promise.race([
+                      downloadImageToBuffer(selectedUrl),
+                      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('ref img timeout')), 10_000)),
+                    ]);
+                    return `data:image/jpeg;base64,${buf.toString('base64')}`;
+                  } catch { return null; }
+                }),
+              )
+            ).filter((b): b is string => b !== null);
+            const enrichedPrompt = buildShotImagePrompt(
+              shot.prompt,
+              refAssets.map((a) => ({ name: a.name, type: a.type, description: a.description, prompt: a.prompt })),
+              { hasRefImages: refImageBase64s.length > 0 },
+            );
+            const imagePromises = Array.from({ length: countPerShot }, () =>
+              generateImageFromPrompt({
+                prompt: enrichedPrompt,
+                apiKey: apiKey!,
+                model: command.imageModel,
+                referenceImageBase64s: refImageBase64s.length > 0 ? refImageBase64s : undefined,
+              }),
+            );
+            const results = await Promise.allSettled(imagePromises);
+            const successes = results.filter(
+              (r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof generateImageFromPrompt>>> =>
+                r.status === 'fulfilled',
+            );
+            if (successes.length > 0) {
+              const alreadyHasSelected = shot.images.some((img) => img.isSelected);
+              const newImages = await Promise.all(
+                successes.map(async (r, i) => {
+                  const imgId = id('img');
+                  let imageUrl = r.value.url;
+                  try {
+                    const buf = await downloadImageToBuffer(r.value.url);
+                    await saveImageBuffer(localShotImagePath(shot.id, imgId), buf);
+                    imageUrl = shotImageApiUrl(shot.id, imgId);
+                  } catch {
+                  }
+                  return { id: imgId, label: `AI生成 ${nowIso()}`, imageUrl, createdAt: nowIso(), isSelected: i === 0 && !alreadyHasSelected };
+                }),
+              );
+              shot.images = [...shot.images, ...newImages];
+              renderedCount++;
+            } else {
+              const firstErr = results.find((r) => r.status === 'rejected') as PromiseRejectedResult | undefined;
+              imageErrors.push(`${shot.title}: ${firstErr?.reason instanceof Error ? firstErr.reason.message : 'generation failed'}`);
+            }
+          } catch (error) {
+            imageErrors.push(`${shot.title}: ${error instanceof Error ? error.message : 'generation failed'}`);
+          }
+        }
+
+        if (!shot.images.some((img) => img.isSelected)) {
           const imageId = id('shot_image');
-          shot.images = [
-            {
-              id: imageId,
-              label: '主版本',
-              imageUrl: `/generated/${shot.id}-${imageId}.jpg`,
-              createdAt: nowIso(),
-              isSelected: true,
-            },
-          ];
+          const label = useRealImageGen ? '主版本(fallback)' : '主版本(stub)';
+          shot.images = [...shot.images, { id: imageId, label, imageUrl: `/generated/${shot.id}-${imageId}.jpg`, createdAt: nowIso(), isSelected: true }];
+          renderedCount++;
         }
 
         const selectedTakeId = syncShotImageTakes(shot);
         const storyboard = workspace.storyboards.find((item) => item.shotId === shot.id);
-        if (storyboard) {
-          storyboard.selectedTakeId = selectedTakeId;
-          touchRevision(storyboard);
-        }
-
+        if (storyboard) { storyboard.selectedTakeId = selectedTakeId; touchRevision(storyboard); }
         shot.state = 'completed';
         shot.status = 'rendered';
         touchRevision(shot);
-      });
+      }
 
       episode.stationStates.storyboard = 'ready';
       syncEpisode(workspace, episode.id);
       const batch = buildBatchSummary(batchItems);
-      const processedShots = selectedShots.filter((shot) => !skippedShotIds.includes(shot.id));
+      const processedShots = shotsToRender.filter((shot) => !skippedShotIds.includes(shot.id));
       const task = createTask(workspace, {
         kind: 'storyboard',
         targetType: 'episode',
         targetId: episode.id,
         title: `为 ${episode.title} 批量生成分镜图`,
-        description: `共完成 ${processedShots.length} 个镜头的分镜主版本图片。`,
+        description: apiKey
+          ? `已生成 ${renderedCount} 个分镜图片${imageErrors.length ? `，${imageErrors.length} 个失败` : ''}`
+          : `共完成 ${processedShots.length} 个镜头（stub 模式）。`,
         status: 'completed',
         retryable: true,
         link: `/series/${episode.seriesId}/episodes/${episode.id}`,
-        error: null,
+        error: imageErrors.length > 0 ? imageErrors.join('; ') : null,
         logs: [
           ...processedShots.map((shot) => `shot rendered: ${shot.title}`),
-          ...skippedShotIds.map((shotId) => `shot skipped by snapshot conflict: ${shotId}`),
+          ...skippedShotIds.map((shotId) => `shot skipped: ${shotId}`),
+          ...imageErrors,
         ],
         batch,
       });

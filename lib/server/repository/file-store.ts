@@ -34,9 +34,17 @@ export async function mutateWorkspaceAtomically<T>(
   const previous = writeQueues.get(targetPath) ?? Promise.resolve();
   const current = previous.then(async () => {
     const workspace = await readWorkspace(targetPath);
-    const result = await mutator(workspace);
-    await writeWorkspaceAtomic(workspace, targetPath);
-    return result;
+
+    try {
+      const result = await mutator(workspace);
+      await writeWorkspaceAtomic(workspace, targetPath);
+      return result;
+    } catch (error) {
+      if (error && typeof error === 'object' && 'persistWorkspace' in error && (error as { persistWorkspace?: boolean }).persistWorkspace) {
+        await writeWorkspaceAtomic(workspace, targetPath);
+      }
+      throw error;
+    }
   });
 
   writeQueues.set(
