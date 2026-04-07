@@ -50,11 +50,14 @@ export const IMAGE_MODEL_CATALOG = [
 ] as const;
 
 export const IMAGE_MODEL_EXTRA = [
-  { id: 'black-forest-labs/FLUX.1-schnell',      label: 'FLUX.1 Schnell',     provider: 'SiliconFlow', supportsRefImages: false, noImageSize: false },
-  { id: 'black-forest-labs/FLUX.1-dev',          label: 'FLUX.1 Dev',         provider: 'SiliconFlow', supportsRefImages: false, noImageSize: false },
-  { id: 'black-forest-labs/FLUX.2-flex',         label: 'FLUX.2 Flex',        provider: 'SiliconFlow', supportsRefImages: true,  noImageSize: false },
-  { id: 'black-forest-labs/FLUX.1-Kontext-dev',  label: 'FLUX.1 Kontext Dev', provider: 'SiliconFlow', supportsRefImages: true,  noImageSize: false },
-  { id: 'black-forest-labs/FLUX.1-Kontext-pro',  label: 'FLUX.1 Kontext Pro', provider: 'SiliconFlow', supportsRefImages: true,  noImageSize: false },
+  { id: 'black-forest-labs/FLUX.1-schnell',      label: 'FLUX.1 Schnell',          provider: 'SiliconFlow',  supportsRefImages: false, noImageSize: false },
+  { id: 'black-forest-labs/FLUX.1-dev',          label: 'FLUX.1 Dev',              provider: 'SiliconFlow',  supportsRefImages: false, noImageSize: false },
+  { id: 'black-forest-labs/FLUX.2-flex',         label: 'FLUX.2 Flex',             provider: 'SiliconFlow',  supportsRefImages: true,  noImageSize: false },
+  { id: 'black-forest-labs/FLUX.1-Kontext-dev',  label: 'FLUX.1 Kontext Dev',      provider: 'SiliconFlow',  supportsRefImages: true,  noImageSize: false },
+  { id: 'black-forest-labs/FLUX.1-Kontext-pro',  label: 'FLUX.1 Kontext Pro',      provider: 'SiliconFlow',  supportsRefImages: true,  noImageSize: false },
+  { id: 'doubao-seedream-5-0-260128',            label: 'Seedream 5.0 Lite ★',     provider: 'Volcengine',   supportsRefImages: true,  noImageSize: false },
+  { id: 'doubao-seedream-4-5-251128',            label: 'Seedream 4.5 ★',          provider: 'Volcengine',   supportsRefImages: true,  noImageSize: false },
+  { id: 'doubao-seedream-4-0-250828',            label: 'Seedream 4.0 ★',          provider: 'Volcengine',   supportsRefImages: true,  noImageSize: false },
 ] as const;
 
 export type ImageModelId = (typeof IMAGE_MODEL_CATALOG)[number]['id'];

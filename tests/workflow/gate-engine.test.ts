@@ -63,6 +63,7 @@ describe('gate engine', () => {
   });
 
   it('reaches export after shot images are generated for a fully prepared episode', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 

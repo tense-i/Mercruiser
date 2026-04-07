@@ -1,12 +1,22 @@
 const SILICONFLOW_IMAGE_API = 'https://api.siliconflow.cn/v1/images/generations';
+const VOLCENGINE_IMAGE_API = 'https://ark.cn-beijing.volces.com/api/v3/images/generations';
 const DEFAULT_IMAGE_MODEL = 'Kwai-Kolors/Kolors';
 const DEFAULT_IMAGE_SIZE = '1024x576';
 const IMAGE_TIMEOUT_MS = 90 * 1000;
+
+const VOLCENGINE_MODELS = new Set([
+  'doubao-seedream-5-0-260128',
+  'doubao-seedream-4-5-251128',
+  'doubao-seedream-4-0-250828',
+]);
 
 const IMAGE_URL_SUPPORTED_MODELS = new Set([
   'black-forest-labs/FLUX.2-flex',
   'black-forest-labs/FLUX.1-Kontext-dev',
   'black-forest-labs/FLUX.1-Kontext-pro',
+  'doubao-seedream-5-0-260128',
+  'doubao-seedream-4-5-251128',
+  'doubao-seedream-4-0-250828',
 ]);
 
 const NO_IMAGE_SIZE_MODELS = new Set<string>();
@@ -15,13 +25,28 @@ function getImageModel(override?: string) {
   return override ?? process.env.SILICONFLOW_IMAGE_MODEL ?? DEFAULT_IMAGE_MODEL;
 }
 
+function getApiKey(modelId: string, explicitKey?: string): string {
+  if (VOLCENGINE_MODELS.has(modelId)) {
+    return explicitKey ?? process.env.VOLCENGINE_API_KEY ?? '';
+  }
+  return explicitKey ?? process.env.SILICONFLOW_API_KEY ?? '';
+}
+
+function getApiEndpoint(modelId: string): string {
+  return VOLCENGINE_MODELS.has(modelId) ? VOLCENGINE_IMAGE_API : SILICONFLOW_IMAGE_API;
+}
+
 export function modelSupportsImageUrls(modelId: string): boolean {
   return IMAGE_URL_SUPPORTED_MODELS.has(modelId);
 }
 
+export function isVolcengineModel(modelId: string): boolean {
+  return VOLCENGINE_MODELS.has(modelId);
+}
+
 export interface GenerateImageOptions {
   prompt: string;
-  apiKey: string;
+  apiKey?: string;
   model?: string;
   imageSize?: string;
   steps?: number;
@@ -36,24 +61,42 @@ export interface GenerateImageResult {
 export async function generateImageFromPrompt(options: GenerateImageOptions): Promise<GenerateImageResult> {
   const {
     prompt,
-    apiKey,
     model,
     imageSize = DEFAULT_IMAGE_SIZE,
     referenceImageBase64s,
   } = options;
 
   const resolvedModel = getImageModel(model);
+  const apiKey = getApiKey(resolvedModel, options.apiKey);
+  if (!apiKey) throw new Error(`No API key configured for model: ${resolvedModel}`);
+
+  const endpoint = getApiEndpoint(resolvedModel);
   const canUseRefImages = referenceImageBase64s && referenceImageBase64s.length > 0 && modelSupportsImageUrls(resolvedModel);
 
-  const body: Record<string, unknown> = {
-    model: resolvedModel,
-    prompt,
-    ...(!NO_IMAGE_SIZE_MODELS.has(resolvedModel) && { image_size: imageSize }),
-    n: 1,
-    ...(canUseRefImages && { image_urls: referenceImageBase64s }),
-  };
+  let body: Record<string, unknown>;
 
-  const response = await fetch(SILICONFLOW_IMAGE_API, {
+  if (VOLCENGINE_MODELS.has(resolvedModel)) {
+    body = {
+      model: resolvedModel,
+      prompt,
+      size: imageSize,
+      response_format: 'url',
+      watermark: false,
+      ...(canUseRefImages && {
+        image: referenceImageBase64s!.length === 1 ? referenceImageBase64s![0] : referenceImageBase64s,
+      }),
+    };
+  } else {
+    body = {
+      model: resolvedModel,
+      prompt,
+      ...(!NO_IMAGE_SIZE_MODELS.has(resolvedModel) && { image_size: imageSize }),
+      n: 1,
+      ...(canUseRefImages && { image_urls: referenceImageBase64s }),
+    };
+  }
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -64,8 +107,8 @@ export async function generateImageFromPrompt(options: GenerateImageOptions): Pr
   });
 
   if (!response.ok) {
-    const body = await response.text().catch(() => '');
-    throw new Error(`Image generation failed (${response.status}): ${body}`);
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`Image generation failed (${response.status}): ${errBody}`);
   }
 
   const data = (await response.json()) as {
