@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getConfiguredAiMode, getStudioModelName, hasRealCredentials } from '@/lib/ai/provider';
+import { getConfiguredAiMode, getResolvedAiDefaults, getStudioModelName, hasRealCredentials, normalizeAiSettings } from '@/lib/ai/provider';
 
 const originalEnv = {
   MERCRUISER_AI_MODE: process.env.MERCRUISER_AI_MODE,
@@ -42,6 +42,31 @@ describe('ai provider config', () => {
     expect(hasRealCredentials('google')).toBe(false);
   });
 
+  it('treats saved mock mode as default when siliconflow credentials exist', () => {
+    delete process.env.MERCRUISER_AI_MODE;
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    process.env.SILICONFLOW_API_KEY = 'test-key';
+
+    expect(getConfiguredAiMode({ settingsMode: 'mock' })).toBe('siliconflow');
+    expect(normalizeAiSettings({ mode: 'mock', model: 'google/gemini-2.5-flash' })).toEqual({
+      mode: 'siliconflow',
+      model: 'siliconflow/Qwen/Qwen3.5-9B',
+    });
+  });
+
+  it('returns siliconflow defaults when siliconflow credentials exist', () => {
+    delete process.env.MERCRUISER_AI_MODE;
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    process.env.SILICONFLOW_API_KEY = 'test-key';
+
+    expect(getResolvedAiDefaults()).toEqual({
+      mode: 'siliconflow',
+      model: 'siliconflow/Qwen/Qwen3.5-9B',
+    });
+  });
+
   it('normalizes provider-prefixed model names from saved settings', () => {
     delete process.env.MERCRUISER_AI_MODEL;
 
@@ -51,5 +76,17 @@ describe('ai provider config', () => {
     expect(getStudioModelName({ settingsMode: 'siliconflow', settingsModel: 'siliconflow/Qwen/Qwen3.5-9B' })).toBe(
       'Qwen/Qwen3.5-9B',
     );
+  });
+
+  it('falls back from unsupported siliconflow text models to the default text model', () => {
+    delete process.env.MERCRUISER_AI_MODEL;
+
+    expect(getStudioModelName({ settingsMode: 'siliconflow', settingsModel: 'siliconflow/Qwen/Qwen3.5-72B' })).toBe(
+      'Qwen/Qwen3.5-9B',
+    );
+    expect(normalizeAiSettings({ mode: 'siliconflow', model: 'siliconflow/Qwen/Qwen3.5-72B' })).toEqual({
+      mode: 'siliconflow',
+      model: 'siliconflow/Qwen/Qwen3.5-9B',
+    });
   });
 });

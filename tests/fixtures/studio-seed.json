@@ -1435,8 +1435,8 @@
   "settings": {
     "locale": "zh-CN",
     "ai": {
-      "mode": "mock",
-      "model": "google/gemini-2.5-flash",
+      "mode": "siliconflow",
+      "model": "siliconflow/Qwen/Qwen3.5-9B",
       "systemPrompt": "你是 Mercruiser Studio 的生产协调 Agent，帮助用户推进系列治理与单集生产。",
       "skillPrompt": "优先使用结构化工具读写本地工作区，避免输出空泛建议。",
       "memoryEnabled": true

@@ -2,7 +2,7 @@ import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { readWorkspace } from '@/lib/server/repository/file-store';
 import { createStudioRepository } from '@/lib/server/repository/studio-repository';
@@ -17,6 +17,11 @@ async function createTempWorkspace() {
 }
 
 describe('gate engine', () => {
+  const originalAiMode = process.env.MERCRUISER_AI_MODE;
+
+  afterEach(() => {
+    process.env.MERCRUISER_AI_MODE = originalAiMode;
+  });
   it('blocks shot generation when assets are not fully rendered', async () => {
     const workspace = await readWorkspace(await createTempWorkspace());
     const gate = buildGateSnapshot(workspace, 'episode_03');
@@ -25,20 +30,48 @@ describe('gate engine', () => {
     expect(gate?.availableActions.find((action) => action.kind === 'generate_shots')?.enabled).toBe(false);
   });
 
-  it('unlocks storyboard after shot images are generated', async () => {
+  it('keeps gate at asset rendering when no real asset image is produced', async () => {
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
-    await repo.dispatch({ type: 'generateScriptFromSource', episodeId: 'episode_03' });
-    await repo.dispatch({ type: 'extractAssetsFromScript', episodeId: 'episode_03' });
-    await repo.dispatch({ type: 'generateAssetImages', episodeId: 'episode_03' });
-    await repo.dispatch({ type: 'generateShotsFromChapters', episodeId: 'episode_03' });
-    await repo.dispatch({ type: 'generateShotImages', episodeId: 'episode_03' });
+    const workspaceBefore = await readWorkspace(dataPath);
+    const episode = workspaceBefore.episodes.find((item) => item.id === 'episode_02');
+    if (!episode) throw new Error('episode_02 missing');
+    episode.shotIds = [];
+    episode.storyboardIds = [];
+    episode.stationStates.shots = 'idle';
+    episode.stationStates.storyboard = 'idle';
+    episode.stationStates['final-cut'] = 'idle';
+    workspaceBefore.shots = [];
+    workspaceBefore.storyboards = [];
+    workspaceBefore.finalCuts = workspaceBefore.finalCuts.map((cut) => cut.id === episode.finalCutId ? {
+      ...cut,
+      tracks: cut.tracks.map((track) => ({ ...track, items: [] })),
+    } : cut);
+    workspaceBefore.assets = workspaceBefore.assets.map((asset) => asset.episodeId === 'episode_02'
+      ? { ...asset, state: 'ready', images: [], versions: [] }
+      : asset);
+    await writeFile(dataPath, JSON.stringify(workspaceBefore, null, 2), 'utf8');
+
+    await repo.dispatch({ type: 'generateAssetImages', episodeId: 'episode_02' });
 
     const workspace = await readWorkspace(dataPath);
-    const gate = buildGateSnapshot(workspace, 'episode_03');
+    const gate = buildGateSnapshot(workspace, 'episode_02');
 
-    expect(gate?.currentStage).toBe('storyboard');
+    expect(gate?.currentStage).toBe('shot_generation');
+    expect(gate?.availableActions.find((action) => action.kind === 'generate_shots')?.enabled).toBe(true);
+  });
+
+  it('reaches export after shot images are generated for a fully prepared episode', async () => {
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await repo.dispatch({ type: 'generateShotImages', episodeId: 'episode_02' });
+
+    const workspace = await readWorkspace(dataPath);
+    const gate = buildGateSnapshot(workspace, 'episode_02');
+
+    expect(gate?.currentStage).toBe('export');
     expect(gate?.availableActions.find((action) => action.kind === 'open_storyboard')?.enabled).toBe(true);
   });
 

@@ -7,6 +7,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { StudioWorkspace } from '@/lib/domain/types';
 
 let previousPath = process.env.MERCRUISER_DATA_PATH;
+const previousSiliconflowKey = process.env.SILICONFLOW_API_KEY;
+const previousGoogleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+const previousGeminiKey = process.env.GEMINI_API_KEY;
+const previousAiMode = process.env.MERCRUISER_AI_MODE;
 
 async function prepareWorkspace(mutate?: (workspace: StudioWorkspace) => void) {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-api-'));
@@ -24,6 +28,10 @@ describe('studio api route', () => {
 
   afterEach(() => {
     process.env.MERCRUISER_DATA_PATH = previousPath;
+    process.env.SILICONFLOW_API_KEY = previousSiliconflowKey;
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = previousGoogleKey;
+    process.env.GEMINI_API_KEY = previousGeminiKey;
+    process.env.MERCRUISER_AI_MODE = previousAiMode;
   });
 
   it('returns episode view from GET', async () => {
@@ -91,7 +99,18 @@ describe('studio api route', () => {
     expect(Array.isArray(payload.issues)).toBe(true);
   });
 
+  it('returns normalized SiliconFlow settings defaults from GET settings view', async () => {
+    const { GET } = await import('@/app/api/studio/route');
+    const response = await GET(new Request('http://localhost/api/studio?view=settings'));
+    const payload = await response.json();
+
+    expect(payload.ok).toBe(true);
+    expect(payload.settings.ai.mode).toBe('siliconflow');
+    expect(payload.settings.ai.model).toBe('siliconflow/Qwen/Qwen3.5-9B');
+  });
+
   it('imports a source-backed series in file mode and auto-generates chapters', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(
       new Request('http://localhost/api/studio', {
@@ -117,7 +136,37 @@ describe('studio api route', () => {
     expect(payload.result.episode.chapterIds.length).toBeGreaterThan(0);
   });
 
+  it('returns explicit failure when script generation has no real credentials', async () => {
+    delete process.env.SILICONFLOW_API_KEY;
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.MERCRUISER_AI_MODE;
+
+    const { POST } = await import('@/app/api/studio/route');
+    const response = await POST(
+      new Request('http://localhost/api/studio', {
+        method: 'POST',
+        body: JSON.stringify({
+          command: {
+            type: 'generateScriptFromSource',
+            episodeId: 'episode_03',
+          },
+          context: {
+            episodeId: 'episode_03',
+          },
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.ok).toBe(false);
+    expect(payload.error).toContain('无法执行剧本拆解');
+    expect(payload.episodeView?.chapters ?? []).toHaveLength(0);
+  });
+
   it('creates episodes from source and returns refreshed series view', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(
       new Request('http://localhost/api/studio', {
@@ -327,6 +376,7 @@ describe('studio api route', () => {
   });
 
   it('imports source documents through the api', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const { POST } = await import('@/app/api/studio/route');
     const response = await POST(
       new Request('http://localhost/api/studio', {
@@ -452,6 +502,7 @@ describe('studio api route', () => {
   });
 
   it('retries failed tasks through the dedicated retry route', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const { POST } = await import('@/app/api/tasks/[taskId]/retry/route');
     const response = await POST(new Request('http://localhost/api/tasks/task_failed_storyboard/retry', { method: 'POST' }), {
       params: Promise.resolve({ taskId: 'task_failed_storyboard' }),

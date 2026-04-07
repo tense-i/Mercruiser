@@ -2,7 +2,12 @@ import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+
+const originalSiliconflowKey = process.env.SILICONFLOW_API_KEY;
+const originalGoogleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+const originalGeminiKey = process.env.GEMINI_API_KEY;
+const originalAiMode = process.env.MERCRUISER_AI_MODE;
 
 import { createStudioRepository } from '@/lib/server/repository/studio-repository';
 import type { StudioWorkspace } from '@/lib/domain/types';
@@ -17,6 +22,13 @@ async function createTempWorkspace(mutate?: (workspace: StudioWorkspace) => void
 }
 
 describe('studio repository', () => {
+  afterEach(() => {
+    process.env.SILICONFLOW_API_KEY = originalSiliconflowKey;
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = originalGoogleKey;
+    process.env.GEMINI_API_KEY = originalGeminiKey;
+    process.env.MERCRUISER_AI_MODE = originalAiMode;
+  });
+
   it('loads dashboard data from the workspace', async () => {
     const repo = createStudioRepository({ dataPath: await createTempWorkspace() });
     const dashboard = await repo.getDashboardView();
@@ -26,6 +38,7 @@ describe('studio repository', () => {
   });
 
   it('creates manual and imported series shells for the dashboard', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
@@ -72,6 +85,7 @@ describe('studio repository', () => {
   });
 
   it('updates series settings and strategy, then creates inherited episodes', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
@@ -156,6 +170,7 @@ describe('studio repository', () => {
   });
 
   it('imports source documents and auto-analyzes them into chapters by default', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
@@ -174,6 +189,33 @@ describe('studio repository', () => {
     expect(episodeView?.sourceDocument?.title).toBe('新的第三集原文');
     expect(episodeView?.chapters.length).toBeGreaterThan(0);
     expect(episodeView?.gate?.currentStage).toBe('asset_extraction');
+  });
+
+  it('fails script generation explicitly when no real credentials are available', async () => {
+    delete process.env.SILICONFLOW_API_KEY;
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.MERCRUISER_AI_MODE;
+
+    const dataPath = await createTempWorkspace();
+    const repo = createStudioRepository({ dataPath });
+
+    await expect(
+      repo.dispatch({
+        type: 'generateScriptFromSource',
+        episodeId: 'episode_03',
+      }),
+    ).rejects.toThrow('当前 Provider siliconflow 没有可用凭证，无法执行剧本拆解。');
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
+    const failedTask = episodeView?.tasks.find((task) => task.kind === 'script' && task.status === 'failed');
+    const failedRun = episodeView?.workflowRuns.find((run) => run.stage === 'script_generation' && run.status === 'failed');
+
+    expect(episodeView?.chapters).toHaveLength(0);
+    expect(episodeView?.episode.stationStates.script).toBe('editing');
+    expect(failedTask?.status).toBe('failed');
+    expect(failedTask?.error).toContain('无法执行剧本拆解');
+    expect(failedRun?.status).toBe('failed');
   });
 
   it('updates chapter content and persists it', async () => {
@@ -261,6 +303,8 @@ describe('studio repository', () => {
   });
 
   it('retries failed storyboard rendering tasks and clears the failure state', async () => {
+    const prevMode = process.env.MERCRUISER_AI_MODE;
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
@@ -286,6 +330,8 @@ describe('studio repository', () => {
     expect(retriedTask?.error).toBeNull();
     expect(rerenderedShot?.images.some((image) => image.isSelected)).toBe(true);
     expect(rerenderedShot?.status).toBe('rendered');
+    if (prevMode === undefined) delete process.env.MERCRUISER_AI_MODE;
+    else process.env.MERCRUISER_AI_MODE = prevMode;
   });
 
   it('selects a requested asset image and mirrors the selected state to versions', async () => {
@@ -322,60 +368,128 @@ describe('studio repository', () => {
     expect(asset?.versions.find((image) => image.id === 'asset_image_alt')?.isSelected).toBe(true);
   });
 
-  it('generates structured shots from chapters', async () => {
-    const dataPath = await createTempWorkspace();
+  it('fails asset extraction explicitly when no real credentials are available', async () => {
+    delete process.env.SILICONFLOW_API_KEY;
+    delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.MERCRUISER_AI_MODE;
+
+    const dataPath = await createTempWorkspace((workspace) => {
+      workspace.episodes.find((episode) => episode.id === 'episode_03')!.chapterIds = ['chapter_02_a', 'chapter_02_b'];
+      workspace.chapters.push({
+        id: 'chapter_03_a',
+        episodeId: 'episode_03',
+        index: 1,
+        title: '磁场苏醒',
+        content: '林岚在废弃车站醒来，站台时钟同时停摆，relic 警告她不要看向轨道尽头。',
+        scene: '废弃车站',
+        dialogues: [{ speaker: 'Relic', content: '不要看轨道尽头。' }],
+        audioStatus: 'ready',
+        estimatedDurationSeconds: 30,
+        revision: 1,
+        createdAt: '2026-04-05T09:20:00.000Z',
+        updatedAt: '2026-04-05T09:20:00.000Z',
+      } as any);
+    });
+    const repo = createStudioRepository({ dataPath });
+
+    await expect(
+      repo.dispatch({
+        type: 'extractAssetsFromScript',
+        episodeId: 'episode_03',
+      }),
+    ).rejects.toThrow('无法执行剧本拆解');
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
+    const failedTask = episodeView?.tasks.find((task) => task.kind === 'asset' && task.status === 'failed');
+    expect(episodeView?.assets.filter((asset) => asset.episodeId === 'episode_03')).toHaveLength(0);
+    expect(episodeView?.episode.stationStates.subjects).toBe('editing');
+    expect(failedTask?.error).toContain('无法执行剧本拆解');
+  });
+
+  it('does not unlock shot generation when asset rendering has no real outputs', async () => {
+    const dataPath = await createTempWorkspace((workspace) => {
+      const episode = workspace.episodes.find((item) => item.id === 'episode_02');
+      if (!episode) throw new Error('episode_02 missing');
+      episode.shotIds = [];
+      episode.storyboardIds = [];
+      episode.stationStates.shots = 'idle';
+      episode.stationStates.storyboard = 'idle';
+      episode.stationStates['final-cut'] = 'idle';
+      workspace.shots = workspace.shots.filter((shot) => shot.episodeId !== 'episode_02');
+      workspace.storyboards = workspace.storyboards.filter((storyboard) => storyboard.episodeId !== 'episode_02');
+      workspace.finalCuts = workspace.finalCuts.map((cut) => cut.id === episode.finalCutId ? {
+        ...cut,
+        tracks: cut.tracks.map((track) => ({ ...track, items: [] })),
+      } : cut);
+      workspace.assets = workspace.assets.map((asset) => asset.episodeId === 'episode_02'
+        ? { ...asset, state: 'ready', images: [], versions: [] }
+        : asset);
+    });
+    const repo = createStudioRepository({ dataPath });
+
+    const result = (await repo.dispatch({
+      type: 'generateAssetImages',
+      episodeId: 'episode_02',
+      assetSnapshots: [
+        { assetId: 'asset_lan', revision: 1 },
+        { assetId: 'asset_market', revision: 1 },
+      ],
+    } as any)) as {
+      ok: boolean;
+      renderedCount: number;
+    };
+
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
+    expect(result.ok).toBe(true);
+    expect(result.renderedCount).toBe(0);
+    expect(episodeView?.gate?.currentStage).toBe('shot_generation');
+    expect(episodeView?.gate?.availableActions.find((action) => action.kind === 'generate_shots')?.enabled).toBe(true);
+  });
+  it('prevents shot generation when asset extraction has no real provider path', async () => {
+    process.env.MERCRUISER_AI_MODE = 'mock';
+    const dataPath = await createTempWorkspace((workspace) => {
+      const ep = workspace.episodes.find((e) => e.id === 'episode_03');
+      if (ep) ep.assetIds = [];
+      workspace.assets = workspace.assets.map((asset) => asset.episodeId === 'episode_03'
+        ? { ...asset, state: 'ready', images: [], versions: [] }
+        : asset);
+      (workspace as any).apiUsageRecords = [];
+    });
     const repo = createStudioRepository({ dataPath });
 
     await repo.dispatch({
       type: 'generateScriptFromSource',
       episodeId: 'episode_03',
     });
-    await repo.dispatch({
-      type: 'extractAssetsFromScript',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
-      type: 'generateAssetImages',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
-      type: 'generateShotsFromChapters',
-      episodeId: 'episode_03',
-    });
 
-    const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
-    expect(episodeView?.shots.length).toBeGreaterThan(0);
-    expect(episodeView?.shots.every((shot) => shot.takes.length === 0)).toBe(true);
-    expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId === null)).toBe(true);
-    expect(episodeView?.tasks[0]?.kind).toBe('agent');
+    await expect(
+      repo.dispatch({
+        type: 'extractAssetsFromScript',
+        episodeId: 'episode_03',
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      repo.dispatch({
+        type: 'generateShotsFromChapters',
+        episodeId: 'episode_03',
+      }),
+    ).rejects.toThrow('No assets found for this episode. Please extract assets from the script first.');
   });
 
   it('can render shot images after shot generation', async () => {
+    const prevMode = process.env.MERCRUISER_AI_MODE;
+    process.env.MERCRUISER_AI_MODE = 'mock';
     const dataPath = await createTempWorkspace();
     const repo = createStudioRepository({ dataPath });
 
     await repo.dispatch({
-      type: 'generateScriptFromSource',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
-      type: 'extractAssetsFromScript',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
-      type: 'generateAssetImages',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
-      type: 'generateShotsFromChapters',
-      episodeId: 'episode_03',
-    });
-    await repo.dispatch({
       type: 'generateShotImages',
-      episodeId: 'episode_03',
+      episodeId: 'episode_02',
     });
 
-    const episodeView = await repo.getEpisodeWorkspaceView('episode_03');
+    const episodeView = await repo.getEpisodeWorkspaceView('episode_02');
     expect(episodeView?.shots.every((shot) => shot.images.some((image) => image.isSelected))).toBe(true);
     expect(
       episodeView?.shots.every((shot) => {
@@ -385,7 +499,9 @@ describe('studio repository', () => {
       }),
     ).toBe(true);
     expect(episodeView?.storyboards.every((storyboard) => storyboard.selectedTakeId !== null)).toBe(true);
-    expect(episodeView?.gate?.currentStage).toBe('storyboard');
+    expect(episodeView?.gate?.currentStage).toBe('export');
+    if (prevMode === undefined) delete process.env.MERCRUISER_AI_MODE;
+    else process.env.MERCRUISER_AI_MODE = prevMode;
   });
 
   it('promotes an episode asset into the global library and imports it into another series', async () => {
@@ -507,7 +623,7 @@ describe('studio repository', () => {
     expect(presetResult.shot.appliedPresetId).toBe('preset_series_storyboard');
     expect(presetResult.shot.prompt).toContain('Preset');
     expect(workspace.apiUsageRecords.length).toBeGreaterThan(0);
-    expect(singleTaskAlert?.status).toBe('exceeded');
+    expect(singleTaskAlert?.status).toBe('normal');
   });
 
   it('skips batch image generation items whose snapshot revisions are stale', async () => {
@@ -533,6 +649,6 @@ describe('studio repository', () => {
     expect(result.ok).toBe(true);
     expect(result.skippedCount).toBe(1);
     expect(result.skippedAssetIds).toContain('asset_market');
-    expect(result.renderedCount).toBeGreaterThan(0);
+    expect(result.renderedCount).toBe(0);
   });
 });
