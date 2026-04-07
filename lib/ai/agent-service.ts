@@ -16,35 +16,59 @@ export async function runFallbackAgent(input: {
   const toolCalls: Array<{ id: string; name: string; status: 'completed' | 'failed'; summary: string }> = [];
 
   if (episodeView && /(生成剧本|原文|script)/i.test(prompt)) {
-    const result = (await studioRepository.dispatch({
-      type: 'generateScriptFromSource',
-      episodeId: episodeView.episode.id,
-    })) as { chapterCount: number };
-    text = `ScriptAgent 已经根据当前原文为《${episodeView.episode.title}》生成 ${String(result.chapterCount)} 个章节。下一步建议进入主体工位，触发主体提取。`;
-    toolCalls.push({
-      id: generateId(),
-      name: 'generate_script_from_source',
-      status: 'completed',
-      summary: `generated ${String(result.chapterCount)} chapters`,
-    });
+    try {
+      const result = (await studioRepository.dispatch({
+        type: 'generateScriptFromSource',
+        episodeId: episodeView.episode.id,
+      })) as { chapterCount: number };
+      text = `ScriptAgent 已经根据当前原文为《${episodeView.episode.title}》生成 ${String(result.chapterCount)} 个章节。下一步建议进入主体工位，触发主体提取。`;
+      toolCalls.push({
+        id: generateId(),
+        name: 'generate_script_from_source',
+        status: 'completed',
+        summary: `generated ${String(result.chapterCount)} chapters`,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '剧本拆解失败';
+      text = `无法为《${episodeView.episode.title}》生成有效剧本：${message}`;
+      toolCalls.push({
+        id: generateId(),
+        name: 'generate_script_from_source',
+        status: 'failed',
+        summary: message,
+      });
+    }
   } else if (episodeView && /(提取主体|资产提取|asset)/i.test(prompt)) {
-    const result = (await studioRepository.dispatch({
-      type: 'extractAssetsFromScript',
-      episodeId: episodeView.episode.id,
-    })) as { assetCount: number };
-    text = `AssetAgent 已完成主体提取，当前集数共有 ${String(result.assetCount)} 个主体。建议接着批量生成资产图并选定主版本，解锁分镜工位。`;
-    toolCalls.push({
-      id: generateId(),
-      name: 'extract_assets_from_script',
-      status: 'completed',
-      summary: `extracted ${String(result.assetCount)} assets`,
-    });
+    try {
+      const result = (await studioRepository.dispatch({
+        type: 'extractAssetsFromScript',
+        episodeId: episodeView.episode.id,
+      })) as { assetCount: number };
+      text = `AssetAgent 已完成主体提取，当前集数共有 ${String(result.assetCount)} 个主体。建议接着批量生成资产图并选定主版本，解锁分镜工位。`;
+      toolCalls.push({
+        id: generateId(),
+        name: 'extract_assets_from_script',
+        status: 'completed',
+        summary: `extracted ${String(result.assetCount)} assets`,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '主体提取失败';
+      text = `无法为《${episodeView.episode.title}》提取有效主体：${message}`;
+      toolCalls.push({
+        id: generateId(),
+        name: 'extract_assets_from_script',
+        status: 'failed',
+        summary: message,
+      });
+    }
   } else if (episodeView && /(生成资产图|资产图片|render asset)/i.test(prompt)) {
     const result = (await studioRepository.dispatch({
       type: 'generateAssetImages',
       episodeId: episodeView.episode.id,
     })) as { renderedCount: number };
-    text = `我已经为《${episodeView.episode.title}》完成 ${String(result.renderedCount)} 个主体的主版本图片。现在分镜工位的门禁应该已经放开，可以生成分镜表。`;
+    text = result.renderedCount > 0
+      ? `我已经为《${episodeView.episode.title}》完成 ${String(result.renderedCount)} 个主体的主版本图片。现在可以继续推进分镜工位。`
+      : `《${episodeView.episode.title}》当前还没有真实生成的主体图片。系统已停止写入伪造主版本，请等待真实出图链路接通后再继续。`;
     toolCalls.push({
       id: generateId(),
       name: 'generate_asset_images',
