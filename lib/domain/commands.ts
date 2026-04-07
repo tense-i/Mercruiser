@@ -82,11 +82,17 @@ export const UpdateChapterCommandSchema = z.object({
   expectedRevision: ExpectedRevisionSchema,
 });
 
+const AiOverrideSchema = z.object({
+  aiMode: z.string().optional(),
+  aiModel: z.string().optional(),
+  aiApiKey: z.string().optional(),
+});
+
 export const GenerateScriptFromSourceCommandSchema = z.object({
   type: z.literal('generateScriptFromSource'),
   episodeId: z.string(),
   forceRegenerate: z.boolean().optional(),
-});
+}).merge(AiOverrideSchema);
 
 export const ImportSourceDocumentCommandSchema = z.object({
   type: z.literal('importSourceDocument'),
@@ -99,12 +105,16 @@ export const ImportSourceDocumentCommandSchema = z.object({
 export const ExtractAssetsFromScriptCommandSchema = z.object({
   type: z.literal('extractAssetsFromScript'),
   episodeId: z.string(),
-});
+}).merge(AiOverrideSchema);
 
 export const GenerateAssetImagesCommandSchema = z.object({
   type: z.literal('generateAssetImages'),
   episodeId: z.string(),
+  assetIds: z.array(z.string()).optional(),
   assetSnapshots: z.array(BatchSnapshotSchema).optional(),
+  skipExisting: z.boolean().optional(),
+  countPerAsset: z.number().int().positive().max(4).optional(),
+  imageModel: z.string().optional(),
 });
 
 export const UpdateAssetCommandSchema = z.object({
@@ -178,6 +188,10 @@ export const UpdateTimelineItemCommandSchema = z.object({
   expectedRevision: ExpectedRevisionSchema,
 });
 
+const ProviderApiKeyPayloadSchema = z.object({
+  apiKey: z.string().optional(),
+});
+
 export const UpdateSettingsCommandSchema = z.object({
   type: z.literal('updateSettings'),
   settings: z.object({
@@ -188,6 +202,13 @@ export const UpdateSettingsCommandSchema = z.object({
         systemPrompt: z.string().optional(),
         skillPrompt: z.string().optional(),
         memoryEnabled: z.boolean().optional(),
+      })
+      .optional(),
+    providers: z
+      .object({
+        siliconflow: ProviderApiKeyPayloadSchema.optional(),
+        google: ProviderApiKeyPayloadSchema.optional(),
+        gateway: ProviderApiKeyPayloadSchema.optional(),
       })
       .optional(),
     workspace: z
@@ -225,13 +246,17 @@ export const GenerateShotsCommandSchema = z.object({
   type: z.literal('generateShotsFromChapters'),
   episodeId: z.string(),
   assetSnapshots: z.array(BatchSnapshotSchema).optional(),
-});
+}).merge(AiOverrideSchema);
 
 export const GenerateShotImagesCommandSchema = z.object({
   type: z.literal('generateShotImages'),
   episodeId: z.string(),
+  shotIds: z.array(z.string()).optional(),
   shotSnapshots: z.array(BatchSnapshotSchema).optional(),
-});
+  skipExisting: z.boolean().optional(),
+  countPerShot: z.number().int().positive().max(4).optional(),
+  imageModel: z.string().optional(),
+}).merge(AiOverrideSchema);
 
 export const RetryTaskCommandSchema = z.object({
   type: z.literal('retryTask'),

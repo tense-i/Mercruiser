@@ -360,7 +360,7 @@ export const ShotSchema = z.object({
   scene: z.string(),
   associatedAssetIds: z.array(z.string()).default([]),
   associatedAssetNames: z.array(z.string()).default([]),
-  duration: z.number().int().positive().max(8).default(3),
+  duration: z.number().int().positive().max(60).default(3),
   shotSize: z.enum(['大远景', '远景', '全景', '中景', '近景', '特写', '大特写']).default('中景'),
   cameraMove: z.string().default('定镜'),
   action: z.string().default(''),
@@ -514,6 +514,22 @@ export const WorkflowRunSchema = z.object({
   updatedAt: z.string(),
 });
 
+export const ProviderApiKeyConfigSchema = z.object({
+  apiKey: z.string().default(''),
+});
+
+export const ProvidersConfigSchema = z
+  .object({
+    siliconflow: ProviderApiKeyConfigSchema.default({ apiKey: '' }),
+    google: ProviderApiKeyConfigSchema.default({ apiKey: '' }),
+    gateway: ProviderApiKeyConfigSchema.default({ apiKey: '' }),
+  })
+  .default({
+    siliconflow: { apiKey: '' },
+    google: { apiKey: '' },
+    gateway: { apiKey: '' },
+  });
+
 export const SettingsSchema = z.object({
   locale: z.string(),
   ai: z.object({
@@ -523,6 +539,7 @@ export const SettingsSchema = z.object({
     skillPrompt: z.string(),
     memoryEnabled: z.boolean(),
   }),
+  providers: ProvidersConfigSchema,
   workspace: z.object({
     aspectRatio: z.string(),
     creationMode: z.string(),
