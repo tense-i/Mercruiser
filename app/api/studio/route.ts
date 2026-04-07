@@ -1,8 +1,40 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
+import { randomUUID } from 'node:crypto';
 
-import { studioRepository, StudioCommandConflictError } from '@/lib/server/repository/studio-repository';
+import { studioRepository, StudioCommandConflictError, StudioPersistedCommandError } from '@/lib/server/repository/studio-repository';
 import { assertLocalMutationRequest } from '@/lib/server/request-guard';
+
+const ASYNC_COMMAND_TYPES = new Set([
+  'generateScriptFromSource',
+  'extractAssetsFromScript',
+  'generateShotsFromChapters',
+  'generateShotImages',
+  'generateAssetImages',
+]);
+
+type JobStatus = 'running' | 'done' | 'failed';
+
+interface JobEntry {
+  status: JobStatus;
+  commandType: string;
+  episodeId?: string;
+  seriesId?: string;
+  error?: string;
+  startedAt: string;
+  finishedAt?: string;
+}
+
+const jobRegistry = new Map<string, JobEntry>();
+
+function cleanupOldJobs() {
+  const cutoff = Date.now() - 30 * 60 * 1000;
+  for (const [id, job] of jobRegistry) {
+    if (job.status !== 'running' && new Date(job.startedAt).getTime() < cutoff) {
+      jobRegistry.delete(id);
+    }
+  }
+}
 
 function formatValidationError(error: ZodError) {
   return error.issues
@@ -18,9 +50,18 @@ function formatValidationError(error: ZodError) {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const jobId = searchParams.get('job');
   const episodeId = searchParams.get('episodeId');
   const seriesId = searchParams.get('seriesId');
   const view = searchParams.get('view');
+
+  if (jobId) {
+    const job = jobRegistry.get(jobId);
+    if (!job) {
+      return NextResponse.json({ ok: false, error: 'Job not found' }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, job });
+  }
 
   if (episodeId) {
     const episodeView = await studioRepository.getEpisodeWorkspaceView(episodeId);
@@ -57,8 +98,36 @@ export async function POST(request: Request) {
     return guard;
   }
 
+  let body: any;
+
   try {
-    const body = await request.json();
+    body = await request.json();
+    const commandType = body.command?.type as string | undefined;
+
+    if (body.async && commandType && ASYNC_COMMAND_TYPES.has(commandType)) {
+      cleanupOldJobs();
+      const jobId = randomUUID();
+      const job: JobEntry = {
+        status: 'running',
+        commandType,
+        episodeId: body.context?.episodeId,
+        seriesId: body.context?.seriesId,
+        startedAt: new Date().toISOString(),
+      };
+      jobRegistry.set(jobId, job);
+
+      studioRepository.dispatch(body.command).then(() => {
+        job.status = 'done';
+        job.finishedAt = new Date().toISOString();
+      }).catch((error: unknown) => {
+        job.status = 'failed';
+        job.finishedAt = new Date().toISOString();
+        job.error = error instanceof Error ? error.message : String(error);
+      });
+
+      return NextResponse.json({ ok: true, jobId, status: 'running' });
+    }
+
     const result = await studioRepository.dispatch(body.command);
     const response: Record<string, unknown> = { ok: true, result };
 
@@ -96,6 +165,20 @@ export async function POST(request: Request) {
 
     if (error instanceof ZodError) {
       return NextResponse.json({ ok: false, error: formatValidationError(error), issues: error.issues }, { status: 400 });
+    }
+
+    if (error instanceof StudioPersistedCommandError) {
+      const response: Record<string, unknown> = { ok: false, error: error.message };
+
+      if (body?.context?.episodeId) {
+        response.episodeView = await studioRepository.getEpisodeWorkspaceView(body.context.episodeId);
+      }
+
+      if (body?.context?.seriesId) {
+        response.seriesView = await studioRepository.getSeriesView(body.context.seriesId);
+      }
+
+      return NextResponse.json(response, { status: 400 });
     }
 
     if (error instanceof Error) {
