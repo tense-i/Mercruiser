@@ -1,0 +1,13 @@
+.git
+.github
+.next
+node_modules
+data
+*.md
+Toonflow-app
+.env*
+.omc
+.omx
+.claude
+.codex
+tsconfig.tsbuildinfo
