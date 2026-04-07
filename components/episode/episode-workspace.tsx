@@ -1400,51 +1400,205 @@ export function EpisodeWorkspace({ initialView }: { initialView: EpisodeWorkspac
           </div>
         ))}
 
-        {activeTab === 'final-cut' && (
-          <div className="flex h-full flex-col gap-6 rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8">
-            <div>
-              <h3 className="text-2xl font-bold text-zinc-100">成片工位尚未完成</h3>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">
-                当前版本还没有实现可用的成片装配与预览闭环。这里暂时只保留只读轨道信息，避免用伪播放器和伪时间线误导你继续操作。
-              </p>
-            </div>
+        {activeTab === 'final-cut' && (() => {
+          const fc = view.finalCut;
+          const videoTrack = fc?.tracks.find((t) => t.type === 'video');
+          const dialogueTrack = fc?.tracks.find((t) => t.type === 'dialogue');
+          const audioTrack = fc?.tracks.find((t) => t.type === 'audio');
+          const totalSeconds = videoTrack?.items.length
+            ? Math.max(...videoTrack.items.map((i) => i.endSeconds))
+            : 0;
+          const shotMap = Object.fromEntries(view.shots.map((s) => [s.id, s]));
+          const hasContent = (videoTrack?.items.length ?? 0) > 0;
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <InfoPill label="Resolution" value={view.finalCut?.resolution ?? '1080p'} />
-              <InfoPill label="FPS" value={String(view.finalCut?.fps ?? 24)} />
-              <InfoPill label="Tracks" value={String(view.finalCut?.tracks.length ?? 0)} />
-            </div>
+          return (
+            <div className="flex h-full flex-col gap-5 overflow-y-auto">
+              {/* ── header ── */}
+              <div className="flex shrink-0 items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-zinc-100">成片时间线</h3>
+                  {hasContent && (
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      共 {videoTrack!.items.length} 个镜头 · {totalSeconds}s
+                      {totalSeconds >= 60 ? ` (${(totalSeconds / 60).toFixed(1)} min)` : ''}
+                      &nbsp;· {fc?.resolution ?? '1080p'} / {fc?.fps ?? 24} fps
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {hasContent && (
+                    <span className={cn(
+                      'rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase',
+                      fc?.exportStatus === 'ready' ? 'bg-emerald-500/20 text-emerald-400' :
+                      fc?.exportStatus === 'review' ? 'bg-amber-500/20 text-amber-400' :
+                      'bg-zinc-700 text-zinc-400',
+                    )}>
+                      {fc?.exportStatus ?? 'draft'}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => void dispatch({ type: 'assembleTimeline', episodeId: view.episode.id })}
+                    className="rounded-xl border border-brand-600 bg-brand-600/20 px-4 py-1.5 text-sm font-bold text-brand-300 hover:bg-brand-600/30"
+                  >
+                    {hasContent ? '重新装配' : '装配时间线'}
+                  </button>
+                </div>
+              </div>
 
-            <div className="space-y-3">
-              {(view.finalCut?.tracks ?? []).map((track) => (
-                <div key={track.id} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm font-bold text-zinc-200">
-                      {track.type === 'video' ? <Video size={16} /> : track.type === 'dialogue' ? <Mic size={16} /> : <Volume2 size={16} />}
-                      <span>{track.name}</span>
+              {!hasContent ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-20 text-center">
+                  <Video size={36} className="text-zinc-700" />
+                  <p className="text-sm text-zinc-500">点击「装配时间线」从故事板自动生成成片轨道</p>
+                  <p className="text-xs text-zinc-600">需要先在故事板中完成分镜图片选定</p>
+                </div>
+              ) : (
+                <>
+                  {/* ── visual filmstrip timeline ── */}
+                  <div className="shrink-0 overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+                    <div className="mb-1 flex items-center gap-1 text-[10px] text-zinc-600">
+                      <Video size={10} /> <span>VIDEO</span>
                     </div>
-                    <span className="text-xs text-zinc-500">{track.items.length} item(s)</span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {track.items.length ? (
-                      track.items.map((item) => (
-                        <div key={item.id} className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-300">
-                          {item.label}
+                    <div className="flex h-16 gap-0.5">
+                      {videoTrack!.items.map((item) => {
+                        const shot = shotMap[item.shotId ?? ''];
+                        const take = shot?.takes.find((t) => t.id === item.takeId);
+                        const imgUrl = take?.url ?? shot?.images.find((i) => i.isSelected)?.imageUrl;
+                        const widthPct = ((item.endSeconds - item.startSeconds) / totalSeconds) * 100;
+                        return (
+                          <div
+                            key={item.id}
+                            className="relative shrink-0 overflow-hidden rounded border border-zinc-700"
+                            style={{ width: `${Math.max(widthPct, 2)}%`, minWidth: '40px' }}
+                            title={`${item.label} (${item.endSeconds - item.startSeconds}s)`}
+                          >
+                            {imgUrl ? (
+                              <img src={imgUrl} alt={item.label} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="h-full w-full bg-zinc-800" />
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5 font-mono text-[8px] text-white truncate">
+                              {item.endSeconds - item.startSeconds}s
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* dialogue bar */}
+                    {(dialogueTrack?.items.length ?? 0) > 0 && (
+                      <>
+                        <div className="mb-1 mt-2 flex items-center gap-1 text-[10px] text-zinc-600">
+                          <Mic size={10} /> <span>DIALOGUE</span>
                         </div>
-                      ))
-                    ) : (
-                      <div className="text-xs text-zinc-500">该轨道暂无内容。</div>
+                        <div className="flex h-5 gap-0.5">
+                          {videoTrack!.items.map((vitem) => {
+                            const ditem = dialogueTrack!.items.find((d) => d.shotId === vitem.shotId);
+                            const widthPct = ((vitem.endSeconds - vitem.startSeconds) / totalSeconds) * 100;
+                            return (
+                              <div
+                                key={vitem.id}
+                                className={cn(
+                                  'shrink-0 overflow-hidden rounded text-[8px] px-1 truncate leading-5',
+                                  ditem ? 'bg-blue-900/60 text-blue-300' : 'bg-zinc-900',
+                                )}
+                                style={{ width: `${Math.max(widthPct, 2)}%`, minWidth: '40px' }}
+                                title={ditem?.label}
+                              >
+                                {ditem?.label ?? ''}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+
+                    {/* sfx bar */}
+                    {(audioTrack?.items.length ?? 0) > 0 && (
+                      <>
+                        <div className="mb-1 mt-2 flex items-center gap-1 text-[10px] text-zinc-600">
+                          <Volume2 size={10} /> <span>AUDIO / SFX</span>
+                        </div>
+                        <div className="flex h-5 gap-0.5">
+                          {videoTrack!.items.map((vitem) => {
+                            const aitem = audioTrack!.items.find((a) => a.shotId === vitem.shotId);
+                            const widthPct = ((vitem.endSeconds - vitem.startSeconds) / totalSeconds) * 100;
+                            return (
+                              <div
+                                key={vitem.id}
+                                className={cn(
+                                  'shrink-0 overflow-hidden rounded text-[8px] px-1 truncate leading-5',
+                                  aitem ? 'bg-purple-900/60 text-purple-300' : 'bg-zinc-900',
+                                )}
+                                style={{ width: `${Math.max(widthPct, 2)}%`, minWidth: '40px' }}
+                                title={aitem?.label}
+                              >
+                                {aitem?.label ?? ''}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
 
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-              下一阶段需要先补齐“从故事板选定结果自动装配到成片时间线”的真实能力，再开放编辑与导出。
+                  {/* ── shot detail cards ── */}
+                  <div className="grid grid-cols-2 gap-3 pb-4 xl:grid-cols-3">
+                    {videoTrack!.items.map((item, idx) => {
+                      const shot = shotMap[item.shotId ?? ''];
+                      const take = shot?.takes.find((t) => t.id === item.takeId);
+                      const imgUrl = take?.url ?? shot?.images.find((i) => i.isSelected)?.imageUrl;
+                      const dItem = dialogueTrack?.items.find((d) => d.shotId === item.shotId);
+                      const aItem = audioTrack?.items.find((a) => a.shotId === item.shotId);
+                      return (
+                        <div key={item.id} className="rounded-xl border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+                          {/* thumbnail */}
+                          <div className="relative aspect-video w-full bg-zinc-800">
+                            {imgUrl ? (
+                              <img src={imgUrl} alt={item.label} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full items-center justify-center">
+                                <Video size={24} className="text-zinc-700" />
+                              </div>
+                            )}
+                            <div className="absolute left-2 top-2 flex items-center gap-1">
+                              <span className="rounded bg-black/70 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">
+                                #{idx + 1}
+                              </span>
+                              <span className="rounded bg-black/70 px-1.5 py-0.5 font-mono text-[9px] text-zinc-300">
+                                {item.endSeconds - item.startSeconds}s
+                              </span>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 px-2 pb-1 pt-3 text-[10px] font-bold text-white truncate">
+                              {item.label}
+                            </div>
+                          </div>
+                          {/* meta */}
+                          {(dItem || aItem) && (
+                            <div className="space-y-1.5 p-2.5">
+                              {dItem && (
+                                <div className="flex items-start gap-1.5">
+                                  <Mic size={10} className="mt-0.5 shrink-0 text-blue-400" />
+                                  <p className="text-[11px] leading-relaxed text-zinc-300 line-clamp-2">{dItem.label}</p>
+                                </div>
+                              )}
+                              {aItem && (
+                                <div className="flex items-start gap-1.5">
+                                  <Volume2 size={10} className="mt-0.5 shrink-0 text-purple-400" />
+                                  <p className="text-[11px] leading-relaxed text-zinc-500 line-clamp-1">{aItem.label}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* ── 导入原文 Dialog ── */}

@@ -178,6 +178,11 @@ export const ApplyGenerationPresetCommandSchema = z.object({
   targetId: z.string(),
 });
 
+export const AssembleTimelineCommandSchema = z.object({
+  type: z.literal('assembleTimeline'),
+  episodeId: z.string(),
+});
+
 export const UpdateTimelineItemCommandSchema = z.object({
   type: z.literal('updateTimelineItem'),
   finalCutId: z.string(),
@@ -283,6 +288,7 @@ export const StudioCommandSchema = z.discriminatedUnion('type', [
   UpdateShotCommandSchema,
   SelectTakeCommandSchema,
   ApplyGenerationPresetCommandSchema,
+  AssembleTimelineCommandSchema,
   UpdateTimelineItemCommandSchema,
   UpdateSettingsCommandSchema,
   GenerateShotsCommandSchema,

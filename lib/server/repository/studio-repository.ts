@@ -1769,6 +1769,82 @@ async function executeCommand(workspace: StudioWorkspace, command: StudioCommand
       syncEpisode(workspace, shot.episodeId);
       return { ok: true, shot, preset };
     }
+    case 'assembleTimeline': {
+      const episode = workspace.episodes.find((item) => item.id === command.episodeId);
+      if (!episode) throw new Error(`Episode ${command.episodeId} not found`);
+      const finalCut = workspace.finalCuts.find((item) => item.id === episode.finalCutId);
+      if (!finalCut) throw new Error(`FinalCut not found for episode ${command.episodeId}`);
+
+      const shots = workspace.shots
+        .filter((item) => item.episodeId === command.episodeId)
+        .sort((a, b) => a.index - b.index);
+
+      const storyboards = workspace.storyboards.filter((item) => item.episodeId === command.episodeId);
+
+      const videoTrack = finalCut.tracks.find((t) => t.type === 'video')!;
+      const dialogueTrack = finalCut.tracks.find((t) => t.type === 'dialogue')!;
+      const audioTrack = finalCut.tracks.find((t) => t.type === 'audio')!;
+
+      const videoItems: typeof videoTrack.items = [];
+      const dialogueItems: typeof dialogueTrack.items = [];
+      const audioItems: typeof audioTrack.items = [];
+
+      let cursor = 0;
+      for (const shot of shots) {
+        const dur = shot.durationSeconds ?? 4;
+        const start = cursor;
+        const end = cursor + dur;
+        const storyboard = storyboards.find((sb) => sb.shotId === shot.id);
+        const takeId = storyboard?.selectedTakeId ?? shot.takes.find((t) => t.isSelected)?.id ?? null;
+
+        videoItems.push({
+          id: id('titem'),
+          label: shot.title,
+          shotId: shot.id,
+          takeId,
+          startSeconds: start,
+          endSeconds: end,
+          locked: false,
+        });
+
+        if (shot.dialogue?.trim()) {
+          dialogueItems.push({
+            id: id('titem'),
+            label: shot.dialogue.trim(),
+            shotId: shot.id,
+            takeId: null,
+            startSeconds: start,
+            endSeconds: end,
+            locked: false,
+          });
+        }
+
+        if (shot.sfx?.trim()) {
+          audioItems.push({
+            id: id('titem'),
+            label: shot.sfx.trim(),
+            shotId: shot.id,
+            takeId: null,
+            startSeconds: start,
+            endSeconds: end,
+            locked: false,
+          });
+        }
+
+        cursor = end;
+      }
+
+      videoTrack.items = videoItems;
+      dialogueTrack.items = dialogueItems;
+      audioTrack.items = audioItems;
+
+      touchRevision(finalCut);
+      finalCut.exportStatus = 'review';
+      episode.stationStates['final-cut'] = 'ready';
+      syncEpisode(workspace, episode.id);
+
+      return { ok: true, totalSeconds: cursor, shotCount: shots.length };
+    }
     case 'updateTimelineItem': {
       const finalCut = workspace.finalCuts.find((item) => item.id === command.finalCutId);
       if (!finalCut) {
