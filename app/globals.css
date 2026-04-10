@@ -1,7 +1,4 @@
-@import "tailwindcss" source(none);
-@source "./app";
-@source "./components";
-@source "./lib";
+@import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
