@@ -29,6 +29,7 @@ const AssetBlueprintSchema = z.object({
   description: z.string().min(1),
   prompt: z.string().min(1),
   chapterIndexes: z.array(z.number().int().positive()).min(1).max(8),
+  consistencyAnchors: z.array(z.string()).default([]),
 });
 
 const AssetAnalysisSchema = z.object({
@@ -271,7 +272,7 @@ export async function generateShotsFromScript(input: {
     dialogues: Array<{ speaker: string; content: string }>;
     estimatedDurationSeconds: number;
   }>;
-  assets: Array<{ id: string; name: string; type: string; description: string; prompt: string }>;
+  assets: Array<{ id: string; name: string; type: string; description: string; prompt: string; consistencyAnchors?: string[] }>;
   aiOverride?: { mode?: string; model?: string; apiKey?: string };
 }) {
   const { workspace, seriesName, episodeTitle, chapters, assets, aiOverride } = input;
@@ -287,65 +288,37 @@ export async function generateShotsFromScript(input: {
     };
   }
 
+  const model = getStudioModel({ settingsMode: effectiveMode, settingsModel: effectiveModel, apiKey: effectiveApiKey });
+
+  const chapterText = chapters
+    .map((chapter) =>
+      [
+        `章节ID：${chapter.id}`,
+        `索引：${chapter.index}`,
+        `标题：${chapter.title}`,
+        `场景：${chapter.scene}`,
+        `预计时长：${chapter.estimatedDurationSeconds}秒`,
+        `正文：${chapter.content}`,
+        `对白：${chapter.dialogues.map((line) => `${line.speaker}: ${line.content}`).join('；') || '无'}`,
+      ].join('\n'),
+    )
+    .join('\n\n');
+
+  // Include consistencyAnchors so shot prompts can reference exact visual identifiers
+  const assetText = assets
+    .map((asset) => {
+      const anchors = asset.consistencyAnchors?.length ? `  [视觉锚点: ${asset.consistencyAnchors.join(' / ')}]` : '';
+      return `- ${asset.name}（${asset.type}）：${asset.description}${anchors}`;
+    })
+    .join('\n');
+
   try {
-    const chapterText = chapters
-      .map((chapter) =>
-        [
-          `章节ID：${chapter.id}`,
-          `索引：${chapter.index}`,
-          `标题：${chapter.title}`,
-          `场景：${chapter.scene}`,
-          `预计时长：${chapter.estimatedDurationSeconds}秒`,
-          `正文：${chapter.content}`,
-          `对白：${chapter.dialogues.map((line) => `${line.speaker}: ${line.content}`).join('；') || '无'}`,
-        ].join('\n'),
-      )
-      .join('\n\n');
-
-    const assetText = assets
-      .map((asset) => `- ${asset.name}（${asset.type}）：${asset.description}`)
-      .join('\n');
-
-    const prompt = [
-      '你是 Mercruiser Studio 的 ProductionAgent。',
-      '请根据下面的章节列表和已确认主体，为本集生成结构化分镜表，每章生成 1 条分镜。',
+    // Phase 1: Generate director plan first to establish visual/narrative constraints
+    const directorPlanPrompt = [
+      '你是 Mercruiser Studio 的 DirectorAgent。',
+      '请根据下面的章节大纲和主体列表，为本集制定导演规划。',
       '返回严格 JSON，不要输出任何解释。',
-      'JSON 结构：',
-      '{',
-      '  "directorPlan": {',
-      '    "theme": "...",',
-      '    "visualStyle": "...",',
-      '    "narrativeStructure": "...",',
-      '    "soundDirection": "...",',
-      '    "transitionStrategy": "..."',
-      '  },',
-      '  "shots": [{',
-      '    "chapterId": "<必须是输入中的章节ID>",',
-      '    "title": "...",',
-      '    "description": "...",',
-      '    "scene": "...",',
-      '    "shotSize": "中景",',
-      '    "cameraMove": "...",',
-      '    "action": "...",',
-      '    "emotion": "...",',
-      '    "composition": "...",',
-      '    "lighting": "...",',
-      '    "cameraMotion": "...",',
-      '    "prompt": "<英文，用于图像生成，具体可视化>",',
-      '    "videoDesc": "<中文，视频描述>",',
-      '    "dialogue": "...",',
-      '    "sfx": "...",',
-      '    "durationSeconds": 4,',
-      '    "referenceAssetNames": ["<来自主体列表的名称>"],',
-      '    "track": "<场景分组，如：夜市、地下通道>"',
-      '  }]',
-      '}',
-      '要求：',
-      '1. 每个章节生成恰好 1 条分镜，chapterId 必须完整匹配输入',
-      '2. prompt 必须英文，具体描述视觉元素、构图、光线',
-      '3. referenceAssetNames 只从已有主体中选取',
-      '4. durationSeconds 参考章节预计时长，取 3-30 秒',
-      '5. shotSize 从 [大远景,远景,全景,中景,近景,特写,大特写] 中选一个',
+      'JSON 结构：{"directorPlan":{"theme":"...","visualStyle":"...","narrativeStructure":"...","soundDirection":"...","transitionStrategy":"..."}}',
       '',
       `系列：${seriesName}`,
       `集数：${episodeTitle}`,
@@ -353,23 +326,61 @@ export async function generateShotsFromScript(input: {
       '已确认主体：',
       assetText,
       '',
+      '章节大纲：',
+      chapters.map((c) => `- [${c.id}] ${c.title}（${c.scene}）`).join('\n'),
+    ].join('\n');
+
+    const { text: directorText } = await generateText({
+      model,
+      prompt: directorPlanPrompt,
+      abortSignal: AbortSignal.timeout(2 * 60 * 1000),
+    });
+
+    const directorParsed = z
+      .object({ directorPlan: DirectorPlanBlueprintSchema })
+      .parse(parseFirstJsonBlock(directorText));
+    const directorPlan = directorParsed.directorPlan;
+
+    // Phase 2: Generate shots with directorPlan injected as hard constraints
+    const shotPrompt = [
+      '你是 Mercruiser Studio 的 ProductionAgent。',
+      '请根据下面的章节列表和已确认主体，为本集生成结构化分镜表，每章生成 1 条分镜。',
+      '返回严格 JSON，不要输出任何解释。',
+      'JSON 结构：{"shots":[{"chapterId":"...","title":"...","description":"...","scene":"...","shotSize":"中景","cameraMove":"...","action":"...","emotion":"...","composition":"...","lighting":"...","cameraMotion":"...","prompt":"<英文>","videoDesc":"<中文>","dialogue":"...","sfx":"...","durationSeconds":4,"referenceAssetNames":["..."],"track":"..."}]}',
+      '要求：',
+      '1. 每个章节生成恰好 1 条分镜，chapterId 必须完整匹配输入',
+      '2. prompt 必须英文，具体描述视觉元素、构图、光线；引用主体时须包含其视觉锚点特征',
+      '3. referenceAssetNames 只从已有主体中选取',
+      '4. durationSeconds 参考章节预计时长，取 3-30 秒',
+      '5. shotSize 从 [大远景,远景,全景,中景,近景,特写,大特写] 中选一个',
+      '',
+      '导演规划（必须遵守，贯穿所有镜头）：',
+      `- 主题：${directorPlan.theme}`,
+      `- 视觉风格：${directorPlan.visualStyle}`,
+      `- 叙事结构：${directorPlan.narrativeStructure}`,
+      `- 音效方向：${directorPlan.soundDirection}`,
+      `- 转场策略：${directorPlan.transitionStrategy}`,
+      '',
+      `系列：${seriesName}`,
+      `集数：${episodeTitle}`,
+      '',
+      '已确认主体（含视觉锚点）：',
+      assetText,
+      '',
       '章节列表：',
       chapterText,
     ].join('\n');
 
-    const { text } = await generateText({
-      model: getStudioModel({
-        settingsMode: effectiveMode,
-        settingsModel: effectiveModel,
-        apiKey: effectiveApiKey,
-      }),
-      prompt,
+    const { text: shotsText } = await generateText({
+      model,
+      prompt: shotPrompt,
       abortSignal: AbortSignal.timeout(5 * 60 * 1000),
     });
 
-    const parsed = ShotGenerationOutputSchema.parse(parseFirstJsonBlock(text));
+    const shotsParsed = z.object({ shots: z.array(ShotBlueprintSchema).min(1).max(32) }).parse(parseFirstJsonBlock(shotsText));
     return {
-      ...parsed,
+      directorPlan,
+      shots: shotsParsed.shots,
       mode: 'ai' as const,
     };
   } catch (error) {
@@ -417,7 +428,7 @@ export async function analyzeChaptersToAssets(input: {
       '请根据下面已经生成好的章节内容，提取本集后续分镜和主体设计真正需要的角色、场景、道具。',
       '禁止输出泛化占位主体、禁止编造与章节无关的对象。',
       '返回严格 JSON，不要输出任何解释。',
-      'JSON 结构：{"assets":[{"name":"...","type":"character|scene|prop","description":"...","prompt":"...","chapterIndexes":[1,2]}]}',
+      'JSON 结构：{"assets":[{"name":"...","type":"character|scene|prop","description":"...","prompt":"...","chapterIndexes":[1,2],"consistencyAnchors":["...","..."]}]}',
       '要求：',
       '1. 只保留对本集视觉生产有价值的主体',
       '2. name 必须来自当前章节语义，不能使用“角色1/场景1/道具1”之类占位词',
@@ -425,6 +436,7 @@ export async function analyzeChaptersToAssets(input: {
       '4. prompt 用英文，用于后续图像生成，要求具体、可视觉化',
       '5. chapterIndexes 必须对应输入章节索引',
       '6. 总数控制在 2-8 个，优先关键角色、核心场景、重要道具',
+      '7. consistencyAnchors 列出该主体最关键的 2-5 个视觉识别特征（如服装颜色、发型、体型、标志性道具），用简洁词组，如 ["红色连帽衫", "左手腕纹身"]；场景和道具同理列出关键视觉特征',
       '',
       `系列：${seriesName}`,
       `集数：${episodeTitle}`,

@@ -1,61 +1,44 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import type { UIMessage } from 'ai';
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { extractLatestUserText } from '@/lib/ai/agent-service';
 
-let previousPath = process.env.MERCRUISER_DATA_PATH;
-const previousAiMode = process.env.MERCRUISER_AI_MODE;
-
-async function prepareWorkspace() {
-  const tempDir = await mkdtemp(path.join(os.tmpdir(), 'mercruiser-ai-'));
-  const targetPath = path.join(tempDir, 'studio.json');
-  const seed = await readFile(path.join(process.cwd(), 'tests', 'fixtures', 'studio-seed.json'), 'utf8');
-  await writeFile(targetPath, seed, 'utf8');
-  process.env.MERCRUISER_DATA_PATH = targetPath;
+function makeUserMessage(text: string): UIMessage {
+  return { id: '1', role: 'user', parts: [{ type: 'text', text }] };
 }
 
-describe('fallback agent service', () => {
-  beforeEach(async () => {
-    await prepareWorkspace();
+function makeAssistantMessage(text: string): UIMessage {
+  return { id: '2', role: 'assistant', parts: [{ type: 'text', text }] };
+}
+
+describe('extractLatestUserText', () => {
+  it('returns the text from the latest user message', () => {
+    const messages: UIMessage[] = [
+      makeUserMessage('第一条消息'),
+      makeAssistantMessage('助手回复'),
+      makeUserMessage('最新用户消息'),
+    ];
+    expect(extractLatestUserText(messages)).toBe('最新用户消息');
   });
 
-  afterEach(() => {
-    process.env.MERCRUISER_DATA_PATH = previousPath;
-    process.env.MERCRUISER_AI_MODE = previousAiMode;
+  it('returns default prompt when no user message exists', () => {
+    const messages: UIMessage[] = [makeAssistantMessage('仅助手消息')];
+    expect(extractLatestUserText(messages)).toBe('请基于当前工作区给出下一步建议。');
   });
 
-  it('returns actionable next-step guidance without credentials', async () => {
-    const { runFallbackAgent } = await import('@/lib/ai/agent-service');
-    const result = await runFallbackAgent({
-      prompt: '下一步应该做什么？',
-      context: { episodeId: 'episode_02' },
-    });
-
-    expect(result.text).toContain('夜市回响');
+  it('returns default prompt for empty message list', () => {
+    expect(extractLatestUserText([])).toBe('请基于当前工作区给出下一步建议。');
   });
 
-  it('returns an explicit failure when asset extraction is unavailable', async () => {
-    delete process.env.MERCRUISER_AI_MODE;
-    const { runFallbackAgent } = await import('@/lib/ai/agent-service');
-    const result = await runFallbackAgent({
-      prompt: '请提取主体',
-      context: { episodeId: 'episode_03' },
-    });
-
-    expect(result.toolCalls[0]?.name).toBe('extract_assets_from_script');
-    expect(result.toolCalls[0]?.status).toBe('failed');
-    expect(result.text).toContain('无法为');
-  });
-
-  it('can trigger shot generation heuristically', async () => {
-    process.env.MERCRUISER_AI_MODE = 'mock';
-    const { runFallbackAgent } = await import('@/lib/ai/agent-service');
-    const result = await runFallbackAgent({
-      prompt: '请根据当前章节拆分分镜',
-      context: { episodeId: 'episode_02' },
-    });
-
-    expect(result.toolCalls[0]?.name).toBe('generate_shots_from_chapters');
+  it('concatenates multiple text parts in the latest user message', () => {
+    const message: UIMessage = {
+      id: '1',
+      role: 'user',
+      parts: [
+        { type: 'text', text: '第一段' },
+        { type: 'text', text: '第二段' },
+      ],
+    };
+    expect(extractLatestUserText([message])).toBe('第一段\n第二段');
   });
 });

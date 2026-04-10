@@ -1,9 +1,13 @@
-import { tool } from 'ai';
+import { tool, generateText, type LanguageModel } from 'ai';
 import { z } from 'zod';
 
 import { studioRepository } from '@/lib/server/repository/studio-repository';
 
-export function createStudioTools(context: { seriesId?: string; episodeId?: string }) {
+export function createStudioTools(
+  context: { seriesId?: string; episodeId?: string },
+  options: { getModel?: () => LanguageModel } = {},
+) {
+  const { getModel } = options;
   return {
     get_episode_workspace: tool({
       description: '读取当前单集工作区，包括阶段门禁、章节、主体、镜头、故事板与任务状态。',
@@ -198,6 +202,38 @@ export function createStudioTools(context: { seriesId?: string; episodeId?: stri
         }
 
         return { ok: true, tasks: [] };
+      },
+    }),
+    run_pipeline_analysis: tool({
+      description:
+        '运行专注于剧集生产管道的分析 SubAgent，深度评估当前进度瓶颈（门禁状态、失败任务、continuity 风险），给出优先行动建议。适合用户询问「下一步做什么」或「哪里卡住了」时调用。',
+      inputSchema: z.object({
+        episodeId: z.string(),
+        question: z.string().optional().describe('用户的具体问题，不填则默认分析整体优先行动'),
+      }),
+      execute: async ({ episodeId, question }) => {
+        if (!getModel) return { ok: false, message: 'Sub-agent model unavailable' };
+
+        const view = await studioRepository.getEpisodeWorkspaceView(episodeId);
+        if (!view) return { ok: false, message: `Episode ${episodeId} not found` };
+
+        const stateSnapshot = JSON.stringify({
+          episode: { id: view.episode.id, title: view.episode.title, currentStage: view.episode.currentStage, progress: view.episode.progress },
+          gate: view.gate,
+          chapters: view.chapters.length,
+          assets: { total: view.assets.length, withImages: view.assets.filter((a) => a.state === 'ready').length },
+          shots: { total: view.shots.length, continuityRisks: view.shots.filter((s) => s.continuityStatus !== 'clear').length },
+          pendingTasks: view.tasks.filter((t) => t.status !== 'completed').map((t) => ({ title: t.title, status: t.status, error: t.error })),
+        });
+
+        const result = await generateText({
+          model: getModel(),
+          system:
+            '你是专注于漫改/动画生产管道的分析 Agent。根据提供的剧集状态快照，分析当前生产瓶颈，给出具体、可操作的优先行动建议。只分析，不执行任何操作。用中文回答。',
+          prompt: `剧集状态快照：\n${stateSnapshot}\n\n${question ?? '分析当前最优先需要解决的问题，并给出具体行动顺序。'}`,
+        });
+
+        return { ok: true, analysis: result.text };
       },
     }),
   };
